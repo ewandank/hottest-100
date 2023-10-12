@@ -16,6 +16,7 @@ export const GET = async ({ url, cookies, fetch }) => {
     "spotify_auth_challenger_verifier"
   )
 
+  // this will freak out if the source and destination url arent teh same, even if its 127.0.0.1 and localhost 
   // check if state and code_verifier are the same as in cookies
   // if not, throw error
   if (state === null || state !== storedState) {
@@ -52,6 +53,6 @@ export const GET = async ({ url, cookies, fetch }) => {
   cookies.set("access_token", responseJSON.access_token, { path: "/" })
   cookies.set("refresh_token", responseJSON.refresh_token, { path: "/" })
 
-  // redirect to home page
+  // redirect page
   throw redirect(303, "/")
 }

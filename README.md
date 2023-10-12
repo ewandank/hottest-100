@@ -1,3 +1,9 @@
+
+Loosely inspired by this tiktok, https://www.tiktok.com/@billy.darcy/video/7236606164501400834, 
+https://www.facebook.com/watch/?v=2815707782030505
+I wanted to build a site that would emulate the countdown, but didn't want to have to manually keep track of the numbers. 
+The spotify shuffle is also well documented to be biased by design, and as such wanted a way to apply a more realistic shuffle before going. 
+
 # create-svelte
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
