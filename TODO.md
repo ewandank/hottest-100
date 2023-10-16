@@ -8,3 +8,4 @@
 * add starting numbers
 * Refactor the token fetch refresh
 * improve redundancy for internet loss /page refresh
+* Implement infinite scrolling rather then pagination

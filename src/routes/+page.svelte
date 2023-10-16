@@ -9,7 +9,6 @@
     import { onDestroy, onMount } from "svelte";
     import { playTrack, getTracks } from "$lib/spotify/helper.js";
     import { goto } from "$app/navigation";
-    import { fly } from "svelte/transition";
     import Track from "$lib/components/Track.svelte";
     let played = [];
     export let data;
@@ -52,16 +51,9 @@
             iterator--;
         }
     }
+    const debouncedHandlePlayerStateChange = debounce(handlePlayerStateChange, 700);
 
-    // const debouncedHandlePlayerStateChange = debounce(
-    //     handlePlayerStateChange,
-    //     50
-    // );
-    // TODO: more comments on this.
-    // maybe should remove duplicates as part of the ingestion proccess.
-    const debouncedHandlePlayerStateChange = handlePlayerStateChange;
-
-    function handlePlayerStateChange(state) {
+    async function handlePlayerStateChange(state) {
         console.log(state);
         if (
             prevState &&
@@ -74,7 +66,7 @@
             console.log("Track ended");
             console.log("Next counter fired!");
             played.push(state.track_window.current_track.id);
-            counter();
+            await counter();
         }
         prevState = state;
     }
