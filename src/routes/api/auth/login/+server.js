@@ -1,10 +1,12 @@
 import { redirect } from "@sveltejs/kit"
-import pkce from "pkce-gen"
 import { BASE_URL, SPOTIFY_APP_CLIENT_ID } from "$env/static/private"
 
+//TODO: I should check this is all i need and if i can remove any of these
 const scope =
   "playlist-read-private user-modify-playback-state streaming user-read-email user-read-private"
 
+
+// used to generate a state 
 const generateRandomString = length => {
   let result = ""
 
@@ -20,13 +22,11 @@ const generateRandomString = length => {
 }
 
 const state = generateRandomString(16)
-const challenge = pkce.create()
 
-export const GET = ({ cookies }) => {
-  /* set state and code_verifier in cookies so we can use them in callback */
-  cookies.set("spotify_auth_state", state)
-  cookies.set("spotify_auth_challenger_verifier", challenge.code_verifier)
-
+export const GET = async({ url, cookies, fetch }) => {
+  console.log("hey")
+  await cookies.set("spotify_auth_state", state, {path: '/'})
+  console.log(cookies.get("spotify_auth_state"))
   throw redirect(
     307,
     `https://accounts.spotify.com/authorize?${new URLSearchParams({
@@ -35,8 +35,6 @@ export const GET = ({ cookies }) => {
       scope,
       redirect_uri: `${BASE_URL}/api/auth/callback`,
       state,
-      code_challenge_method: "S256",
-      code_challenge: challenge.code_challenge
     })}`
   )
 }

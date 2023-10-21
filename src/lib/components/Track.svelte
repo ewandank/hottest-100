@@ -15,14 +15,15 @@
             })
             .join("");
     }
+    import { fade } from "svelte/transition";
 </script>
 
-<div class="container">
+<div class="container" transition:fade>
+    <div class="number-wrapper">
+        <p class="number">{hottest_100_number}</p>
+    </div>
     <div class="img-container">
         <img src={album.images[1].url} alt="Album Artwork for {album.name}" />
-    </div>
-    <div class="number-wrapper">
-        <h2>{hottest_100_number}</h2>
     </div>
     <div class="details-container">
         <p class="name">{name}</p>
@@ -33,35 +34,36 @@
 
 <style>
     p {
-        font-size: small;
+        font-size: var(--font-size-6);
     }
-    .name{
+    .name {
         font-weight: bold;
     }
-    .number-wrapper {
-        text-align: center;
-        width: 80px;
-        margin: auto 0px;
+    .number {
+        margin-top: 0px;
+        font-weight: bold;
+        font-size: var(--font-size-8);
+        margin-right: 10px;
     }
-    .img-container{
-        margin: auto 10px;
+    .number-wrapper {
+        width:120px;
+        margin-top:8px;
     }
     .container {
-        background-color: rgb(196, 196, 196);
+        border-bottom: 3px solid white;
         display: flex;
         width: 100%;
-        height: 120px;
-        border: 1px solid rgb(167, 167, 167);
-        border-radius: 8px;
+        padding: 10px;
     }
     img {
-        height: 100px;
-        width: 100px;
+        height: 150px;
+        width: 150px;
     }
-    * {
-        font-family: Verdana, Geneva, Tahoma, sans-serif;
+    .img-container{
+        margin-top:10px;
     }
-    .details-container {
-        margin:auto 0px;
+    .details-container{
+        margin-top: 10px;
+        margin-left: 15px
     }
 </style>

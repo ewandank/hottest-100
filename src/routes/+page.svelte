@@ -8,12 +8,16 @@
     } from "$lib/utils.js";
     import { onDestroy, onMount } from "svelte";
     import { playTrack, getTracks } from "$lib/spotify/helper.js";
-    import { goto } from "$app/navigation";
     import Track from "$lib/components/Track.svelte";
+    import LoginButton from "$c/LoginButton.svelte";
+    import PlaylistSelector from "$c/PlaylistSelector.svelte";
     let played = [];
     export let data;
     let accessToken = data.accessToken;
+    let expiresIn = data.expiresIn;
+    let refreshToken = data.refreshToken;
     let selectedPlaylist;
+    let loggedIn = accessToken && expiresIn && refreshToken;
     let results = [];
     let currentItems = 10;
     let trackItems = [];
@@ -29,6 +33,17 @@
         // TODO: Implement Starting Number
         iterator = trackItems.length < 100 ? trackItems.length : 100;
         counter();
+    }
+    $: if (expiresIn) {
+        setInterval(refreshAccessToken, (expiresIn - 60) * 1000);
+    }
+
+    async function refreshAccessToken(fetch) {
+        console.log("tokenRefresh called");
+        const res = await fetch("/api/auth/refresh");
+        const resJSON = await res.json();
+        expiresIn = resJSON.expires_in;
+        accessToken = resJSON.access_token;
     }
 
     async function counter() {
@@ -51,10 +66,12 @@
             iterator--;
         }
     }
-    const debouncedHandlePlayerStateChange = debounce(handlePlayerStateChange, 700);
+    const debouncedHandlePlayerStateChange = debounce(
+        handlePlayerStateChange,
+        700
+    );
 
     async function handlePlayerStateChange(state) {
-        console.log(state);
         if (
             prevState &&
             state.track_window.previous_tracks.find(
@@ -63,8 +80,6 @@
             !prevState.paused &&
             state.paused
         ) {
-            console.log("Track ended");
-            console.log("Next counter fired!");
             played.push(state.track_window.current_track.id);
             await counter();
         }
@@ -92,10 +107,6 @@
                         cb(accessToken);
                     } else if (response.status === 401) {
                         // Token has expired or is invalid, refresh it
-                        const refreshedToken = await fetch(
-                            "/api/auth/refresh"
-                        ).then((response) => response.json());
-                        cb(refreshedToken.access_token);
                     } else {
                         // Handle other response status codes as needed
                         console.error(
@@ -107,8 +118,8 @@
                     console.error("Error fetching token:", error);
                 }
             },
-            name: "Hottest 100 player",
-            volume: "0.5",
+            name: "Hottest 100 Player",
+            enableMediaSession: true,
         });
         player.addListener("ready", ({ device_id }) => {
             deviceId = device_id;
@@ -123,12 +134,9 @@
             "player_state_changed",
             debouncedHandlePlayerStateChange
         );
-        // player.addListener(
-        //     "initialization_error",
-        //     (error: WebPlaybackError) => {
-        //         handlePlayerError("initialization_error", error.message);
-        //     }
-        // );
+        player.addListener("initialization_error", (error) => {
+            console.log(error);
+        });
         player.addListener("authentication_error", async (error) => {
             let res = await fetch("/api/auth/refresh");
             let ResponseData = await res.json();
@@ -137,7 +145,7 @@
         // player.addListener("playback_error", (error: WebPlaybackError) => {
         //     handlePlayerError("playback_error", error.message);
         // });
-        // // Add player to Spotify Connect
+
         player.connect();
     };
 
@@ -155,57 +163,56 @@
     onDestroy(() => {
         if (player) player.disconnect();
     });
+    let preloadImageUrls;
+    let imageUrls;
+    // preload the image while the number is playing
+    $: if (trackItems.length !== 0) {
+        imageUrls = trackItems.map((item) => item.track.album.images[1].url);
+        preloadImageUrls = imageUrls.slice(0, iterator);
+    }
+    $: if (imageUrls !== undefined) {
+        preloadImageUrls = imageUrls.slice(iterator - 1, iterator);
+    }
 </script>
 
-<!-- need a better way to check if the user token is valid as data.accessToken can exist but not be valid-->
-{#if accessToken !== undefined}
-    <!-- logged in -->
+<svelte:head>
+    {#if preloadImageUrls !== undefined}
+        {#each preloadImageUrls as image}
+            <link rel="preload" as="image" href={image} />
+        {/each}
+    {/if}
+</svelte:head>
+
+{#if loggedIn}
     {#if trackItems.length === 0}
-        <select bind:value={selectedPlaylist}>
-            <option selected disabled value={undefined}
-                >Please select a playlist to shuffle...</option
-            >
-            {#each userPlaylists as playlist (playlist)}
-                <option value={playlist.id}>{playlist.name}</option>
-            {/each}
-        </select>
-        <button
-            disabled={selectedPlaylist === undefined}
-            on:click|once={startCountDown(selectedPlaylist)}>SEND ITTTT</button
-        >
+        <PlaylistSelector {startCountDown} playlists={userPlaylists} />
     {:else}
         <div class="track-wrapper">
-            {#each results.slice(0, currentItems) as data (data.hottest_100_number)}
+            {#each results as data (data.hottest_100_number)}
                 <div>
                     <Track {...data} />
                 </div>
             {/each}
         </div>
-        {#if currentItems < results.length}
-            <button
-                on:click={() => (currentItems = currentItems + 5)}
-                id="loadmore"
-                type="button"
-            >
-                Show more
-            </button>
-        {/if}
     {/if}
 {:else}
     <!-- need to login -->
-    <button on:click={() => goto("/api/auth/login")}>Login to spotify</button>
+    <LoginButton />
 {/if}
 
 <style>
     .track-wrapper {
-        width: 100%;
+        height: 100vh;
+        width: 100vw;
         align-items: center;
-        gap: 1rem;
-        display: grid;
+        gap: 0rem;
+        display: flex;
+        flex-direction: column;
+        background-image: var(--gradient-0);
     }
     .track-wrapper > * {
-        width: 30%;
-        min-width: 500px;
+        width: 50%;
         margin: 0 auto;
+        min-width: 400px;
     }
 </style>

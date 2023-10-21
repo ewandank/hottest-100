@@ -79,7 +79,10 @@ export async function getPlaylists(fetch, access_token) {
 
         if (response.status == 401) {
             let res = await fetch('/api/auth/refresh');
-            let data = res.json();
+            let data = await res.json();
+            if(accessToken == undefined){
+                break;
+            }
             accessToken = data.access_token;
             continue; // Retry the same URL after token refresh
         }
