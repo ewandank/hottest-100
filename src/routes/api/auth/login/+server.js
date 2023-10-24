@@ -24,9 +24,7 @@ const generateRandomString = length => {
 const state = generateRandomString(16)
 
 export const GET = async({ url, cookies, fetch }) => {
-  console.log("hey")
   await cookies.set("spotify_auth_state", state, {path: '/'})
-  console.log(cookies.get("spotify_auth_state"))
   throw redirect(
     307,
     `https://accounts.spotify.com/authorize?${new URLSearchParams({

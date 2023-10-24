@@ -38,5 +38,5 @@ export const GET = async ({ cookies, fetch }) => {
   cookies.set("access_token", responseJSON.access_token, { path: "/" })
   cookies.set("refresh_token", responseJSON.refresh_token, { path: "/" })
   cookies.set("expires_in", responseJSON.expires_in, {path: "/"})
-  return responseJSON
+  return response;
 }

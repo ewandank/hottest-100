@@ -1,5 +1,5 @@
 import adapter from '@sveltejs/adapter-node';
-
+export const ssr = false;
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {

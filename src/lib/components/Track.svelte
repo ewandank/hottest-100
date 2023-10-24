@@ -1,8 +1,10 @@
 <script>
+    import { fade } from "svelte/transition";
     export let name;
     export let artists;
     export let album;
     export let hottest_100_number;
+    export let playing;
     let artistsList = "";
     $: {
         artistsList = artists
@@ -15,12 +17,14 @@
             })
             .join("");
     }
-    import { fade } from "svelte/transition";
 </script>
 
 <div class="container" transition:fade>
     <div class="number-wrapper">
         <p class="number">{hottest_100_number}</p>
+        {#if playing}
+            <p>Playing now!</p>
+        {/if}
     </div>
     <div class="img-container">
         <img src={album.images[1].url} alt="Album Artwork for {album.name}" />
@@ -43,11 +47,11 @@
         margin-top: 0px;
         font-weight: bold;
         font-size: var(--font-size-8);
-        margin-right: 10px;
     }
     .number-wrapper {
-        width:120px;
-        margin-top:8px;
+        margin-right: 10px;
+        width: 120px;
+        margin-top: 8px;
     }
     .container {
         border-bottom: 3px solid white;
@@ -59,11 +63,11 @@
         height: 150px;
         width: 150px;
     }
-    .img-container{
-        margin-top:10px;
-    }
-    .details-container{
+    .img-container {
         margin-top: 10px;
-        margin-left: 15px
+    }
+    .details-container {
+        margin-top: 10px;
+        margin-left: 15px;
     }
 </style>

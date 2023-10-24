@@ -41,7 +41,7 @@
         justify-content: center;
         align-items: center;
         height: 100vh;
-        background-image: var(--gradient-0); /* Dark background color */
+        background: var(--gradient-0); /* Dark background color */
     }
     .content-wrapper {
         width: 45%;

@@ -7,7 +7,11 @@
         playNumber,
     } from "$lib/utils.js";
     import { onDestroy, onMount } from "svelte";
-    import { playTrack, getTracks } from "$lib/spotify/helper.js";
+    import {
+        playTrack,
+        getTracks,
+        setRepeatMode,
+    } from "$lib/spotify/helper.js";
     import Track from "$lib/components/Track.svelte";
     import LoginButton from "$c/LoginButton.svelte";
     import PlaylistSelector from "$c/PlaylistSelector.svelte";
@@ -34,22 +38,26 @@
         iterator = trackItems.length < 100 ? trackItems.length : 100;
         counter();
     }
-    $: if (expiresIn) {
-        setInterval(refreshAccessToken, (expiresIn - 60) * 1000);
-    }
+    //TODO: FIX THIS 
+    // $: if (expiresIn) {
+    //     setInterval(refreshAccessToken, (expiresIn - 60) * 1000);
+    // }
 
-    async function refreshAccessToken(fetch) {
-        console.log("tokenRefresh called");
-        const res = await fetch("/api/auth/refresh");
-        const resJSON = await res.json();
-        expiresIn = resJSON.expires_in;
-        accessToken = resJSON.access_token;
-    }
+    // async function refreshAccessToken() {
+    //     console.log("tokenRefresh called");
+    //     const res = await fetch("/api/auth/refresh");
+    //     const resJSON = await res.json();
+    //     expiresIn = resJSON.expires_in;
+    //     accessToken = resJSON.access_token;
+    // }
 
     async function counter() {
         if (iterator > 0) {
             const audioSrc = `/numbers/${iterator}.mp3`;
             try {
+                if (results.length > 0) {
+                    results[0].playing = false;
+                }
                 await playNumber(audioSrc);
                 currentTrack = trackItems[iterator - 1].track;
                 playTrack(currentTrack, fetch, accessToken);
@@ -58,7 +66,6 @@
                     playing: true,
                     hottest_100_number: iterator,
                 };
-                // TODO: updating playing state of results[0]
                 results = [currentData, ...results];
             } catch (error) {
                 console.error(`Error playing audio: ${error}`);
@@ -70,20 +77,17 @@
         handlePlayerStateChange,
         700
     );
-
+    // const debouncedHandlePlayerStateChange = handlePlayerStateChange;
     async function handlePlayerStateChange(state) {
         if (
-            prevState &&
             state.track_window.previous_tracks.find(
-                (x) => x.id === state.track_window.current_track.id
+                (x) => x.uid === state.track_window.current_track.uid
             ) &&
-            !prevState.paused &&
             state.paused
         ) {
             played.push(state.track_window.current_track.id);
             await counter();
         }
-        prevState = state;
     }
 
     const initializePlayer = () => {
@@ -124,6 +128,7 @@
         player.addListener("ready", ({ device_id }) => {
             deviceId = device_id;
             setDevice(accessToken, deviceId, false);
+            setRepeatMode(accessToken, "off", deviceId);
         });
 
         player.addListener("not_ready", ({ device_id }) => {
@@ -163,25 +168,7 @@
     onDestroy(() => {
         if (player) player.disconnect();
     });
-    let preloadImageUrls;
-    let imageUrls;
-    // preload the image while the number is playing
-    $: if (trackItems.length !== 0) {
-        imageUrls = trackItems.map((item) => item.track.album.images[1].url);
-        preloadImageUrls = imageUrls.slice(0, iterator);
-    }
-    $: if (imageUrls !== undefined) {
-        preloadImageUrls = imageUrls.slice(iterator - 1, iterator);
-    }
 </script>
-
-<svelte:head>
-    {#if preloadImageUrls !== undefined}
-        {#each preloadImageUrls as image}
-            <link rel="preload" as="image" href={image} />
-        {/each}
-    {/if}
-</svelte:head>
 
 {#if loggedIn}
     {#if trackItems.length === 0}
@@ -202,17 +189,14 @@
 
 <style>
     .track-wrapper {
-        height: 100vh;
-        width: 100vw;
         align-items: center;
         gap: 0rem;
         display: flex;
         flex-direction: column;
-        background-image: var(--gradient-0);
     }
     .track-wrapper > * {
         width: 50%;
-        margin: 0 auto;
-        min-width: 400px;
+        min-width: 500px;
+        /* margin: 0 auto; */
     }
 </style>

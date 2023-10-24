@@ -15,28 +15,10 @@
 html, body {
     min-height: 100%;
     width: 100%;
+    color: var(--gray-0)
 }
-
-:root:has(body:not(.dark)) {
-    --background: var(--surface-4);
-    --color: var(--dark-1);
-    --border: var(--accent-6);
-    --primary: var(--primary-5);
-    --accent: var(--accent-5);
-    --muted: var(--primary-7);
-}
-
-:root:has(body.dark) {
-    --background: var(--surface-0);
-    --color: var(--surface-3);
-    --border: var(--accent-6);
-    --primary: var(--primary-5);
-    --accent: var(--accent-5);
-    --muted: var(--primary-7);
-}
-
-html, body {
-    background: var(--surface-3);
+html {
+    background: var(--gradient-0);
     color: var(--color);
 
 }

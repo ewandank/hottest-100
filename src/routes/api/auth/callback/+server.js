@@ -9,7 +9,6 @@ export const GET = async ({ url, cookies, fetch }) => {
   // get code and state from url
   const code = url.searchParams.get("code")
   const state = url.searchParams.get("state")
-  // console.log(state)
   // get state and code_verifier from cookies
   const storedState =  await cookies.get("spotify_auth_state", {path: '/'})
   // this will freak out if the source and destination url arent teh same, even if its 127.0.0.1 and localhost 
@@ -36,7 +35,6 @@ export const GET = async ({ url, cookies, fetch }) => {
   })
 
   const responseJSON = await response.json()
-  console.log(responseJSON)
   if (responseJSON.error) {
     throw error(400, responseJSON.error_description)
   }

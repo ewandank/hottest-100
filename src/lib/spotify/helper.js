@@ -71,7 +71,7 @@ export async function getPlaylists(fetch, access_token) {
     let accessToken = access_token;
 
     while (nextUrl) {
-        const response = await fetch(nextUrl, {
+        let response = await fetch(nextUrl, {
             headers: {
                 Authorization: `Bearer ${accessToken}`
             }
@@ -80,20 +80,32 @@ export async function getPlaylists(fetch, access_token) {
         if (response.status == 401) {
             let res = await fetch('/api/auth/refresh');
             let data = await res.json();
-            if(accessToken == undefined){
-                break;
+            if (accessToken == undefined) {
+                return null;
+            }
+            if(!res.ok){
+                return null;
             }
             accessToken = data.access_token;
             continue; // Retry the same URL after token refresh
         }
 
-        const userPlaylists = await response.json();
-        const items = userPlaylists.items;
+        let userPlaylists = await response.json();
+        let items = userPlaylists.items;
         allPlaylists = allPlaylists.concat(items);
         nextUrl = userPlaylists.next;
     }
 
     return allPlaylists;
+}
+// will turn off repeat as this breaks the logic to get when the track is ended
+export async function setRepeatMode(accessToken, state, deviceId) {
+    const response = await fetch(`https://api.spotify.com/v1/me/player/repeat?state=${state}&device_id=${deviceId}`, {
+        method: "PUT",
+        headers: {
+            Authorization: "Bearer " + accessToken,
+        },
+    })
 }
 
 function shuffleArray(array) {
