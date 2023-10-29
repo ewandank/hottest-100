@@ -40,8 +40,8 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        background: var(--gradient-0); /* Dark background color */
+        height: 100%;
+        width:100%
     }
     .content-wrapper {
         width: 45%;

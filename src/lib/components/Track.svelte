@@ -22,9 +22,10 @@
 <div class="container" transition:fade>
     <div class="number-wrapper">
         <p class="number">{hottest_100_number}</p>
-        {#if playing}
+        <!-- could put a gif here, but think it will look tacky -->
+        <!-- {#if playing}
             <p>Playing now!</p>
-        {/if}
+        {/if} -->
     </div>
     <div class="img-container">
         <img src={album.images[1].url} alt="Album Artwork for {album.name}" />

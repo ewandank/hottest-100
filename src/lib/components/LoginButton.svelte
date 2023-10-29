@@ -3,7 +3,7 @@
 </script>
 
 <div class="button-wrapper">
-    <button on:click={() => goto("/api/auth/login")}>Login with Spotify</button>
+    <button on:click>Login with Spotify</button>
 </div>
 
 <style>

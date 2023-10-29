@@ -1,38 +1,20 @@
 import { browser } from '$app/environment';
 import { error } from '@sveltejs/kit';
-//This needs a pretty big refactor. /api/refresh returns the new token, so don't need to pass the cookies in 
-export async function playTrack(track, fetch, access_token) {
+import { shuffleArray } from '../utils';
+export async function playTrack(track, access_token) {
     const uris = [track.uri];
-    let accessToken = access_token;
     let response = await fetch("https://api.spotify.com/v1/me/player/play", {
         method: "PUT",
         headers: {
-            Authorization: "Bearer " + accessToken,
+            Authorization: "Bearer " + access_token,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
             uris: uris,
         }),
     });
-    if (response.status == 401) {
-        let res = await fetch('api/auth/refresh')
-        let data = await res.json()
-        accessToken = data.access_token
-
-        //probably not fantastic to only refresh once but anywho
-        response = await fetch("https://api.spotify.com/v1/me/player/play", {
-            method: "PUT",
-            headers: {
-                Authorization: "Bearer " + accessToken,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                uris: uris,
-            }),
-        });
-    }
 }
-export async function getTracks(playlistId, fetch, access_token) {
+export async function getTracks(playlistId, access_token) {
     const limit = 100; // Number of tracks to fetch per request
     let allTracks = [];
     let accessToken = access_token;
@@ -65,42 +47,26 @@ export async function getTracks(playlistId, fetch, access_token) {
     return allTracks;
 }
 
-export async function getPlaylists(fetch, access_token) {
+export async function getPlaylists(access_token) {
     let nextUrl = 'https://api.spotify.com/v1/me/playlists';
     let allPlaylists = [];
-    let accessToken = access_token;
 
     while (nextUrl) {
         let response = await fetch(nextUrl, {
             headers: {
-                Authorization: `Bearer ${accessToken}`
+                Authorization: `Bearer ${access_token}`
             }
         });
-
-        if (response.status == 401) {
-            let res = await fetch('/api/auth/refresh');
-            let data = await res.json();
-            if (accessToken == undefined) {
-                return null;
-            }
-            if(!res.ok){
-                return null;
-            }
-            accessToken = data.access_token;
-            continue; // Retry the same URL after token refresh
-        }
-
         let userPlaylists = await response.json();
         let items = userPlaylists.items;
         allPlaylists = allPlaylists.concat(items);
         nextUrl = userPlaylists.next;
     }
-
     return allPlaylists;
 }
 // will turn off repeat as this breaks the logic to get when the track is ended
-export async function setRepeatMode(accessToken, state, deviceId) {
-    const response = await fetch(`https://api.spotify.com/v1/me/player/repeat?state=${state}&device_id=${deviceId}`, {
+export async function setRepeatMode(accessToken, state) {
+    const response = await fetch(`https://api.spotify.com/v1/me/player/repeat?state=${state}`, {
         method: "PUT",
         headers: {
             Authorization: "Bearer " + accessToken,
@@ -108,11 +74,6 @@ export async function setRepeatMode(accessToken, state, deviceId) {
     })
 }
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
+
 
 

@@ -1,43 +1,4 @@
-export function loadSpotifyPlayer() {
-  return new Promise((resolve, reject) => {
-    const scriptTag = document.getElementById("spotify-player")
 
-    if (!scriptTag) {
-      const script = document.createElement("script")
-
-      script.id = "spotify-player"
-      script.type = "text/javascript"
-      script.async = false
-      script.defer = true
-      script.src = "https://sdk.scdn.co/spotify-player.js"
-      script.onload = () => resolve()
-      script.onerror = error =>
-        reject(new Error(`loadScript: ${error.message}`))
-
-      document.head.appendChild(script)
-    } else {
-      resolve()
-    }
-  })
-}
-export async function setDevice(token, deviceId, shouldPlay) {
-  return fetch(`https://api.spotify.com/v1/me/player`, {
-    body: JSON.stringify({ device_ids: [deviceId], play: shouldPlay }),
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    method: 'PUT',
-  });
-}
-export function onInterval(callback, milliseconds) {
-  const interval = setInterval(callback, milliseconds)
-
-  onDestroy(() => {
-    clearInterval(interval)
-  })
-}
-
-// Debounce function
 export const debounce = (func, delay) => {
   let timerId;
 
@@ -46,9 +7,6 @@ export const debounce = (func, delay) => {
     timerId = setTimeout(() => func(...args), delay);
   };
 };
-
-
-
 export function playNumber(src) {
   return new Promise((resolve, reject) => {
     const audio = new Audio(src);
@@ -60,5 +18,11 @@ export function playNumber(src) {
     };
     audio.play();
   });
+}
+export function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+  }
 }
 
