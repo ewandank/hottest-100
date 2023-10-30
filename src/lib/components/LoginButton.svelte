@@ -4,13 +4,19 @@
 
 <div class="button-wrapper">
     <button on:click>Login with Spotify</button>
+    <p>if you just clicked the button, click it again :)</p>
 </div>
 
 <style>
+    p{
+        margin-top: 20px;
+        color:white
+    }
     .button-wrapper {
         text-align: center;
         margin: 0;
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         height: 100vh;

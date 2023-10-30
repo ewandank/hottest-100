@@ -5,18 +5,15 @@
     export let album;
     export let hottest_100_number;
     export let playing;
-    let artistsList = "";
-    $: {
-        artistsList = artists
-            .map((artist, index) => {
-                if (index === artists.length - 1) {
-                    return artist.name;
-                } else {
-                    return artist.name + ", ";
-                }
-            })
-            .join("");
-    }
+    $: artistsList = artists
+        .map((artist, index) => {
+            if (index === artists.length - 1) {
+                return artist.name;
+            } else {
+                return artist.name + ", ";
+            }
+        })
+        .join("");
 </script>
 
 <div class="container" transition:fade>
@@ -31,44 +28,35 @@
         <img src={album.images[1].url} alt="Album Artwork for {album.name}" />
     </div>
     <div class="details-container">
-        <p class="name">{name}</p>
-        <p class="artists">{artistsList}</p>
-        <p />
+        <p><strong>{name}</strong></p>
+        <p>{artistsList}</p>
     </div>
 </div>
 
 <style>
     p {
-        font-size: var(--font-size-6);
+        font-size: var(--font-size-5);
     }
-    .name {
-        font-weight: bold;
+
+    .details-container{
+        margin-left:10px;
     }
-    .number {
-        margin-top: 0px;
-        font-weight: bold;
+    .number{
         font-size: var(--font-size-8);
+        font-weight: bold;
     }
-    .number-wrapper {
-        margin-right: 10px;
-        width: 120px;
-        margin-top: 8px;
-    }
-    .container {
-        border-bottom: 3px solid white;
+    .container{
         display: flex;
-        width: 100%;
-        padding: 10px;
+        padding:10px;
+        border-bottom: 3px solid white;
     }
-    img {
+    .img-container{}
+    img{
+        width:150px;
         height: 150px;
-        width: 150px;
+        margin: auto 0;
     }
-    .img-container {
-        margin-top: 10px;
-    }
-    .details-container {
-        margin-top: 10px;
-        margin-left: 15px;
+    .number-wrapper{
+        min-width: 110px;
     }
 </style>

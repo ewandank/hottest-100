@@ -12,6 +12,9 @@
         "user-read-private",
     ];
 </script>
+<svelte:head>
+    <title>Hottest 100 Player</title>
+</svelte:head>
 
 <WebPlayback {client_id} name="Hottest 100 Player" bind:this={spotify} {scopes}>
     <TrackWrapper
