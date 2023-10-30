@@ -1,0 +1,10 @@
+.github/
+build/
+.env*
+.git/
+.gitignore
+.svelte-kit/
+node_modules/
+README.md
+dockerfile
+.dockerignore

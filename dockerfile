@@ -4,13 +4,19 @@ WORKDIR /app
 RUN npm install -g pnpm
 COPY package.json ./
 COPY pnpm-lock.yaml ./
-RUN pnpm install --production
-# TODO: Scope this correctly 
-COPY . ./ 
+RUN pnpm install
+COPY . ./
+RUN apt update && \
+    apt install openssl -y && \
+ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+ -keyout nginx-selfsigned.key \
+ -out nginx-selfsigned.crt\
+  -subj "/C=AU/ST=Victoria/L=Melbourne/O=Ewan Dank/CN=hottest100.ewandank.xyz"
 RUN pnpm run build
 
 FROM nginx:stable-alpine-slim
+
 COPY --from=build /app/build /usr/share/nginx/html
-COPY nginx-selfsigned.crt /etc/nginx/ssl/nginx-selfsigned.crt
-COPY nginx-selfsigned.key /etc/nginx/ssl/nginx-selfsigned.key
+COPY --from=build /app/nginx-selfsigned.crt /etc/nginx/ssl/nginx-selfsigned.crt
+COPY --from=build /app/nginx-selfsigned.key /etc/nginx/ssl/nginx-selfsigned.key
 COPY nginx.conf /etc/nginx/nginx.conf
