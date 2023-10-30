@@ -1,8 +1,8 @@
 <script>
     import TrackWrapper from "$c/TrackWrapper.svelte";
     import { WebPlayback } from "svelte-spotify-web-playback";
-    // this is scoped apparently fine
-    const client_id = "8137e083927e4cfb91b6a88a329a5fdc";
+    import { env } from '$env/dynamic/public';
+    const client_id = env.PUBLIC_SPOTIFY_APP_CLIENT_ID;
     let spotify;
     const scopes = [
         "playlist-read-private",
