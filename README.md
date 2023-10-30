@@ -1,52 +1,43 @@
+# Hottest 100 Player
 
-Loosely inspired by this tiktok, https://www.tiktok.com/@billy.darcy/video/7236606164501400834, 
-https://www.facebook.com/watch/?v=2815707782030505
-I wanted to build a site that would emulate the countdown, but didn't want to have to manually keep track of the numbers. 
-The spotify shuffle is also well documented to be biased by design, and as such wanted a way to apply a more realistic shuffle before going. 
+Loosely inspired by this [video](https://www.facebook.com/watch/?v=2815707782030505), and plenty of others like it on social media,
+I wanted to build a site that would emulate the countdown, such that I didn't have to keep track of the current number, and to give it a more authentic feel.
 
-# env file structure 
+The spotify shuffle algorithm is also well documented to be biased by design (read more about that [here](https://engineering.atspotify.com/2014/02/how-to-shuffle-songs/)), and as such the shuffle was implemented to not use spotify's shuffle, to make it closer to random.
+
+## Deployment
+
+This repository includes a docker image that is available using the github repository, or alternatively can be built from source. the image includes a self signed certificate, as https is needed to use the Web Playback SDK.
+To run it, use the below command. You will also need an `.env` file which has the following layout:
+
 ```dosini
-  BASE_URL=http://localhost:5173
-  SPOTIFY_APP_CLIENT_ID=YOUR_CLIENT_ID
-  SPOTIFY_APP_CLIENT_SECRET=YOUR_CLIENT_SECRET
-
+PUBLIC_SPOTIFY_APP_CLIENT_ID=YOUR_CLIENT_ID_GOES_HERE
 ```
 
-# create-svelte
-
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
+ This will host the site on `localhost:5173`.
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+ docker run -p 5173:443 --restart unless-stopped ghcr.io/ewandank/hottest_100:latest 
 ```
 
-## Developing
+## Known Bugs
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+* The login button must be pressed again after initially authorizing use. This appears to be a bug with svelte library I am using.
+* This player does not work on iOS, and appears to be a limitation of mobile safari and background play.
 
+## Features that I would like to implement
+
+Below is a list of features that I would like to implement in the future.
+
+* Allow User to logout (i.e delete their cookies)
+* Show statistics of the countdown once it is complete (% Australian, Artists Who received X number of songs in the countdown etc..)
+
+## Running Development Server
+
+If you would like to work on this project, ensure you have pnpm installed. 
+then you can simply git clone the repository and then run the following. 
+Note that you will need to add `http://localhost:5173/` to your spotify dashboard.
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm i 
+pnpm run dev
 ```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
