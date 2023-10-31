@@ -11,13 +11,15 @@ This repository includes a docker image that is available using the github repos
 To run it, use the below command. You will also need an `.env` file which has the following layout:
 
 ```dosini
-PUBLIC_SPOTIFY_APP_CLIENT_ID=YOUR_CLIENT_ID_GOES_HERE
+CLIENT_ID=YOUR_CLIENT_ID_GOES_HERE
 ```
 
  This will host the site on `localhost:5173`.
 
 ```bash
- docker run -p 5173:443 --restart unless-stopped ghcr.io/ewandank/hottest_100:latest 
+ docker run -p 5173:443 --restart unless-stopped --env-file .env ghcr.io/ewandank/hottest_100:main 
+ #OR 
+ docker run -p 5173:443 --restart unless-stopped -e CLIENT_ID=YOUR_CLIENT_ID .env ghcr.io/ewandank/hottest_100:main
 ```
 
 ## Known Bugs
@@ -34,9 +36,10 @@ Below is a list of features that I would like to implement in the future.
 
 ## Running Development Server
 
-If you would like to work on this project, ensure you have pnpm installed. 
-then you can simply git clone the repository and then run the following. 
+If you would like to work on this project, ensure you have pnpm installed.
+then you can simply git clone the repository and then run the following.
 Note that you will need to add `http://localhost:5173/` to your spotify dashboard.
+
 ```bash
 pnpm i 
 pnpm run dev

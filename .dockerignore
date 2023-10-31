@@ -1,6 +1,5 @@
 .github/
 build/
-.env*
 .git/
 .gitignore
 .svelte-kit/

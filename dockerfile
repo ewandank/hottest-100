@@ -15,8 +15,14 @@ RUN apt update && \
 RUN pnpm run build
 
 FROM nginx:stable-alpine-slim
-
-COPY --from=build /app/build /usr/share/nginx/html
 COPY --from=build /app/nginx-selfsigned.crt /etc/nginx/ssl/nginx-selfsigned.crt
 COPY --from=build /app/nginx-selfsigned.key /etc/nginx/ssl/nginx-selfsigned.key
 COPY nginx.conf /etc/nginx/nginx.conf
+RUN apk add --no-cache bash
+WORKDIR /usr/share/nginx/html
+COPY --from=build /app/build .
+COPY create-env.sh .
+COPY .env-example .env 
+RUN chmod +x create-env.sh
+EXPOSE 443
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/create-env.sh && nginx -g \"daemon off;\""]

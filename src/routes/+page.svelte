@@ -1,8 +1,7 @@
 <script>
     import TrackWrapper from "$c/TrackWrapper.svelte";
     import { WebPlayback } from "svelte-spotify-web-playback";
-    import { env } from '$env/dynamic/public';
-    const client_id = env.PUBLIC_SPOTIFY_APP_CLIENT_ID;
+    const client_id = window._env_.CLIENT_ID;
     let spotify;
     const scopes = [
         "playlist-read-private",
@@ -12,10 +11,10 @@
         "user-read-private",
     ];
 </script>
+
 <svelte:head>
     <title>Hottest 100 Player</title>
 </svelte:head>
-
 <WebPlayback {client_id} name="Hottest 100 Player" bind:this={spotify} {scopes}>
     <TrackWrapper
         slot="all"
@@ -30,4 +29,3 @@
         wrapper={spotify}
     />
 </WebPlayback>
-
