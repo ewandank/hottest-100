@@ -1,9 +1,7 @@
-import { browser } from '$app/environment';
-import { error } from '@sveltejs/kit';
 import { shuffleArray } from '../utils';
 export async function playTrack(track, access_token) {
     const uris = [track.uri];
-    let response = await fetch("https://api.spotify.com/v1/me/player/play", {
+    await fetch("https://api.spotify.com/v1/me/player/play", {
         method: "PUT",
         headers: {
             Authorization: "Bearer " + access_token,

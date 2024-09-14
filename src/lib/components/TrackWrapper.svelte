@@ -14,6 +14,7 @@
     import PlayPauseButton from "$c/PlayPauseButton.svelte";
     import { fade } from "svelte/transition";
     import ViewSelector from "$c/ViewSelector.svelte";
+    import {delay} from "../utils"
     export let player;
     export let state;
     export let internal;
@@ -45,6 +46,8 @@
                     playing: true,
                     hottest_100_number: iterator,
                 };
+                // Mutating results causes the track to render, i want it to play for a bit before rendering. 
+                await delay(30)
                 results = [currentData, ...results];
                 disableButton = false;
             } catch (error) {

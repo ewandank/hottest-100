@@ -25,4 +25,10 @@ export function shuffleArray(array) {
       [array[i], array[j]] = [array[j], array[i]];
   }
 }
+/**
+ * Delay by time seconds
+ * @param {number} time number of seconds to delay by
+ * @returns a promise that resolves when the timeout is done so you can await delay.
+ */
+export const delay = (time) => new Promise((resolve) => setTimeout(resolve, time * 1000))
 
