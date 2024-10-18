@@ -18,7 +18,6 @@
     export let player;
     export let state;
     export let internal;
-    export let error;
     export let wrapper;
     let layout;
     let trackItems = [];
@@ -46,10 +45,11 @@
                     playing: true,
                     hottest_100_number: iterator,
                 };
+                disableButton = false;
                 // Mutating results causes the track to render, i want it to play for a bit before rendering. 
+                // TODO: there's a race condition here if the song is <30seconds. I think i could promisify the playing track and then await it here and call `counter` recursively. 
                 await delay(30)
                 results = [currentData, ...results];
-                disableButton = false;
             } catch (error) {
                 console.error(`Error playing audio: ${error}`);
             }

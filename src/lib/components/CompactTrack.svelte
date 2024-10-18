@@ -3,7 +3,6 @@
     export let name;
     export let artists;
     export let hottest_100_number;
-    export let playing;
     $: artistsList = artists
         .map((artist, index) => {
             if (index === artists.length - 1) {

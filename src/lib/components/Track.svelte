@@ -4,7 +4,6 @@
     export let artists;
     export let album;
     export let hottest_100_number;
-    export let playing;
     $: artistsList = artists
         .map((artist, index) => {
             if (index === artists.length - 1) {
@@ -50,7 +49,6 @@
         padding:10px;
         border-bottom: 3px solid white;
     }
-    .img-container{}
     img{
         width:150px;
         height: 150px;
