@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/solid-router";
-
-import logo from "../logo.svg";
+import { SpotifyWebApi } from '@spotify/web-api-ts-sdk';
 
 export const Route = createFileRoute("/")({
   component: IndexComponent,
@@ -8,33 +7,8 @@ export const Route = createFileRoute("/")({
 
 function IndexComponent() {
   return (
-    <div class="text-center">
-      <header class="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          class="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/routes/index.tsx</code> and save to reload.
-        </p>
-        <a
-          class="text-[#61dafb] hover:underline"
-          href="https://solidjs.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Solid
-        </a>
-        <a
-          class="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
+    <div class="flex items-center justify-center bg-gray-500 h-screen w-full">
+        <button class="w-50 text-2xl bg-pink-600">Log in?</button>
     </div>
   );
 }
