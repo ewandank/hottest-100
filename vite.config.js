@@ -1,6 +1,14 @@
-import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { defineConfig } from "vite";
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+ import path from 'path';
+
+// https://vite.dev/config/
 export default defineConfig({
-	plugins: [sveltekit()],
-	proxy: {}
+  plugins: [svelte()],
+  resolve: {
+    alias: {
+      $c: path.resolve(__dirname, './src/lib/components'),
+      $lib: path.resolve(__dirname, './src/lib'),
+    },
+  },
 });

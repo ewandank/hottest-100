@@ -1,7 +1,3 @@
-<script>
-    import { goto } from "$app/navigation";
-</script>
-
 <div class="button-wrapper">
     <button on:click>Login with Spotify</button>
     <p>if you just clicked the button, click it again :)</p>
