@@ -4,8 +4,7 @@
      * @type {"GRID" | "LIST"}
      */
     export let value = "GRID";
-    let gridActive = false;
-    let listActive = false;
+    
     function handleGrid() {
         value = "GRID";
     }

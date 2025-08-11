@@ -64,7 +64,7 @@ export async function getPlaylists(access_token) {
 }
 // will turn off repeat as this breaks the logic to get when the track is ended
 export async function setRepeatMode(accessToken, state) {
-  const response = await fetch(
+   await fetch(
     `https://api.spotify.com/v1/me/player/repeat?state=${state}`,
     {
       method: "PUT",
