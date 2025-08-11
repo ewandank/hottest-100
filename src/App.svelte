@@ -2,7 +2,7 @@
     import TrackWrapper from "$c/TrackWrapper.svelte";
     import { WebPlayback } from "svelte-spotify-web-playback";
     let spotify;
-    let client_id = import.meta.env.PUBLIC_CLIENT_ID;
+    let client_id = import.meta.env.VITE_PUBLIC_CLIENT_ID;
     const scopes = [
         "playlist-read-private",
         "user-modify-playback-state",
