@@ -1,8 +1,7 @@
-import eslintPluginSvelte from 'eslint-plugin-svelte';
+import eslintPluginSvelte from "eslint-plugin-svelte";
 export default [
-  ...eslintPluginSvelte.configs['flat/recommended'],
+  ...eslintPluginSvelte.configs["flat/recommended"],
   {
-    rules: {
-    }
-  }
+    rules: {},
+  },
 ];

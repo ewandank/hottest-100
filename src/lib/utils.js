@@ -1,4 +1,3 @@
-
 export const debounce = (func, delay) => {
   let timerId;
 
@@ -21,8 +20,8 @@ export function playNumber(src) {
 }
 export function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
 }
 /**
@@ -30,5 +29,5 @@ export function shuffleArray(array) {
  * @param {number} time number of seconds to delay by
  * @returns a promise that resolves when the timeout is done so you can await delay.
  */
-export const delay = (time) => new Promise((resolve) => setTimeout(resolve, time * 1000))
-
+export const delay = (time) =>
+  new Promise((resolve) => setTimeout(resolve, time * 1000));
