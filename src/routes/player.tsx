@@ -3,12 +3,10 @@ import {
   createEffect,
   createResource,
   createSignal,
-  For,
-  onMount,
 } from "solid-js";
 import { createSpotify } from "../resources/createSpotify";
-import { playNumber, shuffle } from "../utils";
-import type { Track, TrackItem } from "@spotify/web-api-ts-sdk";
+import { debounce, playNumber, shuffle } from "../utils";
+import type { Track } from "@spotify/web-api-ts-sdk";
 
 export const Route = createFileRoute("/player")({
   component: RouteComponent,
@@ -20,6 +18,7 @@ interface PlayerSearch {
 
 function RouteComponent() {
   const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
+
   createEffect(() => {
     // Wait for authorization before injecting the SDK script
     const sdk = spotify();
@@ -33,7 +32,6 @@ function RouteComponent() {
       }
     });
   });
-  // TODO
 
   const spotify = createSpotify(
     import.meta.env.VITE_CLIENT_ID,
@@ -71,21 +69,45 @@ function RouteComponent() {
         internalPlayer.addListener("ready", async ({ device_id }) => {
           await spotify()?.player.transferPlayback([device_id]);
           internalPlayer.setVolume(1);
-          // await spotify()?.player.setRepeatMode("off", device_id);
+          // TODO: this doesn't repspond with json????
+          await spotify()?.player.setRepeatMode("off", device_id);
         });
+        internalPlayer.addListener(
+          "player_state_changed",
+          debouncedHandlePlayerStateChange,
+        );
       };
     })();
   });
+
+  const handlePlayerStateChange = async (state: Spotify.PlaybackState) => {
+    console.log("hello");
+    console.log(state);
+    if (state?.track_window) {
+      if (
+        state.track_window.previous_tracks.find(
+          (x) => x.uid === state.track_window.current_track.uid,
+        ) &&
+        state.paused
+      ) {
+        await countdownHandler();
+      }
+    }
+  };
+
+  const debouncedHandlePlayerStateChange = debounce(
+    handlePlayerStateChange,
+    20,
+  );
 
   const [tracks] = createResource(spotify, async () => {
     const playlistId = search().playlistId;
     if (!playlistId) return [];
     let allItems: Track[] = [];
     let next: string | null = null;
-    let sdk = spotify();
-    if (!sdk) return [];
+    if (!spotify()) return [];
     do {
-      const response = await sdk.playlists.getPlaylistItems(
+      const response = await spotify()!.playlists.getPlaylistItems(
         playlistId,
         undefined,
         undefined,
@@ -93,7 +115,7 @@ function RouteComponent() {
         allItems.length,
       );
       if (response && response.items) {
-        // TODO
+        // TODO typescript is mad.
         allItems = allItems.concat(response.items);
         next = response.next;
       } else {
@@ -105,6 +127,7 @@ function RouteComponent() {
   });
 
   const [iterator, setIterator] = createSignal<number>();
+
   const countdownHandler = async () => {
     if (tracks() === undefined) {
       return;
@@ -112,15 +135,22 @@ function RouteComponent() {
     // set the starting number
     if (iterator() === undefined) {
       setIterator(tracks()!.length <= 100 ? tracks()?.length : 100);
+    } else {
+      setIterator(prev => prev = prev! -1)
     }
-    await playNumber(`/numbers/${iterator()}.mp3`)
+    // Play the hottest 100 counter.
+    await playNumber(`/numbers/${iterator()}.mp3`);
+    console.log(iterator());
+    console.log(tracks()?.at(iterator()! - 1)?.track.uri);
 
+    await spotify()?.player.startResumePlayback("", undefined, [
+      tracks()?.at(iterator()! - 1)?.track.uri,
+    ]);
   };
 
   return (
     <>
       <button onClick={countdownHandler}>Get farked</button>
-      <For each={tracks()}>{(item, index) => <p>{item.track.name}</p>}</For>
     </>
   );
 }

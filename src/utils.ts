@@ -1,6 +1,3 @@
-// utils.ts
-// Generic, unbiased shuffle implementation (Fisher-Yates)
-
 export function shuffle<T>(array: T[]): T[] {
   const result = array.slice();
   for (let i = result.length - 1; i > 0; i--) {
@@ -21,4 +18,13 @@ export function playNumber(src: string) {
     };
     audio.play();
   });
+}
+
+
+export function debounce<T extends (...args: any[]) => void>(fn: T, delay: number): (...args: Parameters<T>) => void {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  return (...args: Parameters<T>) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
 }
