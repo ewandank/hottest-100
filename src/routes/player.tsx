@@ -1,7 +1,14 @@
 import { createFileRoute, useSearch } from "@tanstack/solid-router";
-import { createEffect, createResource, createSignal, onMount } from "solid-js";
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  onMount,
+} from "solid-js";
 import { createSpotify } from "../resources/createSpotify";
-import { shuffle } from "../utils";
+import { playNumber, shuffle } from "../utils";
+import type { Track, TrackItem } from "@spotify/web-api-ts-sdk";
 
 export const Route = createFileRoute("/player")({
   component: RouteComponent,
@@ -16,7 +23,7 @@ function RouteComponent() {
   createEffect(() => {
     // Wait for authorization before injecting the SDK script
     const sdk = spotify();
-    sdk?.getAccessToken().then(token => {
+    sdk?.getAccessToken().then((token) => {
       if (token && !document.getElementById("spotify-sdk")) {
         const script = document.createElement("script");
         script.id = "spotify-sdk";
@@ -73,7 +80,7 @@ function RouteComponent() {
   const [tracks] = createResource(spotify, async () => {
     const playlistId = search().playlistId;
     if (!playlistId) return [];
-    let allItems: any[] = [];
+    let allItems: Track[] = [];
     let next: string | null = null;
     let sdk = spotify();
     if (!sdk) return [];
@@ -86,6 +93,7 @@ function RouteComponent() {
         allItems.length,
       );
       if (response && response.items) {
+        // TODO
         allItems = allItems.concat(response.items);
         next = response.next;
       } else {
@@ -96,10 +104,23 @@ function RouteComponent() {
     return shuffledTracks;
   });
 
+  const [iterator, setIterator] = createSignal<number>();
+  const countdownHandler = async () => {
+    if (tracks() === undefined) {
+      return;
+    }
+    // set the starting number
+    if (iterator() === undefined) {
+      setIterator(tracks()!.length <= 100 ? tracks()?.length : 100);
+    }
+    await playNumber(`/numbers/${iterator()}.mp3`)
+
+  };
+
   return (
     <>
-      <button onClick={() => player()?.togglePlay()}>Get farked</button>
-      {JSON.stringify(tracks())}
+      <button onClick={countdownHandler}>Get farked</button>
+      <For each={tracks()}>{(item, index) => <p>{item.track.name}</p>}</For>
     </>
   );
 }

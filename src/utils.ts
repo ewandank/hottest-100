@@ -9,3 +9,16 @@ export function shuffle<T>(array: T[]): T[] {
   }
   return result;
 }
+
+export function playNumber(src: string) {
+  return new Promise<void>((resolve, reject) => {
+    const audio = new Audio(src);
+    audio.onended = () => {
+      resolve();
+    };
+    audio.onerror = (error) => {
+      reject(error);
+    };
+    audio.play();
+  });
+}
