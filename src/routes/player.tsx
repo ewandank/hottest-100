@@ -1,24 +1,32 @@
-import { createFileRoute } from "@tanstack/solid-router";
-import { createEffect, createSignal, onMount } from "solid-js";
+import { createFileRoute, useSearch } from "@tanstack/solid-router";
+import { createEffect, createResource, createSignal, onMount } from "solid-js";
 import { createSpotify } from "../resources/createSpotify";
-
+import { shuffle } from "../utils";
 
 export const Route = createFileRoute("/player")({
   component: RouteComponent,
 });
 
-function RouteComponent() {
+interface PlayerSearch {
+  playlistId?: string;
+}
 
-  const [player, setPlayer] = createSignal<Spotify.Player | null>(null)
-  onMount(() => {
-    if (!document.getElementById("spotify-sdk")) {
-      const script = document.createElement("script");
-      script.id = "spotify-sdk";
-      script.src = "https://sdk.scdn.co/spotify-player.js";
-      script.async = true;
-      document.body.appendChild(script);
-    }
+function RouteComponent() {
+  const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
+  createEffect(() => {
+    // Wait for authorization before injecting the SDK script
+    const sdk = spotify();
+    sdk?.getAccessToken().then(token => {
+      if (token && !document.getElementById("spotify-sdk")) {
+        const script = document.createElement("script");
+        script.id = "spotify-sdk";
+        script.src = "https://sdk.scdn.co/spotify-player.js";
+        script.async = true;
+        document.body.appendChild(script);
+      }
+    });
   });
+  // TODO
 
   const spotify = createSpotify(
     import.meta.env.VITE_CLIENT_ID,
@@ -32,6 +40,8 @@ function RouteComponent() {
     ],
   );
 
+  const search = useSearch({ strict: false });
+
   createEffect(() => {
     (async () => {
       if (spotify() === null) {
@@ -40,23 +50,56 @@ function RouteComponent() {
 
       window.onSpotifyWebPlaybackSDKReady = () => {
         const internalPlayer = new window.Spotify.Player({
-          name: "Web Playback SDK Quick Start Player",
+          name: "Hottest 100 Player",
           getOAuthToken: (cb) => {
             spotify()
               ?.getAccessToken()
-              .then((token) => cb(token?.access_token));
+              // Cheeky non-null assert
+              .then((token) => cb(token!.access_token));
           },
           volume: 0.5,
         });
         internalPlayer.connect();
-        setPlayer(internalPlayer)
+        setPlayer(internalPlayer);
+        internalPlayer.addListener("ready", async ({ device_id }) => {
+          await spotify()?.player.transferPlayback([device_id]);
+          internalPlayer.setVolume(1);
+          // await spotify()?.player.setRepeatMode("off", device_id);
+        });
       };
-      // If SDK is already loaded, trigger manually
-      if (window.Spotify && window.Spotify.Player) {
-        window.onSpotifyWebPlaybackSDKReady();
-      }
     })();
   });
 
-  return <button onClick={() => player()?.togglePlay()}>Get farked</button>
+  const [tracks] = createResource(spotify, async () => {
+    const playlistId = search().playlistId;
+    if (!playlistId) return [];
+    let allItems: any[] = [];
+    let next: string | null = null;
+    let sdk = spotify();
+    if (!sdk) return [];
+    do {
+      const response = await sdk.playlists.getPlaylistItems(
+        playlistId,
+        undefined,
+        undefined,
+        undefined,
+        allItems.length,
+      );
+      if (response && response.items) {
+        allItems = allItems.concat(response.items);
+        next = response.next;
+      } else {
+        next = null;
+      }
+    } while (next);
+    const shuffledTracks = shuffle(allItems);
+    return shuffledTracks;
+  });
+
+  return (
+    <>
+      <button onClick={() => player()?.togglePlay()}>Get farked</button>
+      {JSON.stringify(tracks())}
+    </>
+  );
 }
