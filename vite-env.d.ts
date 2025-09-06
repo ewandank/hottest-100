@@ -7,7 +7,7 @@ interface ViteTypeOptions {
 }
 
 interface ImportMetaEnv {
-  readonly VITE_PUBLIC_CLIENT_ID: string
+  readonly VITE_CLIENT_ID: string
   // more env variables...
 }
 
