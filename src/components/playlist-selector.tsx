@@ -4,17 +4,7 @@ import { createSpotify } from "../resources/createSpotify";
 export const PlaylistSelector: Component<{
   setPlaylistId: (p: string) => void;
 }> = (props) => {
-  const spotify = createSpotify(
-    import.meta.env.VITE_CLIENT_ID,
-    "http://localhost:5173/",
-    [
-      "playlist-read-private",
-      "user-modify-playback-state",
-      "streaming",
-      "user-read-email",
-      "user-read-private",
-    ],
-  );
+  const spotify = createSpotify("http://localhost:5173/");
 
   const [playlists] = createResource(spotify, async (sdk) => {
     if (!sdk) return null;
@@ -44,7 +34,10 @@ export const PlaylistSelector: Component<{
             playlists().items &&
             Array.isArray(playlists().items) && (
               <div style={{ "margin-top": "1rem" }}>
-                  <button onClick={() => props.setPlaylistId(selectedId())}>Start the countdown?</button>
+                {/* TODO, this should be able to start the countdown but i get some weird autoplay thing? might need an aria role */}
+                <button onClick={() => props.setPlaylistId(selectedId())}>
+                  Go to player or something
+                </button>
               </div>
             )}
         </>

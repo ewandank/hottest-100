@@ -9,11 +9,9 @@ import { createSpotify } from "../resources/createSpotify";
 import { debounce, shuffle, playNumber } from "../utils";
 
 // stricly speaking, the playlist won't ever change but i don't think passing in the signal hurts.
-export const CountdownPlayer: Component<{ playlistId: () => string  }> = (
+export const CountdownPlayer: Component<{ playlistId: () => string }> = (
   props,
 ) => {
-
-
   const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
 
   createEffect(() => {
@@ -30,18 +28,7 @@ export const CountdownPlayer: Component<{ playlistId: () => string  }> = (
     });
   });
 
-  const spotify = createSpotify(
-    import.meta.env.VITE_CLIENT_ID,
-    "http://localhost:5173/",
-    [
-      "playlist-read-private",
-      "user-modify-playback-state",
-      "streaming",
-      "user-read-email",
-      "user-read-private",
-    ],
-  );
-
+  const spotify = createSpotify("http://localhost:5173/");
 
   createEffect(() => {
     (async () => {

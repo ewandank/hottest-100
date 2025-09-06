@@ -6,7 +6,7 @@
     "jsxImportSource": "solid-js",
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-  "types": ["vite/client", "spotify-web-playback-sdk"],
+    "types": ["vite/client", "spotify-web-playback-sdk"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

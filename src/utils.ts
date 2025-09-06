@@ -20,8 +20,10 @@ export function playNumber(src: string) {
   });
 }
 
-
-export function debounce<T extends (...args: never[]) => void>(fn: T, delay: number): (...args: Parameters<T>) => void {
+export function debounce<T extends (...args: never[]) => void>(
+  fn: T,
+  delay: number,
+): (...args: Parameters<T>) => void {
   let timer: ReturnType<typeof setTimeout> | null = null;
   return (...args: Parameters<T>) => {
     if (timer) clearTimeout(timer);
