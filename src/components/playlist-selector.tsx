@@ -1,5 +1,5 @@
 import { createResource, createSignal, type Component } from "solid-js";
-import { createSpotify } from "../resources/createSpotify";
+import { createSpotify } from "../signals/createSpotify";
 
 export const PlaylistSelector: Component<{
   setPlaylistId: (p: string) => void;

@@ -8,13 +8,14 @@ import {
   type Accessor,
   For,
 } from "solid-js";
-import { createSpotify } from "../resources/createSpotify";
+import { createSpotify } from "../signals/createSpotify";
 import { debounce, shuffle, playNumber } from "../utils";
 import Pause from "lucide-solid/icons/pause";
 import Play from "lucide-solid/icons/play";
 import List from "lucide-solid/icons/list";
 import ChartNetwork from "lucide-solid/icons/chart-network";
 import GalleryVertical from "lucide-solid/icons/gallery-vertical";
+import { createDelayedSignal } from "../signals/createDelayedSignal";
 
 const [view, setView] = createSignal<"list" | "compact-list" | "stats">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
@@ -232,21 +233,24 @@ type ViewProps = {
   iterator: Accessor<number | undefined>;
 };
 
-const ListView = (props: ViewProps) => (
-  <div class="p-8 bg-gray-100 rounded">
-    <b>{props.iterator()}</b>
-    <For each={props.tracks()?.slice(undefined, 100)}>
-      {(track, index) => (
-        <Show when={props.iterator() <= index() + 1}>
-          <div>
-            {index() + 1}
-            {track.track.name}
-          </div>
-        </Show>
-      )}
-    </For>
-  </div>
-);
+const ListView = (props: ViewProps) => {
+  // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
+  const delayedIterator = createDelayedSignal(props.iterator, 30000);
+  return (
+    <div class="p-8 bg-gray-100 rounded">
+      <For each={props.tracks()?.slice(undefined, 100)}>
+        {(track, index) => (
+          <Show when={delayedIterator() <= index() + 1}>
+            <div>
+              {index() + 1}
+              {track.track.name}
+            </div>
+          </Show>
+        )}
+      </For>
+    </div>
+  );
+};
 
 const CompactListView = (props: ViewProps) => (
   <div class="p-8 bg-gray-100 rounded">
