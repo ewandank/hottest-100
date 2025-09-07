@@ -4,16 +4,26 @@ import {
   createResource,
   createSignal,
   type Component,
+  Show,
+  type Accessor,
+  For,
 } from "solid-js";
 import { createSpotify } from "../resources/createSpotify";
 import { debounce, shuffle, playNumber } from "../utils";
+import Pause from "lucide-solid/icons/pause";
+import Play from "lucide-solid/icons/play";
+import List from "lucide-solid/icons/list";
+import ChartNetwork from "lucide-solid/icons/chart-network";
+import GalleryVertical from "lucide-solid/icons/gallery-vertical";
+
+const [view, setView] = createSignal<"list" | "compact-list" | "stats">("list");
+const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
 
 // stricly speaking, the playlist won't ever change but i don't think passing in the signal hurts.
 export const CountdownPlayer: Component<{ playlistId: () => string }> = (
   props,
 ) => {
-  const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
-
+  const [iterator, setIterator] = createSignal<number>();
   createEffect(() => {
     // Wait for authorization before injecting the SDK script
     const sdk = spotify();
@@ -28,7 +38,7 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
     });
   });
 
-  const spotify = createSpotify("http://localhost:5173/");
+  const spotify = createSpotify("http://localhost:5173/player");
 
   createEffect(() => {
     (async () => {
@@ -52,17 +62,20 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
         setPlayer(internalPlayer);
         internalPlayer.addListener("ready", async ({ device_id }) => {
           await spotify()?.player.transferPlayback([device_id]);
-          // TODO: this doesn't repspond with json????
+          // TODO: this doesn't repsond with json????
           await spotify()?.player.setRepeatMode("off", device_id);
         });
         internalPlayer.addListener(
           "player_state_changed",
           debouncedHandlePlayerStateChange,
         );
+        internalPlayer.addListener("player_state_changed", handlePauseState);
       };
     })();
   });
-
+  const [paused, setPaused] = createSignal(true);
+  const handlePauseState = (state: Spotify.PlaybackState) =>
+    setPaused(state.paused);
   const handlePlayerStateChange = async (state: Spotify.PlaybackState) => {
     if (state?.track_window) {
       if (
@@ -107,10 +120,11 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
     return shuffledTracks;
   });
 
-  const [iterator, setIterator] = createSignal<number>();
-
   const countdownHandler = async () => {
     if (tracks() === undefined) {
+      return;
+    }
+    if (iterator()! <= 0) {
       return;
     }
     // set the starting number
@@ -129,8 +143,123 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
   };
 
   return (
-    <>
-      <button onClick={countdownHandler}>Get farked</button>
-    </>
+    <div class="bg-jjj-gradient flex justify-center h-screen">
+      <div class="w-3/5 bg-transparent">
+        <Toolbar
+          iterator={iterator}
+          startCountdown={countdownHandler}
+          paused={paused}
+          view={view}
+          setView={setView}
+        />
+        <div class="mt-8">
+          <Show when={view() === "list"}>
+            <ListView tracks={tracks} iterator={iterator} />
+          </Show>
+          <Show when={view() === "compact-list"}>
+            <CompactListView tracks={tracks} iterator={iterator} />
+          </Show>
+          <Show when={view() === "stats"}>
+            <StatsView tracks={tracks} iterator={iterator} />
+          </Show>
+        </div>
+      </div>
+    </div>
   );
 };
+
+const Toolbar: Component<{
+  startCountdown: () => void;
+  paused: Accessor<boolean>;
+  view: Accessor<"list" | "compact-list" | "stats">;
+  iterator: Accessor<number | undefined>;
+  setView: (v: "list" | "compact-list" | "stats") => void;
+}> = (props) => (
+  <div class="flex flex-row w-full pt-8 pb-4">
+    <div class="flex-1 flex justify-center">
+      <button
+        onClick={() => {
+          if (props.iterator() === undefined) {
+            props.startCountdown();
+          } else {
+            player()?.togglePlay();
+          }
+        }}
+      >
+        <Show when={props.paused() === true}>
+          <Play class="text-gray-600" />
+        </Show>
+        <Show when={props.paused() === false}>
+          <Pause class="text-gray-600" />
+        </Show>
+      </button>
+    </div>
+    <div class="flex justify-end pr-4">
+      <div class="flex flex-row rounded-md overflow-hidden divide-gray-600 border border-gray-600 bg-white">
+        <button
+          class={`px-4 py-2 focus:outline-none first:rounded-l-md ${props.view() === "list" ? "bg-slate-600" : "bg-white"}`}
+          onClick={() => props.setView("list")}
+        >
+          <List
+            class={props.view() === "list" ? "text-white" : "text-gray-600"}
+          />
+        </button>
+        <button
+          class={`px-4 py-2 focus:outline-none ${props.view() === "compact-list" ? "bg-slate-600" : "bg-white"}`}
+          onClick={() => props.setView("compact-list")}
+        >
+          <GalleryVertical
+            class={
+              props.view() === "compact-list" ? "text-white" : "text-gray-600"
+            }
+          />
+        </button>
+        <button
+          class={`px-4 py-2 focus:outline-none last:rounded-r-md ${props.view() === "stats" ? "bg-slate-600" : "bg-white"}`}
+          onClick={() => props.setView("stats")}
+        >
+          <ChartNetwork
+            class={props.view() === "stats" ? "text-white" : "text-gray-600"}
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+type ViewProps = {
+  tracks: Accessor<Track[] | undefined>;
+  iterator: Accessor<number | undefined>;
+};
+
+const ListView = (props: ViewProps) => (
+  <div class="p-8 bg-gray-100 rounded">
+    <b>{props.iterator()}</b>
+    <For each={props.tracks()?.slice(undefined, 100)}>
+      {(track, index) => (
+        <Show when={props.iterator() <= index() + 1}>
+          <div>
+            {index() + 1}
+            {track.track.name}
+          </div>
+        </Show>
+      )}
+    </For>
+  </div>
+);
+
+const CompactListView = (props: ViewProps) => (
+  <div class="p-8 bg-gray-100 rounded">
+    Compact List View Placeholder
+    <pre>tracks: {JSON.stringify(props.tracks())}</pre>
+    <pre>iterator: {props.iterator()}</pre>
+  </div>
+);
+
+const StatsView = (props: ViewProps) => (
+  <div class="p-8 bg-gray-100 rounded">
+    Stats View Placeholder
+    <pre>tracks: {JSON.stringify(props.tracks())}</pre>
+    <pre>iterator: {props.iterator()}</pre>
+  </div>
+);

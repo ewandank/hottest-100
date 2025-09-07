@@ -4,7 +4,7 @@ import { createSpotify } from "../resources/createSpotify";
 export const PlaylistSelector: Component<{
   setPlaylistId: (p: string) => void;
 }> = (props) => {
-  const spotify = createSpotify("http://localhost:5173/");
+  const spotify = createSpotify("http://localhost:5173/player");
 
   const [playlists] = createResource(spotify, async (sdk) => {
     if (!sdk) return null;

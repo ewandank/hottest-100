@@ -8,80 +8,80 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as ResultsRouteImport } from "./routes/results";
-import { Route as PlayerRouteImport } from "./routes/player";
-import { Route as IndexRouteImport } from "./routes/index";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResultsRouteImport } from './routes/results'
+import { Route as PlayerRouteImport } from './routes/player'
+import { Route as IndexRouteImport } from './routes/index'
 
 const ResultsRoute = ResultsRouteImport.update({
-  id: "/results",
-  path: "/results",
+  id: '/results',
+  path: '/results',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const PlayerRoute = PlayerRouteImport.update({
-  id: "/player",
-  path: "/player",
+  id: '/player',
+  path: '/player',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/player": typeof PlayerRoute;
-  "/results": typeof ResultsRoute;
+  '/': typeof IndexRoute
+  '/player': typeof PlayerRoute
+  '/results': typeof ResultsRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/player": typeof PlayerRoute;
-  "/results": typeof ResultsRoute;
+  '/': typeof IndexRoute
+  '/player': typeof PlayerRoute
+  '/results': typeof ResultsRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/player": typeof PlayerRoute;
-  "/results": typeof ResultsRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/player': typeof PlayerRoute
+  '/results': typeof ResultsRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/player" | "/results";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/player" | "/results";
-  id: "__root__" | "/" | "/player" | "/results";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths: '/' | '/player' | '/results'
+  fileRoutesByTo: FileRoutesByTo
+  to: '/' | '/player' | '/results'
+  id: '__root__' | '/' | '/player' | '/results'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  PlayerRoute: typeof PlayerRoute;
-  ResultsRoute: typeof ResultsRoute;
+  IndexRoute: typeof IndexRoute
+  PlayerRoute: typeof PlayerRoute
+  ResultsRoute: typeof ResultsRoute
 }
 
-declare module "@tanstack/solid-router" {
+declare module '@tanstack/solid-router' {
   interface FileRoutesByPath {
-    "/results": {
-      id: "/results";
-      path: "/results";
-      fullPath: "/results";
-      preLoaderRoute: typeof ResultsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/player": {
-      id: "/player";
-      path: "/player";
-      fullPath: "/player";
-      preLoaderRoute: typeof PlayerRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/player': {
+      id: '/player'
+      path: '/player'
+      fullPath: '/player'
+      preLoaderRoute: typeof PlayerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,7 +89,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PlayerRoute: PlayerRoute,
   ResultsRoute: ResultsRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
