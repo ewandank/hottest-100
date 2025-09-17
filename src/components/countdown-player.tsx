@@ -1,4 +1,4 @@
-import type { Track } from "@spotify/web-api-ts-sdk";
+import type { PlaylistedTrack, Track } from "@spotify/web-api-ts-sdk";
 import {
   createEffect,
   createResource,
@@ -16,6 +16,7 @@ import List from "lucide-solid/icons/list";
 import ChartNetwork from "lucide-solid/icons/chart-network";
 import GalleryVertical from "lucide-solid/icons/gallery-vertical";
 import { createDelayedSignal } from "../signals/createDelayedSignal";
+import { getUserDisplayName } from "../SpotifyHelper";
 
 const [view, setView] = createSignal<"list" | "compact-list" | "stats">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
@@ -98,19 +99,18 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
   const [tracks] = createResource(spotify, async () => {
     const playlistId = props.playlistId();
     if (!playlistId) return [];
-    let allItems: Track[] = [];
+    let allItems: PlaylistedTrack[] = [];
     let next: string | null = null;
     if (!spotify()) return [];
     do {
       const response = await spotify()!.playlists.getPlaylistItems(
         playlistId,
         undefined,
-        undefined,
+        "items(added_by(id),track(name,album(images),artists(name),uri))",
         undefined,
         allItems.length,
       );
       if (response && response.items) {
-        // TODO typescript is mad.
         allItems = allItems.concat(response.items);
         next = response.next;
       } else {
@@ -229,28 +229,38 @@ const Toolbar: Component<{
 );
 
 type ViewProps = {
-  tracks: Accessor<Track[] | undefined>;
+  tracks: Accessor<PlaylistedTrack[] | undefined>;
   iterator: Accessor<number | undefined>;
 };
 
 const ListView = (props: ViewProps) => {
   // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
-  const delayedIterator = createDelayedSignal(props.iterator, 30000);
+  // TODO: undo me back to 30, its annoying af for debugging though.
+  const delayedIterator = createDelayedSignal(props.iterator, 0);
   return (
     <div class="p-8 bg-gray-100 rounded">
       <For each={props.tracks()?.slice(undefined, 100)}>
         {(track, index) => (
           <Show when={delayedIterator() <= index() + 1}>
-            <div>
-              {index() + 1}
-              {track.track.name}
-            </div>
+            <TrackView track={track} idx={index()+1} />
           </Show>
         )}
       </For>
     </div>
   );
 };
+
+const TrackView: Component<{ track: PlaylistedTrack; idx: number }> = (
+  props,
+) => (
+  <div class="flex flex-row w-full">
+    <h2>{props.idx}</h2>
+    {JSON.stringify(props.track)}
+    {props.track.track.name}
+    {/* Artist */}
+    {/* {props.track.track.} */}
+  </div>
+);
 
 const CompactListView = (props: ViewProps) => (
   <div class="p-8 bg-gray-100 rounded">
