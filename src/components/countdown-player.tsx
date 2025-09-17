@@ -1,4 +1,4 @@
-import type { PlaylistedTrack, Track } from "@spotify/web-api-ts-sdk";
+import type { PlaylistedTrack } from "@spotify/web-api-ts-sdk";
 import {
   createEffect,
   createResource,
@@ -7,6 +7,7 @@ import {
   Show,
   type Accessor,
   For,
+  onCleanup,
 } from "solid-js";
 import { createSpotify } from "../signals/createSpotify";
 import { debounce, shuffle, playNumber } from "../utils";
@@ -16,7 +17,8 @@ import List from "lucide-solid/icons/list";
 import ChartNetwork from "lucide-solid/icons/chart-network";
 import GalleryVertical from "lucide-solid/icons/gallery-vertical";
 import { createDelayedSignal } from "../signals/createDelayedSignal";
-import { getUserDisplayName } from "../SpotifyHelper";
+import { TrackView } from "./tracks/track-list-view";
+import { CompactTrackView } from "./tracks/compact-track";
 
 const [view, setView] = createSignal<"list" | "compact-list" | "stats">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
@@ -40,6 +42,9 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
     });
   });
 
+  onCleanup(() => {
+    player()?.disconnect();
+  });
   const spotify = createSpotify("http://localhost:5173/player");
 
   createEffect(() => {
@@ -93,7 +98,7 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
 
   const debouncedHandlePlayerStateChange = debounce(
     handlePlayerStateChange,
-    20,
+    5,
   );
 
   const [tracks] = createResource(spotify, async () => {
@@ -138,13 +143,14 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
     await playNumber(`/numbers/${iterator()}.mp3`);
 
     // play the actual track, the device id will default to the active device (the current device), and an empty string keeps the types happy
+    // TODO: try with retries? this returned 502 oncc
     await spotify()?.player.startResumePlayback("", undefined, [
       tracks()?.at(iterator()! - 1)?.track.uri,
     ]);
   };
 
   return (
-    <div class="bg-jjj-gradient flex justify-center h-screen">
+    <div class="bg-jjj-gradient flex justify-center min-h-screen">
       <div class="w-3/5 bg-transparent">
         <Toolbar
           iterator={iterator}
@@ -155,13 +161,17 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
         />
         <div class="mt-8">
           <Show when={view() === "list"}>
-            <ListView tracks={tracks} iterator={iterator} />
+            <ListView tracks={tracks} iterator={iterator} spotify={spotify} />
           </Show>
           <Show when={view() === "compact-list"}>
-            <CompactListView tracks={tracks} iterator={iterator} />
+            <CompactListView
+              tracks={tracks}
+              iterator={iterator}
+              spotify={spotify}
+            />
           </Show>
           <Show when={view() === "stats"}>
-            <StatsView tracks={tracks} iterator={iterator} />
+            <StatsView tracks={tracks} iterator={iterator} spotify={spotify} />
           </Show>
         </div>
       </div>
@@ -231,6 +241,7 @@ const Toolbar: Component<{
 type ViewProps = {
   tracks: Accessor<PlaylistedTrack[] | undefined>;
   iterator: Accessor<number | undefined>;
+  spotify: () => SpotifyApi;
 };
 
 const ListView = (props: ViewProps) => {
@@ -238,11 +249,16 @@ const ListView = (props: ViewProps) => {
   // TODO: undo me back to 30, its annoying af for debugging though.
   const delayedIterator = createDelayedSignal(props.iterator, 0);
   return (
-    <div class="p-8 bg-gray-100 rounded">
+    <div class="p-8">
       <For each={props.tracks()?.slice(undefined, 100)}>
         {(track, index) => (
           <Show when={delayedIterator() <= index() + 1}>
-            <TrackView track={track} idx={index()+1} />
+            {/* TODO: BAD PROP DRILLING */}
+            <TrackView
+              track={track}
+              idx={index() + 1}
+              spotify={props.spotify}
+            />
           </Show>
         )}
       </For>
@@ -250,25 +266,27 @@ const ListView = (props: ViewProps) => {
   );
 };
 
-const TrackView: Component<{ track: PlaylistedTrack; idx: number }> = (
-  props,
-) => (
-  <div class="flex flex-row w-full">
-    <h2>{props.idx}</h2>
-    {JSON.stringify(props.track)}
-    {props.track.track.name}
-    {/* Artist */}
-    {/* {props.track.track.} */}
-  </div>
-);
-
-const CompactListView = (props: ViewProps) => (
-  <div class="p-8 bg-gray-100 rounded">
-    Compact List View Placeholder
-    <pre>tracks: {JSON.stringify(props.tracks())}</pre>
-    <pre>iterator: {props.iterator()}</pre>
-  </div>
-);
+const CompactListView = (props: ViewProps) => {
+   // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
+  // TODO: undo me back to 30, its annoying af for debugging though.
+  const delayedIterator = createDelayedSignal(props.iterator, 0);
+  return (
+    <div class="p-8">
+      <For each={props.tracks()?.slice(undefined, 100)}>
+        {(track, index) => (
+          <Show when={delayedIterator() <= index() + 1}>
+            {/* TODO: BAD PROP DRILLING */}
+            <CompactTrackView
+              track={track}
+              idx={index() + 1}
+              spotify={props.spotify}
+            />
+          </Show>
+        )}
+      </For>
+    </div>
+  );
+};
 
 const StatsView = (props: ViewProps) => (
   <div class="p-8 bg-gray-100 rounded">
