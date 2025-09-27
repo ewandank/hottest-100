@@ -30,7 +30,7 @@ export const TrackView: Component<{
               .map((artist) => artist.name)
               .join(",")}
           </p>
-          <p>{userName()}</p>
+          <p class="text-gray-500">{userName()}</p>
         </div>
       </div>
     </Suspense>

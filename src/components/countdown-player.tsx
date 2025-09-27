@@ -98,7 +98,7 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
 
   const debouncedHandlePlayerStateChange = debounce(
     handlePlayerStateChange,
-    5,
+    20,
   );
 
   const [tracks] = createResource(spotify, async () => {
