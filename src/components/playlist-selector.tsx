@@ -1,4 +1,4 @@
-import { createResource, createSignal, type Component } from "solid-js";
+import { createResource, createSignal, For, type Component } from "solid-js";
 import { createSpotify } from "../signals/createSpotify";
 
 export const PlaylistSelector: Component<{
@@ -18,29 +18,34 @@ export const PlaylistSelector: Component<{
       {playlists.loading && <span>Loading...</span>}
       {playlists.error && <span>Error: {playlists.error.message}</span>}
       {playlists() && playlists().items && Array.isArray(playlists().items) && (
-        <>
-          <label for="playlist-select">Pick a playlist:</label>
-          <select
-            id="playlist-select"
-            value={selectedId()}
-            onChange={(e) => setSelectedId(e.currentTarget.value)}
-          >
-            {playlists().items?.map((pl) => (
-              <option value={pl.id}>{pl.name}</option>
-            ))}
-          </select>
-          {selectedId() &&
-            playlists() &&
-            playlists().items &&
-            Array.isArray(playlists().items) && (
-              <div style={{ "margin-top": "1rem" }}>
-                {/* TODO, this should be able to start the countdown but i get some weird autoplay thing? might need an aria role */}
-                <button onClick={() => props.setPlaylistId(selectedId())}>
-                  Go to player or something
-                </button>
-              </div>
-            )}
-        </>
+        <div class="bg-jjj-gradient flex justify-center items-center min-h-screen">
+          <div class="flex flex-col gap-4 w-full max-w-4xl mx-auto px-4">
+            <select
+              id="playlist-select"
+              value={selectedId()}
+              onChange={(e) => setSelectedId(e.currentTarget.value)}
+              class="w-full rounded-md bg-gray-400 text-white py-3 px-4 text-lg"
+            >
+              <option value="" disabled selected>
+                Please select a playlist to shuffle...
+              </option>
+              <For each={playlists()?.items}>
+                {(pl) => <option value={pl.id}>{pl.name}</option>}
+              </For>
+            </select>
+            <button
+              onClick={() => props.setPlaylistId(selectedId())}
+              disabled={!selectedId()}
+              class="w-full rounded-md  py-3 px-4 text-lg"
+              classList={{
+                "bg-gray-400 text-white" : selectedId() !== undefined,
+                "bg-gray-300 text-gray-100 cursor-not-allowed opacity-60" : selectedId() === "",
+              }}
+            >
+              Start the countdown
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
