@@ -193,10 +193,7 @@ export const CountdownPlayer: Component = () => {
             <ListView tracks={tracks} spotify={spotify} />
           </Show>
           <Show when={view() === "compact-list"}>
-            <CompactListView
-              tracks={tracks}
-              spotify={spotify}
-            />
+            <CompactListView tracks={tracks} spotify={spotify} />
           </Show>
           <Show when={view() === "stats"}>
             <StatsView tracks={tracks} spotify={spotify} />
@@ -328,11 +325,11 @@ const StatsView = (props: ViewProps) => {
   const counts = () => {
     const internalCounts: Record<string, number> = {};
     props.tracks()?.forEach((track) => {
-    const name = track.added_by?.id ?? undefined;
-    internalCounts[name] = (internalCounts[name] || 0) + 1;
-  });
-  }
- 
+      const name = track.added_by?.id ?? undefined;
+      internalCounts[name] = (internalCounts[name] || 0) + 1;
+    });
+    return internalCounts;
+  };
 
   return (
     <div class="p-8">
@@ -344,7 +341,7 @@ const StatsView = (props: ViewProps) => {
           </tr>
         </thead>
         <tbody>
-          <For each={Object.entries(counts)}>
+          <For each={Object.entries(counts())}>
             {([person, num]) => (
               <tr>
                 <td class="px-4 py-2 border-b">
