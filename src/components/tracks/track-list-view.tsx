@@ -1,22 +1,15 @@
 import type { PlaylistedTrack, SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { createResource, Suspense, type Component } from "solid-js";
-import { userCache } from "../../SpotifyHelper";
+import { getUserDisplayName } from "../../SpotifyHelper";
 export const TrackView: Component<{
   track: PlaylistedTrack;
   idx: number;
   spotify: () => SpotifyApi;
 }> = (props) => {
-  const [userName] = createResource(props.spotify, async (sdk) => {
-    if (!sdk) return undefined;
-    const userId = props.track.added_by.id;
-    if (userCache.has(userId)) {
-      return userCache.get(userId);
-    }
-    const user = await sdk.users.profile(userId);
-    const name = user?.display_name ?? userId;
-    userCache.set(userId, name);
-    return name;
-  });
+  const [userName] = createResource(
+    () => [props.spotify(), props.track.added_by.id],
+    ([sdk, userId]) => getUserDisplayName(sdk, userId)
+  );
   return (
     <Suspense>
       <div class="flex flex-row w-full items-center py-4">

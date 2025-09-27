@@ -44,6 +44,9 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
 
   onCleanup(() => {
     player()?.disconnect();
+    // This helps when this component gets hmr-ed.
+    const script = document.getElementById("spotify-sdk");
+    script?.remove();
   });
   const spotify = createSpotify("http://localhost:5173/player");
 
@@ -69,8 +72,13 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
         setPlayer(internalPlayer);
         internalPlayer.addListener("ready", async ({ device_id }) => {
           await spotify()?.player.transferPlayback([device_id]);
-          // TODO: this doesn't repsond with json????
-          await spotify()?.player.setRepeatMode("off", device_id);
+          try {
+            await spotify()?.player.setRepeatMode("off", device_id);
+          } catch (e) {
+            if (e instanceof SyntaxError) {
+              // Ignore it
+            }
+          }
         });
         internalPlayer.addListener(
           "player_state_changed",
@@ -104,26 +112,48 @@ export const CountdownPlayer: Component<{ playlistId: () => string }> = (
   const [tracks] = createResource(spotify, async () => {
     const playlistId = props.playlistId();
     if (!playlistId) return [];
-    let allItems: PlaylistedTrack[] = [];
-    let next: string | null = null;
     if (!spotify()) return [];
-    do {
-      const response = await spotify()!.playlists.getPlaylistItems(
-        playlistId,
-        undefined,
-        "items(added_by(id),track(name,album(images),artists(name),uri))",
-        undefined,
-        allItems.length,
-      );
-      if (response && response.items) {
-        allItems = allItems.concat(response.items);
-        next = response.next;
-      } else {
-        next = null;
+
+    // First call just to discover total number of tracks
+    const firstPage = await spotify()!.playlists.getPlaylistItems(
+      playlistId,
+      undefined,
+      "items(added_by(id),track(name,album(images),artists(name),uri)),total",
+      undefined, // defaults to 100.
+      0,
+    );
+
+    const total = firstPage.total ?? firstPage.items.length;
+    const allItems: PlaylistedTrack[] = [...firstPage.items];
+
+    if (total > firstPage.items.length) {
+      // Calculate offsets for remaining pages
+      const offsets: number[] = [];
+      for (let offset = firstPage.items.length; offset < total; offset += 100) {
+        offsets.push(offset);
       }
-    } while (next);
-    const shuffledTracks = shuffle(allItems);
-    return shuffledTracks;
+
+      // Kick off all requests in parallel
+      const pages = await Promise.all(
+        offsets.map((offset) =>
+          spotify()!.playlists.getPlaylistItems(
+            playlistId,
+            undefined,
+            "items(added_by(id),track(name,album(images),artists(name),uri))",
+            undefined, //defaults to 100
+            offset,
+          ),
+        ),
+      );
+
+      // Collect results
+      for (const page of pages) {
+        allItems.push(...page.items);
+      }
+    }
+    console.log(allItems);
+    console.log("Fetched", allItems.length, "tracks");
+    return shuffle(allItems).slice(undefined, 100);
   });
 
   const countdownHandler = async () => {
@@ -250,7 +280,7 @@ const ListView = (props: ViewProps) => {
   const delayedIterator = createDelayedSignal(props.iterator, 0);
   return (
     <div class="p-8">
-      <For each={props.tracks()?.slice(undefined, 100)}>
+      <For each={props.tracks()}>
         {(track, index) => (
           <Show when={delayedIterator() <= index() + 1}>
             {/* TODO: BAD PROP DRILLING */}
@@ -267,12 +297,12 @@ const ListView = (props: ViewProps) => {
 };
 
 const CompactListView = (props: ViewProps) => {
-   // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
+  // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
   // TODO: undo me back to 30, its annoying af for debugging though.
   const delayedIterator = createDelayedSignal(props.iterator, 0);
   return (
     <div class="p-8">
-      <For each={props.tracks()?.slice(undefined, 100)}>
+      <For each={props.tracks()}>
         {(track, index) => (
           <Show when={delayedIterator() <= index() + 1}>
             {/* TODO: BAD PROP DRILLING */}
@@ -288,10 +318,41 @@ const CompactListView = (props: ViewProps) => {
   );
 };
 
-const StatsView = (props: ViewProps) => (
-  <div class="p-8 bg-gray-100 rounded">
-    Stats View Placeholder
-    <pre>tracks: {JSON.stringify(props.tracks())}</pre>
-    <pre>iterator: {props.iterator()}</pre>
-  </div>
-);
+const StatsView = (props: ViewProps) => {
+  // const [userName] = createResource(
+  //   () => [props.spotify(), props.track.added_by.id],
+  //   ([sdk, userId]) => getUserDisplayName(sdk, userId),
+  // );
+  // Count songs per person
+  const counts = () => {
+    const internalCounts: Record<string, number> = {};
+    props.tracks()?.forEach((track) => {
+    const name = track.added_by?.id ?? undefined;
+    internalCounts[name] = (internalCounts[name] || 0) + 1;
+  });
+  }
+ 
+
+  return (
+    <div class="p-8">
+      <table class="min-w-[300px] bg-white rounded shadow">
+        <thead>
+          <tr>
+            <th class="text-left px-4 py-2 border-b">Person</th>
+            <th class="text-left px-4 py-2 border-b">Number of Songs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <For each={Object.entries(counts)}>
+            {([person, num]) => (
+              <tr>
+                <td class="px-4 py-2 border-b">{person !== undefined ? person : "Unknown"}</td>
+                <td class="px-4 py-2 border-b">{num}</td>
+              </tr>
+            )}
+          </For>
+        </tbody>
+      </table>
+    </div>
+  );
+};
