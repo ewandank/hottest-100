@@ -3,6 +3,7 @@ import { render } from "solid-js/web";
 
 import { routeTree } from "./routeTree.gen";
 import "./styles.css";
+import { GlobalStateProvider } from "./context/context";
 
 const router = createRouter({
   routeTree,
@@ -20,7 +21,9 @@ declare module "@tanstack/solid-router" {
 function App() {
   return (
     <>
-      <RouterProvider router={router} />
+      <GlobalStateProvider>
+        <RouterProvider router={router} />
+      </GlobalStateProvider>
     </>
   );
 }

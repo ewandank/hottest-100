@@ -1,22 +1,22 @@
 import { createFileRoute } from "@tanstack/solid-router";
-import { createSignal, Match, Switch, type Accessor } from "solid-js";
+import { Match, Switch } from "solid-js";
 import { PlaylistSelector } from "../components/playlist-selector";
 import { CountdownPlayer } from "../components/countdown-player";
+import { useGlobalContext } from "../context/context";
 
 export const Route = createFileRoute("/player")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [playlistId, setPlaylistId] = createSignal<string>();
+  const [store, setStore] = useGlobalContext();
   return (
     <Switch>
-      <Match when={playlistId() === undefined}>
-        <PlaylistSelector setPlaylistId={setPlaylistId} />
+      <Match when={store.playlistId === undefined}>
+        <PlaylistSelector />
       </Match>
-      <Match when={playlistId() !== undefined}>
-        {/* there is literally no way it can be undefined in this case */}
-        <CountdownPlayer playlistId={playlistId as Accessor<string>} />
+      <Match when={store.playlistId !== undefined}>
+        <CountdownPlayer />
       </Match>
     </Switch>
   );
