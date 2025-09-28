@@ -111,12 +111,12 @@ export const CountdownPlayer: Component = () => {
     const playlistId = store.playlistId;
     if (!playlistId) return [];
     if (!spotify()) return [];
-
+    const fields =  "items(added_by(id),track(name,album(images),artists(name),uri,duration_ms)),total"
     // First call just to discover total number of tracks
     const firstPage = await spotify()!.playlists.getPlaylistItems(
       playlistId,
       undefined,
-      "items(added_by(id),track(name,album(images),artists(name),uri,duration_ms)),total",
+     fields,
       undefined, // defaults to 100.
       0,
     );
@@ -137,7 +137,7 @@ export const CountdownPlayer: Component = () => {
           spotify()!.playlists.getPlaylistItems(
             playlistId,
             undefined,
-            "items(added_by(id),track(name,album(images),artists(name),uri))",
+            fields,
             undefined, //defaults to 100
             offset,
           ),

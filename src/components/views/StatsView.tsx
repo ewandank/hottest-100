@@ -23,7 +23,7 @@ export const StatsView = (props: ViewProps) => {
   };
 
   return (
-    <div class="grid grid-cols-3 gap-5">
+    <div class="grid grid-cols-2 gap-5">
       {/* <UserCountTable
         spotify={props.spotify}
         tracks={props.tracks}
@@ -50,6 +50,11 @@ export const StatsView = (props: ViewProps) => {
         currentIndex={currentIndex}
       />
       <TopNArtists
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <BackToBack
         spotify={props.spotify}
         tracks={props.tracks}
         currentIndex={currentIndex}
@@ -179,7 +184,7 @@ const UserCountGraph: Component<{
   };
 
   return (
-    <Card class="col-span-3">
+    <Card class="col-span-2">
       <CardHeader>
         <CardTitle>Who got the most songs in?</CardTitle>
       </CardHeader>
@@ -418,27 +423,82 @@ const BackToBack: Component<{
   tracks: Accessor<PlaylistedTrack[]>;
   currentIndex: Accessor<number>;
 }> = (props) => {
-  const runs = () => {}
+  const runs = () => {
+    const currentTracks = props.tracks()?.slice(props.currentIndex());
+    if (!currentTracks?.length) return [];
+
+    const artistRuns: Array<{
+      artist: string;
+      positions: number[];
+    }> = [];
+
+    let currentRun: {
+      artist: string;
+      positions: number[];
+    } | null = null;
+
+    // Process tracks to find runs
+    for (let i = 0; i < currentTracks.length - 1; i++) {
+      const currentTrack = currentTracks[i];
+      const nextTrack = currentTracks[i + 1];
+
+      // Get original positions in the countdown (1-based)
+      const currentPosition = i + props.currentIndex() + 1;
+      const nextPosition = i + props.currentIndex() + 2;
+
+      // Get artists from current and next tracks
+      const currentArtists = currentTrack.track.artists;
+      const nextArtists = nextTrack.track.artists;
+
+      // Find shared artists between current and next tracks
+      for (const currentArtist of currentArtists) {
+        const isInRun = nextArtists.some(
+          (nextArtist) => nextArtist.name === currentArtist.name,
+        );
+
+        if (isInRun) {
+          // If we have an active run with this artist
+          if (currentRun && currentRun.artist === currentArtist.name) {
+            // Add next position to the run
+            if (!currentRun.positions.includes(nextPosition)) {
+              currentRun.positions.push(nextPosition);
+            }
+          } else {
+            // Start a new run
+            currentRun = {
+              artist: currentArtist.name,
+              positions: [currentPosition, nextPosition],
+            };
+            artistRuns.push(currentRun);
+          }
+        } else if (currentRun && currentRun.artist === currentArtist.name) {
+          // End current run
+          currentRun = null;
+        }
+      }
+    }
+
+    // Sort runs by length (longest runs first)
+    return artistRuns.sort((a, b) => b.positions.length - a.positions.length);
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Artist Runs</CardTitle>
+        <CardTitle>b2b2b</CardTitle>
       </CardHeader>
       <CardContent class="h-44 overflow-y-auto">
         <For each={runs()}>
           {(run) => (
-            <div class="mb-2">
-              <p class="font-bold">{run.artist}</p>
-              <p class="text-sm">
-                Positions: {run.positions.join(", ")}
+            <div class="mb-2 text-lg">
+              <p>
+                <span class="font-bold">{run.artist}</span>
+                {" - "}
+                <span>{run.positions.map(value => `#${value}`).join(" & ")}</span>
               </p>
             </div>
           )}
         </For>
-        {runs().length === 0 && (
-          <p class="text-sm opacity-80">No artist runs found yet.</p>
-        )}
       </CardContent>
     </Card>
   );
