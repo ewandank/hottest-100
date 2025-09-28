@@ -12,6 +12,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@solid-primitives/refs": "^1.1.2",
     "@spotify/web-api-ts-sdk": "^1.2.0",
     "@tanstack/solid-query": "^5.90.3",
     "@tanstack/solid-router": "^1.131.4",

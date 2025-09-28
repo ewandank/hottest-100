@@ -1,9 +1,10 @@
 import { For, type Accessor, type Component } from "solid-js";
 import { useGlobalContext } from "../../context/context";
 import { createDelayedSignal } from "../../signals/createDelayedSignal";
-import { useUserDisplayName } from "../../SpotifyHelper";
+import { useUserDisplayName, useUserDisplayNames } from "../../SpotifyHelper";
 import type { ViewProps } from "../countdown-player";
 import type { PlaylistedTrack, SpotifyApi } from "@spotify/web-api-ts-sdk";
+import { BarChart } from "../charts";
 
 export const StatsView = (props: ViewProps) => {
   const [store] = useGlobalContext();
@@ -13,7 +14,7 @@ export const StatsView = (props: ViewProps) => {
       return 0;
     }
     if (delayedIterator() !== undefined) {
-      return delayedIterator();
+      return delayedIterator() - 1;
     }
     return props.tracks().length;
   };
@@ -30,6 +31,11 @@ export const StatsView = (props: ViewProps) => {
         tracks={props.tracks}
         currentIndex={currentIndex}
       />
+      <UserCountGraph
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
     </div>
   );
 };
@@ -37,7 +43,7 @@ export const StatsView = (props: ViewProps) => {
 const UserCountTable: Component<{
   spotify: Accessor<SpotifyApi>;
   tracks: Accessor<PlaylistedTrack[]>;
-  currentIndex: Accesor<number>;
+  currentIndex: Accessor<number>;
 }> = (props) => {
   const counts = () => {
     const internalCounts: Record<string, number> = {};
@@ -85,10 +91,46 @@ const UserCountTable: Component<{
   );
 };
 
+const UserCountGraph: Component<{
+  spotify: Accessor<SpotifyApi>;
+  tracks: Accessor<PlaylistedTrack[]>;
+  currentIndex: Accessor<number>;
+}> = (props) => {
+  // Compute user counts and ids in original order
+  const getCounts = () => {
+    const counts: Record<string, number> = {};
+    const order: string[] = [];
+    const tracks = props.tracks()?.slice(props.currentIndex()) ?? [];
+    for (const track of tracks) {
+      const id = track.added_by?.id ?? "unknown";
+      if (!(id in counts)) order.push(id);
+      counts[id] = (counts[id] || 0) + 1;
+    }
+    return order.map((id) => [id, counts[id]] as [string, number]);
+  };
+
+  const chartData = () => {
+    const entries = getCounts();
+    const ids = entries.map(([id]) => id);
+    const values = entries.map(([, value]) => value);
+    const displayNames = useUserDisplayNames(props.spotify(), ids);
+    return {
+      labels: displayNames.map((d) => d.data ?? "Unknown"),
+      datasets: [
+        {
+          data: [...values],
+        },
+      ],
+    };
+  };
+
+  return <BarChart data={chartData()}/>;
+};
+
 const ArtistCountTable: Component<{
   spotify: Accessor<SpotifyApi>;
   tracks: Accessor<PlaylistedTrack[]>;
-  currentIndex: Accesor<number>;
+  currentIndex: Accessor<number>;
 }> = (props) => {
   const counts = () => {
     const internalCounts: Record<string, number> = {};
@@ -108,28 +150,28 @@ const ArtistCountTable: Component<{
   };
 
   return (
-      <div class="max-h-[374px] overflow-y-auto rounded  w-xl">
-        <table class="min-w-[300px] w-full">
-            {/* TODO don't like the bg-white, but need a way for the scroll to not cover it */}
-          <thead class="sticky top-0 z-10 bg-white">
-            <tr>
-              <th class="text-left px-4 py-2 border-b">Artist</th>
-              <th class="text-left px-4 py-2 border-b">Number of Songs</th>
-            </tr>
-          </thead>
-          <tbody>
-            <For each={counts()}>
-              {([person, num]) => (
-                <tr>
-                  <td class="px-4 py-2 border-b">
-                    {person !== undefined ? person : "Unknown"}
-                  </td>
-                  <td class="px-4 py-2 border-b">{num}</td>
-                </tr>
-              )}
-            </For>
-          </tbody>
-        </table>
-      </div>
+    <div class="max-h-[374px] overflow-y-auto rounded  w-xl">
+      <table class="min-w-[300px] w-full">
+        {/* TODO don't like the bg-white, but need a way for the scroll to not cover it */}
+        <thead class="sticky top-0 z-10 bg-white">
+          <tr>
+            <th class="text-left px-4 py-2 border-b">Artist</th>
+            <th class="text-left px-4 py-2 border-b">Number of Songs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <For each={counts()}>
+            {([person, num]) => (
+              <tr>
+                <td class="px-4 py-2 border-b">
+                  {person !== undefined ? person : "Unknown"}
+                </td>
+                <td class="px-4 py-2 border-b">{num}</td>
+              </tr>
+            )}
+          </For>
+        </tbody>
+      </table>
+    </div>
   );
 };
