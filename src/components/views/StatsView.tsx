@@ -400,12 +400,22 @@ const TopNArtists: Component<{
       </CardHeader>
       <CardContent class="h-44 overflow-y-auto">
         <For each={counts()}>
-          {([person, num], idx) => (
-            <p class="py-0.5">
-              <span class="font-bold">{idx() + 1}.</span> {person} - {num} song
-              {num !== 1 ? "s" : ""}
-            </p>
-          )}
+          {([person, num], idx) => {
+            // Calculate the correct position (accounting for ties)
+            let position = 1;
+            for (let i = 0; i < idx(); i++) {
+              // If current item's count is less than previous item's count, increment position
+              if (counts()[i][1] > counts()[idx()][1]) {
+                position++;
+              }
+            }
+            return (
+              <p class="py-0.5">
+                <span class="font-bold">{position}.</span> {person} - {num} song
+                {num !== 1 ? "s" : ""}
+              </p>
+            );
+          }}
         </For>
       </CardContent>
       <CardFooter>
