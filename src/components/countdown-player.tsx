@@ -116,7 +116,7 @@ export const CountdownPlayer: Component = () => {
     const firstPage = await spotify()!.playlists.getPlaylistItems(
       playlistId,
       undefined,
-      "items(added_by(id),track(name,album(images),artists(name),uri)),total",
+      "items(added_by(id),track(name,album(images),artists(name),uri,duration_ms)),total",
       undefined, // defaults to 100.
       0,
     );
