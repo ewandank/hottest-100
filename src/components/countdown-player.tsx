@@ -302,13 +302,13 @@ type ViewProps = {
 const ListView = (props: ViewProps) => {
   const [store] = useGlobalContext();
   // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
-  // TODO: undo me back to 30, its annoying af for debugging though.
-  const delayedIterator = createDelayedSignal(() => store.iterator, 0);
+  const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
+  const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator());
   return (
     <div class="p-8">
       <For each={props.tracks()}>
         {(track, index) => (
-          <Show when={delayedIterator() <= index() + 1}>
+          <Show when={currentIndex() <= index() + 1}>
             {/* TODO: BAD PROP DRILLING */}
             <TrackView
               track={track}
@@ -348,13 +348,15 @@ const CompactListView = (props: ViewProps) => {
 
 const StatsView = (props: ViewProps) => {
   const [store] = useGlobalContext();
-  const delayedIterator = createDelayedSignal(() => store.iterator, 0);
+  // I think i need to hoik this up a level, as whenever you change view these seem to reset.
+  const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
+  const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator() - 1);
   // Count songs per person
   const counts = () => {
     const internalCounts: Record<string, number> = {};
     props
       .tracks()
-      .slice(delayedIterator() - 1)
+      ?.slice(currentIndex())
       ?.forEach((track) => {
         const name = track.added_by?.id ?? undefined;
         internalCounts[name] = (internalCounts[name] || 0) + 1;
