@@ -1,5 +1,11 @@
-import { useQueries, useQuery, useQueryClient } from "@tanstack/solid-query";
-import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
+import { useQueries, useQuery } from "@tanstack/solid-query";
+import type {
+  Album,
+  Artist,
+  PlaylistedTrack,
+  SpotifyApi,
+  TrackItem,
+} from "@spotify/web-api-ts-sdk";
 
 /**
  * Hook to fetch and cache the display name for a Spotify user using TanStack Query.
@@ -8,7 +14,7 @@ import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
  * @returns display name or userId if not found
  */
 export function useUserDisplayName(
-  sdk: SpotifyApi | undefined,
+  sdk: SpotifyApi | null,
   userId: string,
 ) {
   return useQuery(() => ({
@@ -26,7 +32,7 @@ export function useUserDisplayName(
  * @returns display name or userId if not found
  */
 export function useUserDisplayNames(
-  sdk: SpotifyApi | undefined,
+  sdk: SpotifyApi | null,
   userIds: string[],
 ) {
   return useQueries(() => ({
@@ -38,10 +44,24 @@ export function useUserDisplayNames(
   }));
 }
 
-const fetchUserName = (sdk: SpotifyApi | undefined, userId: string) => {
+const fetchUserName = (sdk: SpotifyApi | null, userId: string) => {
   return async () => {
     if (!sdk) return userId;
     const user = await sdk.users.profile(userId);
     return user?.display_name ?? userId;
   };
 };
+
+/**
+ * A type that actually lines up with the fields I am requesting, no more no less.
+ */
+export interface ActualPlaylistedTrack
+  extends Pick<PlaylistedTrack, "added_by"> {
+  track: ActualTrackItem;
+}
+
+interface ActualTrackItem
+  extends Pick<TrackItem, "duration_ms" | "uri" | "name"> {
+  album: Pick<Album, "images" | "release_date">;
+  artists: Pick<Artist, "name">[];
+}

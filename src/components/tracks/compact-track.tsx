@@ -1,10 +1,14 @@
-import { SpotifyApi, type PlaylistedTrack } from "@spotify/web-api-ts-sdk";
+import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { Suspense, type Component } from "solid-js";
-import { useUserDisplayName } from "../../SpotifyHelper";
+import {
+  useUserDisplayName,
+  type ActualPlaylistedTrack,
+} from "../../SpotifyHelper";
+
 export const CompactTrackView: Component<{
-  track: PlaylistedTrack;
+  track: ActualPlaylistedTrack;
   idx: number;
-  spotify: () => SpotifyApi;
+  spotify: () => SpotifyApi | null;
 }> = (props) => {
   const userName = useUserDisplayName(props.spotify(), props.track.added_by.id);
   return (
@@ -15,9 +19,7 @@ export const CompactTrackView: Component<{
         <div class="pl-4 flex flex-col">
           <p class="font-bold"> {props.track.track.name}</p>
           <p>
-            {(props.track.track.artists as { name: string }[])
-              .map((artist) => artist.name)
-              .join(",")}
+            {props.track.track.artists.map((artist) => artist.name).join(",")}
           </p>
           <p class="text-gray-500">{userName.data}</p>
         </div>

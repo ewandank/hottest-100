@@ -18,8 +18,6 @@ import type {
   ChartOptions,
   Plugin as ChartPlugin,
   ChartType,
-  ChartTypeRegistry,
-  TooltipModel,
 } from "chart.js";
 import {
   ArcElement,

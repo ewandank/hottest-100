@@ -9,7 +9,7 @@ export const Route = createFileRoute("/player")({
 });
 
 function RouteComponent() {
-  const [store, setStore] = useGlobalContext();
+  const [store] = useGlobalContext();
   return (
     <Switch>
       <Match when={store.playlistId === undefined}>

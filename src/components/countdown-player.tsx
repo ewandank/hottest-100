@@ -1,4 +1,7 @@
-import type { PlaylistedTrack, SpotifyApi } from "@spotify/web-api-ts-sdk";
+import type {
+  PlaylistedTrack,
+  SpotifyApi,
+} from "@spotify/web-api-ts-sdk";
 import {
   createEffect,
   createResource,
@@ -20,6 +23,7 @@ import { ListView } from "./views/ListView";
 import { CompactListView } from "./views/CompactListView";
 import { StatsView } from "./views/StatsView";
 import { useGlobalContext } from "../context/context";
+import type { ActualPlaylistedTrack } from "../SpotifyHelper";
 
 const [view, setView] = createSignal<"list" | "compact-list" | "stats">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
@@ -107,6 +111,9 @@ export const CountdownPlayer: Component = () => {
     20,
   );
 
+
+
+
   const [tracks] = createResource(spotify, async () => {
     const playlistId = store.playlistId;
     if (!playlistId) return [];
@@ -150,7 +157,8 @@ export const CountdownPlayer: Component = () => {
         allItems.push(...page.items);
       }
     }
-    return shuffle(allItems).slice(undefined, 100);
+    // Spotify types are wrong. Make sure this lines up with teh fields array.
+    return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
   });
 
   const countdownHandler = async () => {
@@ -297,7 +305,7 @@ const Toolbar: Component<{
 };
 
 export type ViewProps = {
-  tracks: Accessor<PlaylistedTrack[] | undefined>;
-  spotify: () => SpotifyApi;
+  tracks: Accessor<ActualPlaylistedTrack[] | undefined>;
+  spotify: () => SpotifyApi | null;
   showSpoilers: Accessor<boolean>;
 };
