@@ -25,11 +25,11 @@ export const PlaylistSelector: Component = () => {
             <div class="flex flex-col gap-4 w-full max-w-4xl mx-auto px-4">
               <select
                 id="playlist-select"
-                value={store.playlistId}
+                value={store.playlistId || ""}
                 onChange={(e) => setSelectedId(e.currentTarget.value)}
                 class="w-full rounded-md bg-gray-400 text-white py-3 px-4 text-lg"
               >
-                <option value="" disabled selected>
+                <option value="" disabled>
                   Please select a playlist to shuffle...
                 </option>
                 <For each={playlists()?.items}>
@@ -41,7 +41,7 @@ export const PlaylistSelector: Component = () => {
                 disabled={!selectedId()}
                 class="w-full rounded-md  py-3 px-4 text-lg"
                 classList={{
-                  "bg-gray-400 text-white": selectedId() !== undefined,
+                  "bg-gray-400 text-white": selectedId() !== "",
                   "bg-gray-300 text-gray-100 cursor-not-allowed opacity-60":
                     selectedId() === "",
                 }}

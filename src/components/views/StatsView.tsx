@@ -23,7 +23,7 @@ export const StatsView = (props: ViewProps) => {
   };
 
   return (
-    <div class="grid grid-cols-2 gap-5">
+    <div class="grid grid-cols-3 gap-5">
       {/* <UserCountTable
         spotify={props.spotify}
         tracks={props.tracks}
@@ -39,6 +39,11 @@ export const StatsView = (props: ViewProps) => {
         tracks={props.tracks}
         currentIndex={currentIndex}
       />
+      <TopNArtists
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
       <LongestSong
         spotify={props.spotify}
         tracks={props.tracks}
@@ -49,12 +54,23 @@ export const StatsView = (props: ViewProps) => {
         tracks={props.tracks}
         currentIndex={currentIndex}
       />
-      <TopNArtists
+
+      <BackToBack
         spotify={props.spotify}
         tracks={props.tracks}
         currentIndex={currentIndex}
       />
-      <BackToBack
+      <SongsByYear
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <NewestSong
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <OldestSong
         spotify={props.spotify}
         tracks={props.tracks}
         currentIndex={currentIndex}
@@ -504,12 +520,168 @@ const BackToBack: Component<{
               <p>
                 <span class="font-bold">{run.artist}</span>
                 {" - "}
-                <span>{run.positions.map(value => `#${value}`).join(" & ")}</span>
+                <span>
+                  {run.positions.map((value) => `#${value}`).join(" & ")}
+                </span>
               </p>
             </div>
           )}
         </For>
+        {runs().length === 0 && <p>No artist has gone back to back</p>}
       </CardContent>
     </Card>
   );
+};
+
+const SongsByYear: Component<{
+  spotify: Accessor<SpotifyApi>;
+  tracks: Accessor<PlaylistedTrack[]>;
+  currentIndex: Accessor<number>;
+}> = (props) => {
+  const years = () => {
+    const internalCounts: Record<string, number> = {};
+    props
+      .tracks()
+      ?.slice(props.currentIndex())
+      ?.forEach((track) => {
+        const year = track.track.album.release_date.slice(0, 4) ?? undefined;
+        internalCounts[year] = (internalCounts[year] || 0) + 1;
+      });
+    const sortedCounts = Object.entries(internalCounts).sort((a, b) => {
+      // First sort by count (descending)
+      const countDiff = b[1] - a[1];
+      if (countDiff !== 0) return countDiff;
+
+      // If counts are equal, sort by year (descending/newest first)
+      return parseInt(b[0]) - parseInt(a[0]);
+    });
+    return sortedCounts;
+  };
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Songs By Year</CardTitle>
+      </CardHeader>
+      <CardContent class="overflow-y-auto h-36">
+        <For each={years()}>
+          {([year, num]) => (
+            <p>
+              {year} - {num}
+            </p>
+          )}
+        </For>
+        {years().length === 0 && <p>No songs available</p>}
+      </CardContent>
+    </Card>
+  );
+};
+
+const NewestSong: Component<{
+  spotify: Accessor<SpotifyApi>;
+  tracks: Accessor<PlaylistedTrack[]>;
+  currentIndex: Accessor<number>;
+}> = (props) => {
+  const newestSong = () => {
+    const tracks = props.tracks();
+    if (!tracks || tracks.length === 0) return undefined;
+
+    const currentTracks = tracks.slice(props.currentIndex());
+    if (!currentTracks || currentTracks.length === 0) return undefined;
+
+    // Sort the tracks by release date in descending order (newest first)
+    return [...currentTracks].sort((a, b) => {
+      const dateA = a.track.album.release_date || "";
+      const dateB = b.track.album.release_date || "";
+      // Compare dates in string form since they're in YYYY-MM-DD format
+      return dateB.localeCompare(dateA);
+    })[0];
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Newest Song</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {newestSong() !== undefined ? (
+          <div class="flex flex-col items-center justify-center h-full">
+            <p class="text-2xl font-extrabold">
+              {formatDate(newestSong()!.track.album.release_date)}
+            </p>
+            <p class="font-bold">{newestSong()!.track.name}</p>
+            <p>
+              {newestSong()!
+                .track.artists.map((artist) => artist.name)
+                .join(", ")}
+            </p>
+          </div>
+        ) : (
+          <p>No songs available</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+const OldestSong: Component<{
+  spotify: Accessor<SpotifyApi>;
+  tracks: Accessor<PlaylistedTrack[]>;
+  currentIndex: Accessor<number>;
+}> = (props) => {
+  const oldestSong = () => {
+    const tracks = props.tracks();
+    if (!tracks || tracks.length === 0) return undefined;
+
+    const currentTracks = tracks.slice(props.currentIndex());
+    if (!currentTracks || currentTracks.length === 0) return undefined;
+
+    // Sort the tracks by release date in ascending order (oldest first)
+    return [...currentTracks].sort((a, b) => {
+      const dateA = a.track.album.release_date || "";
+      const dateB = b.track.album.release_date || "";
+      // Compare dates in string form since they're in YYYY-MM-DD format
+      return dateA.localeCompare(dateB);
+    })[0];
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Oldest Song</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {oldestSong() !== undefined ? (
+          <div class="flex flex-col items-center justify-center h-full">
+            <p class="text-2xl font-extrabold">
+              {formatDate(oldestSong()!.track.album.release_date)}
+            </p>
+            <p class="font-bold">{oldestSong()!.track.name}</p>
+            <p>
+              {/* Use type assertion to handle the track types properly */}
+              {(oldestSong()!.track.artists as { name: string }[])
+                .map((artist) => artist.name)
+                .join(", ")}
+            </p>
+          </div>
+        ) : (
+          <p>No songs available</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+// Helper function to convert YYYY-MM-DD date to DD/MM/YYYY format
+const formatDate = (dateStr: string): string => {
+  if (!dateStr) return "";
+
+  // Check if the date is in the YYYY-MM-DD format
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    const [_, year, month, day] = match;
+    return `${day}/${month}/${year}`;
+  }
+
+  // If it's only YYYY format or any other format, return as is
+  return dateStr;
 };

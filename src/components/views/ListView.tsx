@@ -24,4 +24,3 @@ export const ListView = (props: ViewProps) => {
     </div>
   );
 };
-

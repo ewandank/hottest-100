@@ -6,8 +6,8 @@ import {
   type Component,
   Show,
   type Accessor,
-  For,
   onCleanup,
+  Suspense,
 } from "solid-js";
 import { createSpotify } from "../signals/createSpotify";
 import { debounce, shuffle, playNumber } from "../utils";
@@ -111,12 +111,13 @@ export const CountdownPlayer: Component = () => {
     const playlistId = store.playlistId;
     if (!playlistId) return [];
     if (!spotify()) return [];
-    const fields =  "items(added_by(id),track(name,album(images),artists(name),uri,duration_ms)),total"
+    const fields =
+      "items(added_by(id),track(name,album(images,release_date),artists(name),uri,duration_ms)),total";
     // First call just to discover total number of tracks
     const firstPage = await spotify()!.playlists.getPlaylistItems(
       playlistId,
       undefined,
-     fields,
+      fields,
       undefined, // defaults to 100.
       0,
     );
@@ -191,29 +192,31 @@ export const CountdownPlayer: Component = () => {
           showSpoilers={showSpoilers}
           setShowSpoilers={setShowSpoilers}
         />
-        <div class="mt-8">
-          <Show when={view() === "list"}>
-            <ListView
-              tracks={tracks}
-              spotify={spotify}
-              showSpoilers={showSpoilers}
-            />
-          </Show>
-          <Show when={view() === "compact-list"}>
-            <CompactListView
-              tracks={tracks}
-              spotify={spotify}
-              showSpoilers={showSpoilers}
-            />
-          </Show>
-          <Show when={view() === "stats"}>
-            <StatsView
-              tracks={tracks}
-              spotify={spotify}
-              showSpoilers={showSpoilers}
-            />
-          </Show>
-        </div>
+        <Suspense>
+          <div class="mt-8">
+            <Show when={view() === "list"}>
+              <ListView
+                tracks={tracks}
+                spotify={spotify}
+                showSpoilers={showSpoilers}
+              />
+            </Show>
+            <Show when={view() === "compact-list"}>
+              <CompactListView
+                tracks={tracks}
+                spotify={spotify}
+                showSpoilers={showSpoilers}
+              />
+            </Show>
+            <Show when={view() === "stats"}>
+              <StatsView
+                tracks={tracks}
+                spotify={spotify}
+                showSpoilers={showSpoilers}
+              />
+            </Show>
+          </div>
+        </Suspense>
       </div>
     </div>
   );

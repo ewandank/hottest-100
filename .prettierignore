@@ -3,3 +3,4 @@ build
 coverage
 dist
 pnpm-lock.yaml
+routeTree.gen.ts

@@ -1,6 +1,6 @@
 import { SpotifyApi, type PlaylistedTrack } from "@spotify/web-api-ts-sdk";
 import { Suspense, type Component } from "solid-js";
-import {  useUserDisplayName } from "../../SpotifyHelper";
+import { useUserDisplayName } from "../../SpotifyHelper";
 export const CompactTrackView: Component<{
   track: PlaylistedTrack;
   idx: number;
