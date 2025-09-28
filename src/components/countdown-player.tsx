@@ -16,11 +16,10 @@ import Play from "lucide-solid/icons/play";
 import List from "lucide-solid/icons/list";
 import ChartNetwork from "lucide-solid/icons/chart-network";
 import GalleryVertical from "lucide-solid/icons/gallery-vertical";
-import { createDelayedSignal } from "../signals/createDelayedSignal";
-import { TrackView } from "./tracks/track-list-view";
-import { CompactTrackView } from "./tracks/compact-track";
+import { ListView } from "./views/ListView";
+import { CompactListView } from "./views/CompactListView";
+import { StatsView } from "./views/StatsView";
 import { useGlobalContext } from "../context/context";
-import { useUserDisplayName } from "../SpotifyHelper";
 
 const [view, setView] = createSignal<"list" | "compact-list" | "stats">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
@@ -232,6 +231,7 @@ const Toolbar: Component<{
   return (
     <div class="flex flex-row w-full pt-8 pb-4 items-center">
       <div class="flex-1 flex justify-center">
+        {/* Disable this button when the coundown audio is playing*/}
         <button
           onClick={() => {
             if (store.iterator === undefined) {
@@ -293,104 +293,8 @@ const Toolbar: Component<{
   );
 };
 
-type ViewProps = {
+export type ViewProps = {
   tracks: Accessor<PlaylistedTrack[] | undefined>;
   spotify: () => SpotifyApi;
   showSpoilers: Accessor<boolean>;
-};
-
-const ListView = (props: ViewProps) => {
-  const [store] = useGlobalContext();
-  // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
-  const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
-  const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator());
-  return (
-    <div class="p-8">
-      <For each={props.tracks()}>
-        {(track, index) => (
-          <Show when={currentIndex() <= index() + 1}>
-            {/* TODO: BAD PROP DRILLING */}
-            <TrackView
-              track={track}
-              idx={index() + 1}
-              spotify={props.spotify}
-            />
-          </Show>
-        )}
-      </For>
-    </div>
-  );
-};
-
-const CompactListView = (props: ViewProps) => {
-  const [store] = useGlobalContext();
-  // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
-  const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
-  const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator());
-
-  return (
-    <div class="p-8">
-      <For each={props.tracks()}>
-        {(track, index) => (
-          <Show when={currentIndex() <= index() + 1}>
-            {/* TODO: BAD PROP DRILLING */}
-            <CompactTrackView
-              track={track}
-              idx={index() + 1}
-              spotify={props.spotify}
-            />
-          </Show>
-        )}
-      </For>
-    </div>
-  );
-};
-
-const StatsView = (props: ViewProps) => {
-  const [store] = useGlobalContext();
-  // I think i need to hoik this up a level, as whenever you change view these seem to reset.
-  const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
-  const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator() - 1);
-  // Count songs per person
-  const counts = () => {
-    const internalCounts: Record<string, number> = {};
-    props
-      .tracks()
-      ?.slice(currentIndex())
-      ?.forEach((track) => {
-        const name = track.added_by?.id ?? undefined;
-        internalCounts[name] = (internalCounts[name] || 0) + 1;
-      });
-    return internalCounts;
-  };
-
-  return (
-    <div class="p-8">
-      <table class="min-w-[300px] bg-white rounded shadow">
-        <thead>
-          <tr>
-            <th class="text-left px-4 py-2 border-b">Person</th>
-            <th class="text-left px-4 py-2 border-b">Number of Songs</th>
-          </tr>
-        </thead>
-        <tbody>
-          <For each={Object.entries(counts())}>
-            {([person, num]) => {
-              const displayName = useUserDisplayName(props.spotify(), person);
-              return (
-                <tr>
-                  <td class="px-4 py-2 border-b">
-                    {displayName.data !== undefined
-                      ? displayName.data
-                      : "Unknown"}
-                  </td>
-                  <td class="px-4 py-2 border-b">{num}</td>
-                </tr>
-              );
-            }}
-          </For>
-        </tbody>
-      </table>
-    </div>
-  );
 };
