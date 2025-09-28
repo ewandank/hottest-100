@@ -1,22 +1,12 @@
-import type { PlaylistedTrack, SpotifyApi } from "@spotify/web-api-ts-sdk";
-import { createResource, Suspense, type Component } from "solid-js";
-import { userCache } from "../../SpotifyHelper";
+import { SpotifyApi, type PlaylistedTrack } from "@spotify/web-api-ts-sdk";
+import { Suspense, type Component } from "solid-js";
+import {  useUserDisplayName } from "../../SpotifyHelper";
 export const CompactTrackView: Component<{
   track: PlaylistedTrack;
   idx: number;
   spotify: () => SpotifyApi;
 }> = (props) => {
-  const [userName] = createResource(props.spotify, async (sdk) => {
-    if (!sdk) return undefined;
-    const userId = props.track.added_by.id;
-    if (userCache.has(userId)) {
-      return userCache.get(userId);
-    }
-    const user = await sdk.users.profile(userId);
-    const name = user?.display_name ?? userId;
-    userCache.set(userId, name);
-    return name;
-  });
+  const userName = useUserDisplayName(props.spotify(), props.track.added_by.id);
   return (
     <Suspense>
       <div class="flex flex-row w-full items-center py-4">
@@ -29,7 +19,7 @@ export const CompactTrackView: Component<{
               .map((artist) => artist.name)
               .join(",")}
           </p>
-          <p class="text-gray-500">{userName()}</p>
+          <p class="text-gray-500">{userName.data}</p>
         </div>
       </div>
     </Suspense>

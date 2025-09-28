@@ -20,6 +20,7 @@ import { createDelayedSignal } from "../signals/createDelayedSignal";
 import { TrackView } from "./tracks/track-list-view";
 import { CompactTrackView } from "./tracks/compact-track";
 import { useGlobalContext } from "../context/context";
+import { useUserDisplayName } from "../SpotifyHelper";
 
 const [view, setView] = createSignal<"list" | "compact-list" | "stats">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
@@ -179,6 +180,7 @@ export const CountdownPlayer: Component = () => {
     ]);
   };
 
+  const [showSpoilers, setShowSpoilers] = createSignal(false);
   return (
     <div class="bg-jjj-gradient flex justify-center min-h-screen">
       <div class="w-3/5 bg-transparent">
@@ -187,16 +189,30 @@ export const CountdownPlayer: Component = () => {
           paused={paused}
           view={view}
           setView={setView}
+          showSpoilers={showSpoilers}
+          setShowSpoilers={setShowSpoilers}
         />
         <div class="mt-8">
           <Show when={view() === "list"}>
-            <ListView tracks={tracks} spotify={spotify} />
+            <ListView
+              tracks={tracks}
+              spotify={spotify}
+              showSpoilers={showSpoilers}
+            />
           </Show>
           <Show when={view() === "compact-list"}>
-            <CompactListView tracks={tracks} spotify={spotify} />
+            <CompactListView
+              tracks={tracks}
+              spotify={spotify}
+              showSpoilers={showSpoilers}
+            />
           </Show>
           <Show when={view() === "stats"}>
-            <StatsView tracks={tracks} spotify={spotify} />
+            <StatsView
+              tracks={tracks}
+              spotify={spotify}
+              showSpoilers={showSpoilers}
+            />
           </Show>
         </div>
       </div>
@@ -209,10 +225,12 @@ const Toolbar: Component<{
   paused: Accessor<boolean>;
   view: Accessor<"list" | "compact-list" | "stats">;
   setView: (v: "list" | "compact-list" | "stats") => void;
+  showSpoilers: Accessor<boolean>;
+  setShowSpoilers: (v: boolean) => void;
 }> = (props) => {
   const [store] = useGlobalContext();
   return (
-    <div class="flex flex-row w-full pt-8 pb-4">
+    <div class="flex flex-row w-full pt-8 pb-4 items-center">
       <div class="flex-1 flex justify-center">
         <button
           onClick={() => {
@@ -230,6 +248,16 @@ const Toolbar: Component<{
             <Pause class="text-gray-600" />
           </Show>
         </button>
+      </div>
+      <div class="flex items-center gap-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={props.showSpoilers()}
+            onInput={(e) => props.setShowSpoilers(e.currentTarget.checked)}
+          />
+          Show spoilers
+        </label>
       </div>
       <div class="flex justify-end pr-4">
         <div class="flex flex-row rounded-md overflow-hidden divide-gray-600 border border-gray-600 bg-white">
@@ -268,6 +296,7 @@ const Toolbar: Component<{
 type ViewProps = {
   tracks: Accessor<PlaylistedTrack[] | undefined>;
   spotify: () => SpotifyApi;
+  showSpoilers: Accessor<boolean>;
 };
 
 const ListView = (props: ViewProps) => {
@@ -296,13 +325,14 @@ const ListView = (props: ViewProps) => {
 const CompactListView = (props: ViewProps) => {
   const [store] = useGlobalContext();
   // TODO: would be nice if I could delay this based on the length of the song. This will implode if the song is <30 seconds.
-  // TODO: undo me back to 30, its annoying af for debugging though.
-  const delayedIterator = createDelayedSignal(() => store.iterator, 0);
+  const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
+  const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator());
+
   return (
     <div class="p-8">
       <For each={props.tracks()}>
         {(track, index) => (
-          <Show when={delayedIterator() <= index() + 1}>
+          <Show when={currentIndex() <= index() + 1}>
             {/* TODO: BAD PROP DRILLING */}
             <CompactTrackView
               track={track}
@@ -317,17 +347,18 @@ const CompactListView = (props: ViewProps) => {
 };
 
 const StatsView = (props: ViewProps) => {
-  // const [userName] = createResource(
-  //   () => [props.spotify(), props.track.added_by.id],
-  //   ([sdk, userId]) => getUserDisplayName(sdk, userId),
-  // );
+  const [store] = useGlobalContext();
+  const delayedIterator = createDelayedSignal(() => store.iterator, 0);
   // Count songs per person
   const counts = () => {
     const internalCounts: Record<string, number> = {};
-    props.tracks()?.forEach((track) => {
-      const name = track.added_by?.id ?? undefined;
-      internalCounts[name] = (internalCounts[name] || 0) + 1;
-    });
+    props
+      .tracks()
+      .slice(delayedIterator() - 1)
+      ?.forEach((track) => {
+        const name = track.added_by?.id ?? undefined;
+        internalCounts[name] = (internalCounts[name] || 0) + 1;
+      });
     return internalCounts;
   };
 
@@ -342,14 +373,19 @@ const StatsView = (props: ViewProps) => {
         </thead>
         <tbody>
           <For each={Object.entries(counts())}>
-            {([person, num]) => (
-              <tr>
-                <td class="px-4 py-2 border-b">
-                  {person !== undefined ? person : "Unknown"}
-                </td>
-                <td class="px-4 py-2 border-b">{num}</td>
-              </tr>
-            )}
+            {([person, num]) => {
+              const displayName = useUserDisplayName(props.spotify(), person);
+              return (
+                <tr>
+                  <td class="px-4 py-2 border-b">
+                    {displayName.data !== undefined
+                      ? displayName.data
+                      : "Unknown"}
+                  </td>
+                  <td class="px-4 py-2 border-b">{num}</td>
+                </tr>
+              );
+            }}
           </For>
         </tbody>
       </table>

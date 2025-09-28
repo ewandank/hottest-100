@@ -1,21 +1,23 @@
-// I don't think this works how i think it does.
-export const userCache = new Map<string, string>();
-
+import { useQuery } from "@tanstack/solid-query";
 import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
 
 /**
- * Fetches and caches the display name for a Spotify user.
+ * Hook to fetch and cache the display name for a Spotify user using TanStack Query.
  * @param sdk SpotifyApi instance
  * @param userId Spotify user ID
  * @returns display name or userId if not found
  */
-export async function getUserDisplayName(sdk: SpotifyApi | undefined, userId: string): Promise<string> {
-	if (!sdk) return userId;
-	if (userCache.has(userId)) {
-		return userCache.get(userId)!;
-	}
-	const user = await sdk.users.profile(userId);
-	const name = user?.display_name ?? userId;
-	userCache.set(userId, name);
-	return name;
+export function useUserDisplayName(
+  sdk: SpotifyApi | undefined,
+  userId: string,
+) {
+  return useQuery(() => ({
+    queryKey: ["spotify-user", userId],
+    queryFn: async () => {
+      if (!sdk) return userId;
+      const user = await sdk.users.profile(userId);
+      return user?.display_name ?? userId;
+    },
+    enabled: !!sdk && !!userId,
+  }));
 }
