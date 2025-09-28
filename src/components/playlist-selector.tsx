@@ -3,7 +3,7 @@ import { createSpotify } from "../signals/createSpotify";
 import { useGlobalContext } from "../context/context";
 
 export const PlaylistSelector: Component = () => {
-  const spotify = createSpotify("http://localhost:5173/player");
+  const spotify = createSpotify(`${window.location.origin}/player`);
 
   const [playlists] = createResource(spotify, async (sdk) => {
     if (!sdk) return null;

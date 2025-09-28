@@ -47,7 +47,7 @@ export const CountdownPlayer: Component = () => {
     const script = document.getElementById("spotify-sdk");
     script?.remove();
   });
-  const spotify = createSpotify("http://localhost:5173/player");
+  const spotify = createSpotify(`${window.location.origin}/player`);
 
   createEffect(() => {
     (async () => {
