@@ -1,13 +1,17 @@
 import { For, type Accessor, type Component } from "solid-js";
 import { useGlobalContext } from "../../context/context";
 import { createDelayedSignal } from "../../signals/createDelayedSignal";
-import { useUserDisplayNames, type ActualPlaylistedTrack } from "../../SpotifyHelper";
+import {
+  useUserDisplayNames,
+  type ActualPlaylistedTrack,
+} from "../../SpotifyHelper";
 import type { ViewProps } from "../countdown-player";
 import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { BarChart } from "../charts";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../Card";
 import type { ChartData } from "chart.js";
 import { millisToMinutesAndSeconds } from "../../utils";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 export type StatsComponentProps = {
   spotify: Accessor<SpotifyApi | null>;
@@ -17,13 +21,17 @@ export type StatsComponentProps = {
 
 export const StatsView = (props: ViewProps) => {
   const [store] = useGlobalContext();
-  const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
+  const delayedIteratorSignal = createDelayedSignal(
+    () => store.iterator,
+    30_000,
+  );
   const currentIndex = () => {
     if (props.showSpoilers()) {
       return 0;
     }
-    if (delayedIterator() !== undefined) {
-      return delayedIterator() - 1;
+    const iterator = delayedIteratorSignal();
+    if (iterator !== undefined) {
+      return iterator - 1;
     }
     return props.tracks()?.length;
   };
@@ -85,8 +93,6 @@ export const StatsView = (props: ViewProps) => {
   );
 };
 
-
-
 const UserCountGraph: Component<StatsComponentProps> = (props) => {
   // Get all unique people in the playlist
   const allPeople = () => {
@@ -107,7 +113,7 @@ const UserCountGraph: Component<StatsComponentProps> = (props) => {
       if (id) counts[id] = (counts[id] || 0) + 1;
     }
 
-    if (Object.values(counts).length === 0) return 10; // Default if no data
+    if (Object.values(counts).length === 0) return 25; // Default if no data
 
     const maxValue = Math.max(...Object.values(counts));
     // Add 10% padding to the top for visual appeal, then round to nearest multiple of 5
@@ -119,7 +125,7 @@ const UserCountGraph: Component<StatsComponentProps> = (props) => {
   const maxYValue = calculateMaxPossibleCount();
 
   // Compute counts for each person for the visible portion
-  const getCounts = () => {
+  const getCounts = (): [string, number][] => {
     const tracks = props.tracks()?.slice(props.currentIndex()) ?? [];
     const counts: Record<string, number> = {};
     for (const track of tracks) {
@@ -130,7 +136,7 @@ const UserCountGraph: Component<StatsComponentProps> = (props) => {
     for (const id of allPeople()) {
       if (!(id in counts)) counts[id] = 0;
     }
-    return allPeople().map((id) => [id, counts[id]] as [string, number]);
+    return allPeople().map((id) => [id, counts[id]]);
   };
 
   const chartData = (): ChartData => {
@@ -142,7 +148,7 @@ const UserCountGraph: Component<StatsComponentProps> = (props) => {
       labels: displayNames.map((d) => d.data ?? "Unknown"),
       datasets: [
         {
-          data: [...values],
+          data: values,
           //   bg-blue-500
           backgroundColor: ["oklch(62.3% 0.214 259.815)"],
           borderRadius: 20,
@@ -164,11 +170,16 @@ const UserCountGraph: Component<StatsComponentProps> = (props) => {
             plugins: {
               legend: { display: false },
               tooltip: { enabled: false },
+              datalabels: {
+                anchor: "end",
+                align: "top",
+              },
             },
             scales: {
               y: { max: maxYValue },
             },
           }}
+          plugins={[ChartDataLabels]}
           width={600}
           height={200}
         />
@@ -176,7 +187,6 @@ const UserCountGraph: Component<StatsComponentProps> = (props) => {
     </Card>
   );
 };
-
 
 const LongestSong: Component<StatsComponentProps> = (props) => {
   const longestSong = () => {
@@ -200,21 +210,21 @@ const LongestSong: Component<StatsComponentProps> = (props) => {
       <CardHeader>
         <CardTitle>Longest Song</CardTitle>
       </CardHeader>
-      <CardContent class="text-center">
+      <CardContent class="text-center text-3xl font-bold">
         {longestSong() !== undefined ? (
           <>
-            <p class="text-6xl font-extrabold text-center">
-              {millisToMinutesAndSeconds(longestSong()!.track.duration_ms)}
-            </p>
-            <p class="font-bold">{longestSong()!.track.name}</p>
             <p>
               {(longestSong()!.track.artists as { name: string }[])
                 .map((artist) => artist.name)
                 .join(",")}
             </p>
+            <p class="">"{longestSong()!.track.name}"</p>
+            <p class="font-extrabold text-center  text-blue-500">
+              {millisToMinutesAndSeconds(longestSong()!.track.duration_ms)}
+            </p>
           </>
         ) : (
-          <p>No songs available</p>
+          <p class="text-base font-normal">No songs available</p>
         )}
       </CardContent>
     </Card>
@@ -242,22 +252,21 @@ const ShortestSong: Component<StatsComponentProps> = (props) => {
       <CardHeader>
         <CardTitle>Shortest Song</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent class="text-center text-3xl font-bold">
         {shortestSong() !== undefined ? (
-          <div class="flex flex-col items-center justify-center h-full">
-            <p class="text-6xl font-extrabold">
+          <>
+            <p>
+              {shortestSong()!
+                .track.artists.map((artist) => artist.name)
+                .join(",")}
+            </p>
+            <p class="">"{shortestSong()!.track.name}"</p>
+            <p class="font-extrabold text-center text-blue-500">
               {millisToMinutesAndSeconds(shortestSong()!.track.duration_ms)}
             </p>
-            <p class="font-bold">{shortestSong()!.track.name}</p>
-            <p>
-              {/* Use type assertion to handle the track types properly */}
-              {shortestSong()!
-                .track.artists.map((a: { name: string }) => a.name)
-                .join(", ")}
-            </p>
-          </div>
+          </>
         ) : (
-          <p>No songs available</p>
+          <p class="text-base font-normal">No songs available</p>
         )}
       </CardContent>
     </Card>
@@ -273,7 +282,7 @@ const TopNArtists: Component<StatsComponentProps> = (props) => {
       .tracks()
       ?.slice(props.currentIndex())
       ?.forEach((track) => {
-        const artists = track.track.artists as { name: string }[];
+        const artists = track.track.artists;
         artists.forEach((artist) => {
           const name = artist.name ?? undefined;
           internalCounts[name] = (internalCounts[name] || 0) + 1;
@@ -307,7 +316,7 @@ const TopNArtists: Component<StatsComponentProps> = (props) => {
       <CardHeader>
         <CardTitle>Top {counts().length} Artists</CardTitle>
       </CardHeader>
-      <CardContent class="h-44 overflow-y-auto">
+      <CardContent class="h-56 overflow-y-auto">
         <For each={counts()}>
           {([person, num], idx) => {
             // Calculate the correct position (accounting for ties)
@@ -358,8 +367,9 @@ const BackToBack: Component<StatsComponentProps> = (props) => {
       const nextTrack = currentTracks[i + 1];
 
       // Get original positions in the countdown (1-based)
-      const currentPosition = i + props.currentIndex() + 1;
-      const nextPosition = i + props.currentIndex() + 2;
+      const currentIndex = props.currentIndex() ?? 0;
+      const currentPosition = i + currentIndex + 1;
+      const nextPosition = i + currentIndex + 2;
 
       // Get artists from current and next tracks
       const currentArtists = currentTrack.track.artists;
@@ -534,9 +544,8 @@ const OldestSong: Component<StatsComponentProps> = (props) => {
             </p>
             <p class="font-bold">{oldestSong()!.track.name}</p>
             <p>
-              {/* Use type assertion to handle the track types properly */}
-              {(oldestSong()!.track.artists as { name: string }[])
-                .map((artist) => artist.name)
+              {oldestSong()!
+                .track.artists.map((artist) => artist.name)
                 .join(", ")}
             </p>
           </div>

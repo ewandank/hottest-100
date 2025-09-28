@@ -12,7 +12,7 @@ export const ListView = (props: ViewProps) => {
     <div class="p-8">
       <For each={props.tracks()}>
         {(track, index) => (
-          <Show when={currentIndex() <= index() + 1}>
+          <Show when={currentIndex !== undefined && currentIndex()! <= index() + 1}>
             <TrackView
               track={track}
               idx={index() + 1}

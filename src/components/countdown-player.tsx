@@ -1,7 +1,4 @@
-import type {
-  PlaylistedTrack,
-  SpotifyApi,
-} from "@spotify/web-api-ts-sdk";
+import type { PlaylistedTrack, SpotifyApi } from "@spotify/web-api-ts-sdk";
 import {
   createEffect,
   createResource,
@@ -111,9 +108,6 @@ export const CountdownPlayer: Component = () => {
     20,
   );
 
-
-
-
   const [tracks] = createResource(spotify, async () => {
     const playlistId = store.playlistId;
     if (!playlistId) return [];
@@ -158,7 +152,10 @@ export const CountdownPlayer: Component = () => {
       }
     }
     // Spotify types are wrong. Make sure this lines up with teh fields array.
-    return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
+    return shuffle(allItems).slice(
+      undefined,
+      100,
+    ) as unknown as ActualPlaylistedTrack[];
   });
 
   const countdownHandler = async () => {
@@ -242,7 +239,7 @@ const Toolbar: Component<{
   return (
     <div class="flex flex-row w-full pt-8 pb-4 items-center">
       <div class="flex-1 flex justify-center">
-        {/* Disable this button when the coundown audio is playing*/}
+        {/* TODO: Disable this button when the coundown audio is playing*/}
         <button
           onClick={() => {
             if (store.iterator === undefined) {
@@ -260,16 +257,19 @@ const Toolbar: Component<{
           </Show>
         </button>
       </div>
-      <div class="flex items-center gap-4">
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={props.showSpoilers()}
-            onInput={(e) => props.setShowSpoilers(e.currentTarget.checked)}
-          />
-          Show spoilers
-        </label>
-      </div>
+      {/* Only allow cheating in development */}
+      {import.meta.env.DEV && (
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={props.showSpoilers()}
+              onInput={(e) => props.setShowSpoilers(e.currentTarget.checked)}
+            />
+            Show spoilers
+          </label>
+        </div>
+      )}
       <div class="flex justify-end pr-4">
         <div class="flex flex-row rounded-md overflow-hidden divide-gray-600 border border-gray-600 bg-white">
           <button
