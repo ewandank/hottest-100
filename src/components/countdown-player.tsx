@@ -27,6 +27,7 @@ const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
 
 export const CountdownPlayer: Component = () => {
   const [store, setStore] = useGlobalContext();
+  const [disabled, setDisabled] = createSignal(false);
   createEffect(() => {
     // Wait for authorization before injecting the SDK script
     const sdk = spotify();
@@ -174,9 +175,11 @@ export const CountdownPlayer: Component = () => {
       );
     }
     // Play the hottest 100 counter.
+    setDisabled(true);
     if (store.iterator !== undefined) {
       await playNumber(`/numbers/${store.iterator}.mp3`);
     }
+    setDisabled(false);
 
     // play the actual track, the device id will default to the active device (the current device), and an empty string keeps the types happy
     // TODO: try with retries? this returned 502 once
@@ -196,6 +199,7 @@ export const CountdownPlayer: Component = () => {
           setView={setView}
           showSpoilers={showSpoilers}
           setShowSpoilers={setShowSpoilers}
+          disabled={disabled}
         />
         <Suspense>
           <div class="mt-8">
@@ -234,6 +238,7 @@ const Toolbar: Component<{
   setView: (v: "list" | "compact-list" | "stats") => void;
   showSpoilers: Accessor<boolean>;
   setShowSpoilers: (v: boolean) => void;
+  disabled: Accessor<boolean>;
 }> = (props) => {
   const [store] = useGlobalContext();
   return (
@@ -241,6 +246,7 @@ const Toolbar: Component<{
       <div class="flex-1 flex justify-center">
         {/* TODO: Disable this button when the coundown audio is playing*/}
         <button
+          disabled={props.disabled()}
           onClick={() => {
             if (store.iterator === undefined) {
               props.startCountdown();
