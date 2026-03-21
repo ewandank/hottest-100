@@ -234,10 +234,10 @@ const Toolbar: Component<{
             }
           }}
         >
-          <Show when={props.paused() === true}>
+          <Show when={props.paused()}>
             <Play class="text-gray-600" />
           </Show>
-          <Show when={props.paused() === false}>
+          <Show when={!props.paused()}>
             <Pause class="text-gray-600" />
           </Show>
         </button>
