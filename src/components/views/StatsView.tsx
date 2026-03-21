@@ -1,10 +1,7 @@
 import { For, type Accessor, type Component } from "solid-js";
 import { useGlobalContext } from "../../context/context";
 import { createDelayedSignal } from "../../signals/createDelayedSignal";
-import {
-  useUserDisplayNames,
-  type ActualPlaylistedTrack,
-} from "../../SpotifyHelper";
+import { useUserDisplayNames, type ActualPlaylistedTrack } from "../../SpotifyHelper";
 import type { ViewProps } from "../countdown-player";
 import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { BarChart } from "../charts";
@@ -21,10 +18,7 @@ export type StatsComponentProps = {
 
 export const StatsView = (props: ViewProps) => {
   const [store] = useGlobalContext();
-  const delayedIteratorSignal = createDelayedSignal(
-    () => store.iterator,
-    30_000,
-  );
+  const delayedIteratorSignal = createDelayedSignal(() => store.iterator, 30_000);
   const currentIndex = () => {
     if (props.showSpoilers()) {
       return 0;
@@ -48,47 +42,15 @@ export const StatsView = (props: ViewProps) => {
         tracks={props.tracks}
         currentIndex={currentIndex}
       /> */}
-      <UserCountGraph
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <TopNArtists
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <LongestSong
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <ShortestSong
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
+      <UserCountGraph spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <TopNArtists spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <LongestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <ShortestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
 
-      <BackToBack
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <SongsByYear
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <NewestSong
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <OldestSong
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
+      <BackToBack spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <SongsByYear spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <NewestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <OldestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
     </div>
   );
 };
@@ -219,7 +181,7 @@ const LongestSong: Component<StatsComponentProps> = (props) => {
                 .join(",")}
             </p>
             <p class="">"{longestSong()!.track.name}"</p>
-            <p class="font-extrabold text-center  text-blue-500">
+            <p class="text-center font-extrabold text-blue-500">
               {millisToMinutesAndSeconds(longestSong()!.track.duration_ms)}
             </p>
           </>
@@ -261,7 +223,7 @@ const ShortestSong: Component<StatsComponentProps> = (props) => {
                 .join(",")}
             </p>
             <p class="">"{shortestSong()!.track.name}"</p>
-            <p class="font-extrabold text-center text-blue-500">
+            <p class="text-center font-extrabold text-blue-500">
               {millisToMinutesAndSeconds(shortestSong()!.track.duration_ms)}
             </p>
           </>
@@ -298,10 +260,7 @@ const TopNArtists: Component<StatsComponentProps> = (props) => {
 
       // Find where to cut off (include all entries with the same count as the TOP_N position)
       let cutoffIndex = TOP_N;
-      while (
-        cutoffIndex < sortedCounts.length &&
-        sortedCounts[cutoffIndex][1] === cutoffCount
-      ) {
+      while (cutoffIndex < sortedCounts.length && sortedCounts[cutoffIndex][1] === cutoffCount) {
         cutoffIndex++;
       }
 
@@ -338,8 +297,7 @@ const TopNArtists: Component<StatsComponentProps> = (props) => {
       </CardContent>
       <CardFooter>
         <p class="text-xs opacity-80">
-          Note that if more then one artist is on a song, they are counted
-          separately.
+          Note that if more then one artist is on a song, they are counted separately.
         </p>
       </CardFooter>
     </Card>
@@ -377,9 +335,7 @@ const BackToBack: Component<StatsComponentProps> = (props) => {
 
       // Find shared artists between current and next tracks
       for (const currentArtist of currentArtists) {
-        const isInRun = nextArtists.some(
-          (nextArtist) => nextArtist.name === currentArtist.name,
-        );
+        const isInRun = nextArtists.some((nextArtist) => nextArtist.name === currentArtist.name);
 
         if (isInRun) {
           // If we have an active run with this artist
@@ -419,9 +375,7 @@ const BackToBack: Component<StatsComponentProps> = (props) => {
               <p>
                 <span class="font-bold">{run.artist}</span>
                 {" - "}
-                <span>
-                  {run.positions.map((value) => `#${value}`).join(" & ")}
-                </span>
+                <span>{run.positions.map((value) => `#${value}`).join(" & ")}</span>
               </p>
             </div>
           )}
@@ -457,7 +411,7 @@ const SongsByYear: Component<StatsComponentProps> = (props) => {
       <CardHeader>
         <CardTitle>Songs By Year</CardTitle>
       </CardHeader>
-      <CardContent class="overflow-y-auto h-36">
+      <CardContent class="h-36 overflow-y-auto">
         <For each={years()}>
           {([year, num]) => (
             <p>
@@ -495,7 +449,7 @@ const NewestSong: Component<StatsComponentProps> = (props) => {
       </CardHeader>
       <CardContent>
         {newestSong() !== undefined ? (
-          <div class="flex flex-col items-center justify-center h-full">
+          <div class="flex h-full flex-col items-center justify-center">
             <p class="text-2xl font-extrabold">
               {formatDate(newestSong()!.track.album.release_date)}
             </p>
@@ -538,7 +492,7 @@ const OldestSong: Component<StatsComponentProps> = (props) => {
       </CardHeader>
       <CardContent>
         {oldestSong() !== undefined ? (
-          <div class="flex flex-col items-center justify-center h-full">
+          <div class="flex h-full flex-col items-center justify-center">
             <p class="text-2xl font-extrabold">
               {formatDate(oldestSong()!.track.album.release_date)}
             </p>

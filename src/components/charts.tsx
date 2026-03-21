@@ -1,12 +1,5 @@
 import type { Component } from "solid-js";
-import {
-  createEffect,
-  createSignal,
-  mergeProps,
-  on,
-  onCleanup,
-  onMount,
-} from "solid-js";
+import { createEffect, createSignal, mergeProps, on, onCleanup, onMount } from "solid-js";
 import { unwrap } from "solid-js/store";
 
 import type { Ref } from "@solid-primitives/refs";
@@ -203,10 +196,7 @@ const BubbleChart = /* #__PURE__ */ createTypedChart("bubble", [
   PointElement,
   LinearScale,
 ]);
-const DonutChart = /* #__PURE__ */ createTypedChart("doughnut", [
-  DoughnutController,
-  ArcElement,
-]);
+const DonutChart = /* #__PURE__ */ createTypedChart("doughnut", [DoughnutController, ArcElement]);
 const LineChart = /* #__PURE__ */ createTypedChart("line", [
   LineController,
   LineElement,
@@ -214,10 +204,7 @@ const LineChart = /* #__PURE__ */ createTypedChart("line", [
   CategoryScale,
   LinearScale,
 ]);
-const PieChart = /* #__PURE__ */ createTypedChart("pie", [
-  PieController,
-  ArcElement,
-]);
+const PieChart = /* #__PURE__ */ createTypedChart("pie", [PieController, ArcElement]);
 const PolarAreaChart = /* #__PURE__ */ createTypedChart("polarArea", [
   PolarAreaController,
   ArcElement,
