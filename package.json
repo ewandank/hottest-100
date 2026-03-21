@@ -7,8 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "oxfmt",
-    "format:ci": "oxfmt --check",
+    "fmt": "oxfmt",
+    "fmt:ci": "oxfmt --check",
     "typecheck": "tsc"
   },
   "dependencies": {
