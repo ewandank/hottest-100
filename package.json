@@ -7,7 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier . --write",
+    "format": "oxfmt",
+    "format:ci": "oxfmt --check",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -31,7 +32,7 @@
     "@tanstack/solid-router-devtools": "^1.131.4",
     "@types/spotify-web-playback-sdk": "^0.1.19",
     "eslint": "^9.33.0",
-    "prettier": "3.6.2",
+    "oxfmt": "^0.41.0",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.39.0",
