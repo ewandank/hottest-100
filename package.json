@@ -8,8 +8,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "fmt": "oxfmt",
-    "fmt:ci": "oxfmt --check",
-    "typecheck": "tsc"
+    "fmt:ci": "oxfmt --check"
   },
   "dependencies": {
     "@solid-primitives/refs": "^1.1.2",
@@ -31,11 +30,13 @@
     "@tanstack/router-plugin": "^1.131.4",
     "@tanstack/solid-router-devtools": "^1.131.4",
     "@types/spotify-web-playback-sdk": "^0.1.19",
-    "eslint": "^9.33.0",
+    "@typescript/native-preview": "7.0.0-dev.20260320.1",
     "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
+    "oxlint-tsgolint": "^0.17.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.39.0",
+    "typescript-eslint": "^8.57.1",
     "vite": "^7.1.11",
     "vite-plugin-solid": "^2.11.8"
   },
