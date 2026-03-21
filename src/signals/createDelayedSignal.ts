@@ -3,10 +3,7 @@ import type { Accessor } from "solid-js";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const createDelayedSignal = <T>(
-  source: () => T,
-  ms: number,
-): Accessor<T> => {
+export const createDelayedSignal = <T>(source: () => T, ms: number): Accessor<T> => {
   const [delayed, setDelayed] = createSignal(source());
 
   createEffect(() => {

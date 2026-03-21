@@ -20,11 +20,7 @@ export function createSpotify(redirectUrl: string) {
 
   onMount(async () => {
     try {
-      const auth = new AuthorizationCodeWithPKCEStrategy(
-        clientId,
-        redirectUrl,
-        scopes,
-      );
+      const auth = new AuthorizationCodeWithPKCEStrategy(clientId, redirectUrl, scopes);
       const sdk = new SpotifyApi(auth, config);
       const { authenticated } = await sdk.authenticate();
       setSpotify(authenticated ? sdk : null);
