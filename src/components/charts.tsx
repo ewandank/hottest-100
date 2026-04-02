@@ -222,14 +222,4 @@ const ScatterChart = /* #__PURE__ */ createTypedChart("scatter", [
   LinearScale,
 ]);
 
-export {
-  BaseChart as Chart,
-  BarChart,
-  BubbleChart,
-  DonutChart,
-  LineChart,
-  PieChart,
-  PolarAreaChart,
-  RadarChart,
-  ScatterChart,
-};
+export { BarChart };

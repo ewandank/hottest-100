@@ -40,4 +40,4 @@ const CardFooter: Component<ComponentProps<"div">> = (props) => {
   return <div class={cn("flex items-center p-6 pt-0", local.class)} {...others} />;
 };
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export { Card, CardHeader, CardFooter, CardTitle, CardContent };

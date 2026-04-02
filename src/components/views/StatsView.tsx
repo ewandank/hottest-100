@@ -10,7 +10,7 @@ import type { ChartData } from "chart.js";
 import { millisToMinutesAndSeconds } from "../../utils";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
-export type StatsComponentProps = {
+type StatsComponentProps = {
   spotify: Accessor<SpotifyApi | null>;
   tracks: Accessor<ActualPlaylistedTrack[] | undefined>;
   currentIndex: Accessor<number | undefined>;
