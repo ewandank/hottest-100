@@ -54,13 +54,13 @@ const BaseChart: Component<ChartProps> = (rawProps) => {
   const init = () => {
     const ctx = canvasRef()?.getContext("2d") as ChartItem;
     const config = unwrap(props);
-    const chart = new Chart(ctx, {
+    const newChart = new Chart(ctx, {
       type: config.type,
       data: config.data,
       options: config.options,
       plugins: config.plugins,
     });
-    setChart(chart);
+    setChart(newChart);
   };
 
   onMount(() => init());
