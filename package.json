@@ -10,7 +10,8 @@
     "fmt": "oxfmt",
     "fmt:ci": "oxfmt --check",
     "typecheck": "tsc",
-    "knip": "knip"
+    "knip": "knip",
+    "knip:ci": "knip --reporter github-actions"
   },
   "dependencies": {
     "@solid-primitives/refs": "^1.1.2",
