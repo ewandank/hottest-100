@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "fmt": "oxfmt",
     "fmt:ci": "oxfmt --check",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "knip": "knip"
   },
   "dependencies": {
     "@solid-primitives/refs": "^1.1.2",
@@ -18,7 +19,6 @@
     "@tanstack/solid-router": "^1.131.4",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-solid": "^1.0.0",
     "solid-js": "^1.9.8",
@@ -29,9 +29,10 @@
     "@eslint/js": "^9.33.0",
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/router-plugin": "^1.131.4",
-    "@tanstack/solid-router-devtools": "^1.131.4",
+    "@types/node": "^25.5.0",
     "@types/spotify-web-playback-sdk": "^0.1.19",
     "eslint": "^9.33.0",
+    "knip": "^6.2.0",
     "oxfmt": "^0.41.0",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2",
@@ -39,5 +40,5 @@
     "vite": "^7.1.11",
     "vite-plugin-solid": "^2.11.8"
   },
-  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
+  "packageManager": "pnpm@10.33.0"
 }

@@ -11,7 +11,7 @@ const [store, setStore] = createStore<storeState>({
 });
 
 type StoreContextType = [storeState, typeof setStore];
-export const GlobalState = createContext<StoreContextType>();
+const GlobalState = createContext<StoreContextType>();
 
 export const GlobalStateProvider: Component<{
   children: JSX.Element | undefined | null;
