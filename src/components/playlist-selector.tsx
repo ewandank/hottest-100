@@ -1,7 +1,6 @@
 import { createResource, createSignal, For, type Component } from "solid-js";
 import { Link } from "@tanstack/solid-router";
 import { createSpotify } from "../signals/createSpotify";
-import { useGlobalContext } from "../context/context";
 
 export const PlaylistSelector: Component = () => {
   const spotify = createSpotify(`${window.location.origin}/player`);
@@ -10,9 +9,6 @@ export const PlaylistSelector: Component = () => {
     if (!sdk) return null;
     return await sdk.currentUser.playlists.playlists();
   });
-
-  const [store] = useGlobalContext();
-
   const [selectedId, setSelectedId] = createSignal("");
 
   return (
@@ -26,7 +22,7 @@ export const PlaylistSelector: Component = () => {
             <div class="mx-auto flex w-full max-w-4xl flex-col gap-4 px-4">
               <select
                 id="playlist-select"
-                value={store.playlistId || ""}
+                value={selectedId()}
                 onChange={(e) => setSelectedId(e.currentTarget.value)}
                 class="w-full rounded-md bg-gray-400 px-4 py-3 text-lg text-white"
               >

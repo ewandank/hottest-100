@@ -20,11 +20,16 @@ import { CompactListView } from "./views/CompactListView";
 import { StatsView } from "./views/StatsView";
 import { useGlobalContext } from "../context/context";
 import type { ActualPlaylistedTrack } from "../SpotifyHelper";
+import { getRouteApi } from "@tanstack/solid-router";
+
+const route = getRouteApi("/player/$playlistId");
 
 const [view, setView] = createSignal<"list" | "compact-list">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
-
 export const CountdownPlayer: Component = () => {
+  const params = route.useParams();
+  // I'm losing reactivity here but its probably ok as it should be static.
+  const playlistId = params().playlistId;
   const [store, setStore] = useGlobalContext();
   const [disabled, setDisabled] = createSignal(false);
   createEffect(() => {
