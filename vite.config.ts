@@ -10,4 +10,8 @@ export default defineConfig({
     solidPlugin(),
     tailwindcss(),
   ],
+  server: {
+    // Spotify api no longer allows localhost for some reason.
+    host: "127.0.0.1",
+  },
 });
