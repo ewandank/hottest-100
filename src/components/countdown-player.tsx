@@ -64,7 +64,7 @@ export const CountdownPlayer: Component = () => {
         const internalPlayer = new window.Spotify.Player({
           name: "Hottest 100 Player",
           getOAuthToken: (cb) => {
-            spotify()
+            void spotify()
               ?.getAccessToken()
               // Cheeky non-null assert
               .then((token) => cb(token!.access_token));
@@ -72,7 +72,7 @@ export const CountdownPlayer: Component = () => {
           // just go full volume, use your systems volume if you want that.
           volume: 1,
         });
-        internalPlayer.connect();
+        void internalPlayer.connect();
         setPlayer(internalPlayer);
         internalPlayer.addListener("ready", async ({ device_id }) => {
           await spotify()?.player.transferPlayback([device_id]);
@@ -230,7 +230,7 @@ const Toolbar: Component<{
             if (store.iterator === undefined) {
               props.startCountdown();
             } else {
-              player()?.togglePlay();
+              void player()?.togglePlay();
             }
           }}
         >

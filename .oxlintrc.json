@@ -1,15 +1,27 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["eslint", "typescript", "import", "unicorn"],
+  "plugins": ["typescript", "unicorn", "oxc", "import", "unicorn"],
+  "ignorePatterns": ["routeTree.gen.ts"],
   "options": {
     "typeAware": true,
-    "typeCheck": true
+    "typeCheck": true,
+    "reportUnusedDisableDirectives": "error"
   },
+
   "categories": {
     "correctness": "error",
     "perf": "error",
     // "style": "error",
     // "restriction": "error",
     "suspicious": "error"
+  },
+  "rules": {
+    // when I am doing as unknown as foo the types are wrong not me.
+    "no-unsafe-type-assertion": "off",
+    // this seems bad for css imports.
+    "no-unassigned-import": "off"
+  },
+  "env": {
+    "builtin": true
   }
 }
