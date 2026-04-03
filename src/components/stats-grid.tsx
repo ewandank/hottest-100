@@ -1,18 +1,21 @@
 import { type ViewProps } from "./countdown-player";
 import { useGlobalContext } from "../context/context";
 import { createDelayedSignal } from "../signals/createDelayedSignal";
-import { UserCountGraph } from "./stats/UserCountGraph";
-import { TopNArtists } from "./stats/TopNArtists";
-import { LongestSong } from "./stats/LongestSong";
-import { ShortestSong } from "./stats/ShortestSong";
-import { BackToBack } from "./stats/BackToBack";
-import { SongsByYear } from "./stats/SongsByYear";
-import { NewestSong } from "./stats/NewestSong";
-import { OldestSong } from "./stats/OldestSong";
+import { UserCountGraph } from "./stats/user-count-graph";
+import { TopNArtists } from "./stats/top-n-artists";
+import { LongestSong } from "./stats/longest-song";
+import { ShortestSong } from "./stats/shortest-song";
+import { BackToBack } from "./stats/back-to-back";
+import { SongsByYear } from "./stats/songs-by-year";
+import { NewestSong } from "./stats/newest-song";
+import { OldestSong } from "./stats/oldest-song";
 
 export const StatsView = (props: ViewProps) => {
   const [store] = useGlobalContext();
-  const delayedIteratorSignal = createDelayedSignal(() => store.iterator, 30_000);
+  const delayedIteratorSignal = createDelayedSignal(
+    () => store.iterator,
+    30_000,
+  );
   const currentIndex = () => {
     if (props.showSpoilers()) {
       return 0;
@@ -26,14 +29,46 @@ export const StatsView = (props: ViewProps) => {
 
   return (
     <div class="grid h-fit grid-cols-3 gap-5">
-      <UserCountGraph spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <TopNArtists spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <LongestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <ShortestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <BackToBack spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <SongsByYear spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <NewestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <OldestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <UserCountGraph
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <TopNArtists
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <LongestSong
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <ShortestSong
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <BackToBack
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <SongsByYear
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <NewestSong
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
+      <OldestSong
+        spotify={props.spotify}
+        tracks={props.tracks}
+        currentIndex={currentIndex}
+      />
     </div>
   );
 };

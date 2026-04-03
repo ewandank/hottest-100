@@ -1,7 +1,7 @@
 import { type Component } from "solid-js";
 import { Card, CardContent, CardHeader, CardTitle } from "../Card";
 import type { StatsComponentProps } from "./types";
-import { formatDate } from "./NewestSong";
+import { formatDate } from "./newest-song";
 
 export const OldestSong: Component<StatsComponentProps> = (props) => {
   const oldestSong = () => {
