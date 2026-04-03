@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PlayerRouteImport } from './routes/player'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlayerIndexRouteImport } from './routes/player.index'
+import { Route as PlayerPlaylistIdRouteImport } from './routes/player.$playlistId'
 
 const PlayerRoute = PlayerRouteImport.update({
   id: '/player',
@@ -22,31 +24,46 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayerIndexRoute = PlayerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PlayerRoute,
+} as any)
+const PlayerPlaylistIdRoute = PlayerPlaylistIdRouteImport.update({
+  id: '/$playlistId',
+  path: '/$playlistId',
+  getParentRoute: () => PlayerRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/player': typeof PlayerRoute
+  '/player': typeof PlayerRouteWithChildren
+  '/player/$playlistId': typeof PlayerPlaylistIdRoute
+  '/player/': typeof PlayerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/player': typeof PlayerRoute
+  '/player/$playlistId': typeof PlayerPlaylistIdRoute
+  '/player': typeof PlayerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/player': typeof PlayerRoute
+  '/player': typeof PlayerRouteWithChildren
+  '/player/$playlistId': typeof PlayerPlaylistIdRoute
+  '/player/': typeof PlayerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/player'
+  fullPaths: '/' | '/player' | '/player/$playlistId' | '/player/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/player'
-  id: '__root__' | '/' | '/player'
+  to: '/' | '/player/$playlistId' | '/player'
+  id: '__root__' | '/' | '/player' | '/player/$playlistId' | '/player/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PlayerRoute: typeof PlayerRoute
+  PlayerRoute: typeof PlayerRouteWithChildren
 }
 
 declare module '@tanstack/solid-router' {
@@ -65,12 +82,39 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/player/': {
+      id: '/player/'
+      path: '/'
+      fullPath: '/player/'
+      preLoaderRoute: typeof PlayerIndexRouteImport
+      parentRoute: typeof PlayerRoute
+    }
+    '/player/$playlistId': {
+      id: '/player/$playlistId'
+      path: '/$playlistId'
+      fullPath: '/player/$playlistId'
+      preLoaderRoute: typeof PlayerPlaylistIdRouteImport
+      parentRoute: typeof PlayerRoute
+    }
   }
 }
 
+interface PlayerRouteChildren {
+  PlayerPlaylistIdRoute: typeof PlayerPlaylistIdRoute
+  PlayerIndexRoute: typeof PlayerIndexRoute
+}
+
+const PlayerRouteChildren: PlayerRouteChildren = {
+  PlayerPlaylistIdRoute: PlayerPlaylistIdRoute,
+  PlayerIndexRoute: PlayerIndexRoute,
+}
+
+const PlayerRouteWithChildren =
+  PlayerRoute._addFileChildren(PlayerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PlayerRoute: PlayerRoute,
+  PlayerRoute: PlayerRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
