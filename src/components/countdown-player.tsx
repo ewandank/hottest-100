@@ -202,7 +202,7 @@ export const CountdownPlayer: Component = () => {
         />
         <Suspense>
           <div class="mt-8 flex flex-1 gap-2 overflow-hidden min-h-0">
-            <div class="w-1/3 overflow-y-auto">
+            <div class="w-2/5 overflow-y-auto">
               <Show when={view() === "list"}>
                 <ListView
                   tracks={tracks}
