@@ -14,7 +14,6 @@ import { debounce, shuffle, playNumber } from "../utils";
 import Pause from "lucide-solid/icons/pause";
 import Play from "lucide-solid/icons/play";
 import List from "lucide-solid/icons/list";
-import ChartNetwork from "lucide-solid/icons/chart-network";
 import GalleryVertical from "lucide-solid/icons/gallery-vertical";
 import { ListView } from "./views/ListView";
 import { CompactListView } from "./views/CompactListView";
@@ -22,7 +21,7 @@ import { StatsView } from "./views/StatsView";
 import { useGlobalContext } from "../context/context";
 import type { ActualPlaylistedTrack } from "../SpotifyHelper";
 
-const [view, setView] = createSignal<"list" | "compact-list" | "stats">("list");
+const [view, setView] = createSignal<"list" | "compact-list">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
 
 export const CountdownPlayer: Component = () => {
@@ -80,13 +79,17 @@ export const CountdownPlayer: Component = () => {
             }
           }
         });
-        internalPlayer.addListener("player_state_changed", debouncedHandlePlayerStateChange);
+        internalPlayer.addListener(
+          "player_state_changed",
+          debouncedHandlePlayerStateChange,
+        );
         internalPlayer.addListener("player_state_changed", handlePauseState);
       };
     })();
   });
   const [paused, setPaused] = createSignal(true);
-  const handlePauseState = (state: Spotify.PlaybackState) => setPaused(state.paused);
+  const handlePauseState = (state: Spotify.PlaybackState) =>
+    setPaused(state?.paused ?? false);
   const handlePlayerStateChange = async (state: Spotify.PlaybackState) => {
     if (state?.track_window) {
       if (
@@ -100,7 +103,10 @@ export const CountdownPlayer: Component = () => {
     }
   };
 
-  const debouncedHandlePlayerStateChange = debounce(handlePlayerStateChange, 20);
+  const debouncedHandlePlayerStateChange = debounce(
+    handlePlayerStateChange,
+    20,
+  );
 
   const [tracks] = createResource(spotify, async () => {
     const playlistId = store.playlistId;
@@ -146,7 +152,10 @@ export const CountdownPlayer: Component = () => {
       }
     }
     // Spotify types are wrong. Make sure this lines up with teh fields array.
-    return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
+    return shuffle(allItems).slice(
+      undefined,
+      100,
+    ) as unknown as ActualPlaylistedTrack[];
   });
 
   const countdownHandler = async () => {
@@ -160,7 +169,9 @@ export const CountdownPlayer: Component = () => {
     if (store.iterator === undefined) {
       setStore("iterator", tracks()!.length);
     } else {
-      setStore("iterator", (prev) => (prev !== undefined ? prev - 1 : undefined));
+      setStore("iterator", (prev) =>
+        prev !== undefined ? prev - 1 : undefined,
+      );
     }
     // Play the hottest 100 counter.
     setDisabled(true);
@@ -176,10 +187,10 @@ export const CountdownPlayer: Component = () => {
     ]);
   };
 
-  const [showSpoilers, setShowSpoilers] = createSignal(false);
+  const [showSpoilers, setShowSpoilers] = createSignal(true);
   return (
-    <div class="bg-jjj-gradient flex min-h-screen justify-center">
-      <div class="w-3/5 bg-transparent">
+    <div class="bg-jjj-gradient flex h-full flex-col overflow-hidden">
+      <div class="flex flex-1 flex-col mx-auto w-4/5 min-h-0">
         <Toolbar
           startCountdown={countdownHandler}
           paused={paused}
@@ -190,16 +201,30 @@ export const CountdownPlayer: Component = () => {
           disabled={disabled}
         />
         <Suspense>
-          <div class="mt-8">
-            <Show when={view() === "list"}>
-              <ListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
-            </Show>
-            <Show when={view() === "compact-list"}>
-              <CompactListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
-            </Show>
-            <Show when={view() === "stats"}>
-              <StatsView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
-            </Show>
+          <div class="mt-8 flex flex-1 gap-2 overflow-hidden min-h-0">
+            <div class="w-1/3 overflow-y-auto">
+              <Show when={view() === "list"}>
+                <ListView
+                  tracks={tracks}
+                  spotify={spotify}
+                  showSpoilers={showSpoilers}
+                />
+              </Show>
+              <Show when={view() === "compact-list"}>
+                <CompactListView
+                  tracks={tracks}
+                  spotify={spotify}
+                  showSpoilers={showSpoilers}
+                />
+              </Show>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+              <StatsView
+                tracks={tracks}
+                spotify={spotify}
+                showSpoilers={showSpoilers}
+              />
+            </div>
           </div>
         </Suspense>
       </div>
@@ -239,7 +264,7 @@ const Toolbar: Component<{
           </Show>
         </button>
       </div>
-      {/* Only allow cheating in development */}
+      {/* Only allow cheating in development
       {import.meta.env.DEV && (
         <div class="flex items-center gap-4">
           <label class="flex cursor-pointer items-center gap-2">
@@ -251,28 +276,26 @@ const Toolbar: Component<{
             Show spoilers
           </label>
         </div>
-      )}
+      )} */}
       <div class="flex justify-end pr-4">
         <div class="flex flex-row divide-gray-600 overflow-hidden rounded-md border border-gray-600 bg-white">
           <button
             class={`px-4 py-2 first:rounded-l-md focus:outline-none ${props.view() === "list" ? "bg-slate-600" : "bg-white"}`}
             onClick={() => props.setView("list")}
           >
-            <List class={props.view() === "list" ? "text-white" : "text-gray-600"} />
+            <List
+              class={props.view() === "list" ? "text-white" : "text-gray-600"}
+            />
           </button>
           <button
             class={`px-4 py-2 focus:outline-none ${props.view() === "compact-list" ? "bg-slate-600" : "bg-white"}`}
             onClick={() => props.setView("compact-list")}
           >
             <GalleryVertical
-              class={props.view() === "compact-list" ? "text-white" : "text-gray-600"}
+              class={
+                props.view() === "compact-list" ? "text-white" : "text-gray-600"
+              }
             />
-          </button>
-          <button
-            class={`px-4 py-2 last:rounded-r-md focus:outline-none ${props.view() === "stats" ? "bg-slate-600" : "bg-white"}`}
-            onClick={() => props.setView("stats")}
-          >
-            <ChartNetwork class={props.view() === "stats" ? "text-white" : "text-gray-600"} />
           </button>
         </div>
       </div>

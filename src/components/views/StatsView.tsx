@@ -31,7 +31,7 @@ export const StatsView = (props: ViewProps) => {
   };
 
   return (
-    <div class="grid grid-cols-3 gap-5">
+    <div class="grid h-fit grid-cols-3 gap-5">
       {/* <UserCountTable
         spotify={props.spotify}
         tracks={props.tracks}
