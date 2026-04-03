@@ -17,7 +17,7 @@ import List from "lucide-solid/icons/list";
 import GalleryVertical from "lucide-solid/icons/gallery-vertical";
 import { ListView } from "./views/ListView";
 import { CompactListView } from "./views/CompactListView";
-import { StatsView } from "./views/StatsView";
+import { StatsView } from "../StatsView";
 import { useGlobalContext } from "../context/context";
 import type { ActualPlaylistedTrack } from "../SpotifyHelper";
 import { getRouteApi } from "@tanstack/solid-router";

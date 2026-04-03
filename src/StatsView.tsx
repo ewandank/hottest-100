@@ -1,13 +1,13 @@
 import { For, type Accessor, type Component } from "solid-js";
-import { useGlobalContext } from "../../context/context";
-import { createDelayedSignal } from "../../signals/createDelayedSignal";
-import { useUserDisplayNames, type ActualPlaylistedTrack } from "../../SpotifyHelper";
-import type { ViewProps } from "../countdown-player";
+import { useGlobalContext } from "./context/context";
+import { createDelayedSignal } from "./signals/createDelayedSignal";
+import { useUserDisplayNames, type ActualPlaylistedTrack } from "./SpotifyHelper";
+import type { ViewProps } from "./components/countdown-player";
 import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
-import { BarChart } from "../charts";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../Card";
+import { BarChart } from "./components/charts";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./components/Card";
 import type { ChartData } from "chart.js";
-import { millisToMinutesAndSeconds } from "../../utils";
+import { millisToMinutesAndSeconds } from "./utils";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
 type StatsComponentProps = {

@@ -19,9 +19,7 @@ export const PlaylistSelector: Component = () => {
           <option value="" disabled>
             Please select a playlist to shuffle...
           </option>
-          <For each={playlists()?.items}>
-            {(pl) => <option value={pl.id}>{pl.name}</option>}
-          </For>
+          <For each={playlists()?.items}>{(pl) => <option value={pl.id}>{pl.name}</option>}</For>
         </select>
         <Link
           to="/player/$playlistId"
@@ -30,8 +28,7 @@ export const PlaylistSelector: Component = () => {
           class="w-full rounded-md px-4 py-3 text-center text-lg"
           classList={{
             "bg-gray-400 text-white": selectedId() !== "",
-            "bg-gray-300 text-gray-100 cursor-not-allowed opacity-60":
-              selectedId() === "",
+            "bg-gray-300 text-gray-100 cursor-not-allowed opacity-60": selectedId() === "",
           }}
         >
           Start the countdown
