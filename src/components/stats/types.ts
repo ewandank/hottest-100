@@ -1,4 +1,4 @@
-import { type Accessor, type Component } from "solid-js";
+import { type Accessor } from "solid-js";
 import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import type { ActualPlaylistedTrack } from "../../SpotifyHelper";
 
