@@ -12,10 +12,7 @@ import { OldestSong } from "./stats/oldest-song";
 
 export const StatsView = (props: ViewProps) => {
   const [store] = useGlobalContext();
-  const delayedIteratorSignal = createDelayedSignal(
-    () => store.iterator,
-    30_000,
-  );
+  const delayedIteratorSignal = createDelayedSignal(() => store.iterator, 30_000);
   const currentIndex = () => {
     if (props.showSpoilers()) {
       return 0;
@@ -29,46 +26,14 @@ export const StatsView = (props: ViewProps) => {
 
   return (
     <div class="grid h-fit grid-cols-3 gap-5">
-      <UserCountGraph
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <TopNArtists
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <LongestSong
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <ShortestSong
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <BackToBack
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <SongsByYear
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <NewestSong
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <OldestSong
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
+      <UserCountGraph spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <TopNArtists spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <LongestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <ShortestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <BackToBack spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <SongsByYear spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <NewestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      <OldestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
     </div>
   );
 };
