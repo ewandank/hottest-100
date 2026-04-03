@@ -111,16 +111,11 @@
 }
 
 @layer base {
-  html,
-  body,
-  #app {
-    @apply h-full;
-  }
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply text-foreground min-h-screen flex flex-col;
+    @apply text-foreground;
     background-image: linear-gradient(
       180deg,
       #dae7e8,
