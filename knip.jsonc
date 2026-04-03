@@ -1,3 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
+  // this is used through oxlint.
+  "ignoreDependencies": ["@typescript/native-preview"],
 }
