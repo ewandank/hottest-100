@@ -1,12 +1,5 @@
 import type { Component } from "solid-js";
-import {
-  createEffect,
-  createSignal,
-  mergeProps,
-  on,
-  onCleanup,
-  onMount,
-} from "solid-js";
+import { createEffect, createSignal, mergeProps, on, onCleanup, onMount } from "solid-js";
 import { unwrap } from "solid-js/store";
 
 import type { Ref } from "@solid-primitives/refs";

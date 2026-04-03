@@ -14,9 +14,7 @@ const GlobalState = createContext<StoreContextType>();
 export const GlobalStateProvider: Component<{
   children: JSX.Element | undefined | null;
 }> = (props) => (
-  <GlobalState.Provider value={[store, setStore]}>
-    {props.children}
-  </GlobalState.Provider>
+  <GlobalState.Provider value={[store, setStore]}>{props.children}</GlobalState.Provider>
 );
 
 export const useGlobalContext = () => {

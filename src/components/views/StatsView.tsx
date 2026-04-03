@@ -32,21 +32,10 @@ export const StatsView = (props: ViewProps) => {
 
   return (
     <div class="grid h-fit grid-cols-3 gap-5">
-      {/* <UserCountTable
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <ArtistCountTable
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      /> */}
       <UserCountGraph spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
       <TopNArtists spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
       <LongestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
       <ShortestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-
       <BackToBack spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
       <SongsByYear spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
       <NewestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
