@@ -189,7 +189,7 @@ export const CountdownPlayer: Component = () => {
 
   const [showSpoilers, setShowSpoilers] = createSignal(true);
   return (
-    <div class="bg-jjj-gradient flex h-full flex-col overflow-hidden">
+    <div class="bg-jjj-gradient flex h-screen flex-col overflow-hidden">
       <div class="flex flex-1 flex-col mx-auto w-4/5 min-h-0">
         <Toolbar
           startCountdown={countdownHandler}
