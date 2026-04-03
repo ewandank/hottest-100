@@ -7,7 +7,7 @@ export const Route = createFileRoute("/")({
 
 function IndexComponent() {
   return (
-    <div class="flex h-full min-h-screen items-center justify-center">
+    <div class="flex flex-1 items-center justify-center">
       <Link to={"/player"} class="rounded-2xl bg-gray-400 px-20 py-10 text-2xl shadow">
         Go to player
       </Link>

@@ -17,14 +17,19 @@ import List from "lucide-solid/icons/list";
 import GalleryVertical from "lucide-solid/icons/gallery-vertical";
 import { ListView } from "./views/ListView";
 import { CompactListView } from "./views/CompactListView";
-import { StatsView } from "./views/StatsView";
+import { StatsView } from "./stats-grid";
 import { useGlobalContext } from "../context/context";
 import type { ActualPlaylistedTrack } from "../SpotifyHelper";
+import { getRouteApi } from "@tanstack/solid-router";
+
+const route = getRouteApi("/player/$playlistId");
 
 const [view, setView] = createSignal<"list" | "compact-list">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
-
 export const CountdownPlayer: Component = () => {
+  const params = route.useParams();
+  // I'm losing reactivity here but its probably ok as it should be static.
+  const playlistId = params().playlistId;
   const [store, setStore] = useGlobalContext();
   const [disabled, setDisabled] = createSignal(false);
   createEffect(() => {
@@ -102,7 +107,6 @@ export const CountdownPlayer: Component = () => {
   const debouncedHandlePlayerStateChange = debounce(handlePlayerStateChange, 20);
 
   const [tracks] = createResource(spotify, async () => {
-    const playlistId = store.playlistId;
     if (!playlistId) return [];
     if (!spotify()) return [];
     const fields =
@@ -175,36 +179,34 @@ export const CountdownPlayer: Component = () => {
     ]);
   };
 
-  const [showSpoilers, setShowSpoilers] = createSignal(true);
+  const [showSpoilers, setShowSpoilers] = createSignal(false);
   return (
-    <div class="bg-jjj-gradient flex h-screen flex-col overflow-hidden">
-      <div class="mx-auto flex min-h-0 w-4/5 flex-1 flex-col">
-        <Toolbar
-          startCountdown={countdownHandler}
-          paused={paused}
-          view={view}
-          setView={setView}
-          showSpoilers={showSpoilers}
-          setShowSpoilers={setShowSpoilers}
-          disabled={disabled}
-        />
-        <Suspense>
-          <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
-            <div class="w-2/5 overflow-y-auto">
-              <Show when={view() === "list"}>
-                <ListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
-              </Show>
-              <Show when={view() === "compact-list"}>
-                <CompactListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
-              </Show>
-            </div>
-            <div class="flex-1 overflow-y-auto">
-              <StatsView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
-            </div>
+    <>
+      <Toolbar
+        startCountdown={countdownHandler}
+        paused={paused}
+        view={view}
+        setView={setView}
+        showSpoilers={showSpoilers}
+        setShowSpoilers={setShowSpoilers}
+        disabled={disabled}
+      />
+      <Suspense>
+        <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
+          <div class="w-2/5 overflow-y-auto">
+            <Show when={view() === "list"}>
+              <ListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+            </Show>
+            <Show when={view() === "compact-list"}>
+              <CompactListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+            </Show>
           </div>
-        </Suspense>
-      </div>
-    </div>
+          <div class="flex-1 overflow-y-auto">
+            <StatsView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+          </div>
+        </div>
+      </Suspense>
+    </>
   );
 };
 

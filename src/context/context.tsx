@@ -2,11 +2,9 @@ import { createContext, useContext, type Component, type JSX } from "solid-js";
 import { createStore } from "solid-js/store";
 
 type storeState = {
-  playlistId: string | undefined;
   iterator: number | undefined;
 };
 const [store, setStore] = createStore<storeState>({
-  playlistId: undefined,
   iterator: undefined,
 });
 

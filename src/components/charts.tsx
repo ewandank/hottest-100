@@ -13,25 +13,14 @@ import type {
   ChartType,
 } from "chart.js";
 import {
-  ArcElement,
   BarController,
   BarElement,
-  BubbleController,
   CategoryScale,
   Chart,
   Colors,
-  DoughnutController,
   Filler,
   Legend,
   LinearScale,
-  LineController,
-  LineElement,
-  PieController,
-  PointElement,
-  PolarAreaController,
-  RadarController,
-  RadialLinearScale,
-  ScatterController,
   Tooltip,
 } from "chart.js";
 
@@ -191,35 +180,4 @@ const BarChart = /* #__PURE__ */ createTypedChart("bar", [
   CategoryScale,
   LinearScale,
 ]);
-const BubbleChart = /* #__PURE__ */ createTypedChart("bubble", [
-  BubbleController,
-  PointElement,
-  LinearScale,
-]);
-const DonutChart = /* #__PURE__ */ createTypedChart("doughnut", [DoughnutController, ArcElement]);
-const LineChart = /* #__PURE__ */ createTypedChart("line", [
-  LineController,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-]);
-const PieChart = /* #__PURE__ */ createTypedChart("pie", [PieController, ArcElement]);
-const PolarAreaChart = /* #__PURE__ */ createTypedChart("polarArea", [
-  PolarAreaController,
-  ArcElement,
-  RadialLinearScale,
-]);
-const RadarChart = /* #__PURE__ */ createTypedChart("radar", [
-  RadarController,
-  LineElement,
-  PointElement,
-  RadialLinearScale,
-]);
-const ScatterChart = /* #__PURE__ */ createTypedChart("scatter", [
-  ScatterController,
-  PointElement,
-  LinearScale,
-]);
-
 export { BarChart };
