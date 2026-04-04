@@ -12,7 +12,7 @@ export const ShortestSong: Component<StatsComponentProps> = (props) => {
     if (!currentTracks || currentTracks.length === 0) return undefined;
 
     // Sort the tracks by duration in ascending order and take the first one
-    return currentTracks.sort((a, b) => {
+    return currentTracks.toSorted((a, b) => {
       const durationA = a.track.duration_ms;
       const durationB = b.track.duration_ms;
       return durationA - durationB; // Ascending order (shortest first)

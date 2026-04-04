@@ -35,7 +35,7 @@ export const CountdownPlayer: Component = () => {
   createEffect(() => {
     // Wait for authorization before injecting the SDK script
     const sdk = spotify();
-    sdk?.getAccessToken().then((token) => {
+    void sdk?.getAccessToken().then((token) => {
       if (token && !document.getElementById("spotify-sdk")) {
         const script = document.createElement("script");
         script.id = "spotify-sdk";
@@ -55,7 +55,7 @@ export const CountdownPlayer: Component = () => {
   const spotify = createSpotify(`${window.location.origin}/player`);
 
   createEffect(() => {
-    (async () => {
+    void (async () => {
       if (spotify() === null) {
         return;
       }
@@ -84,13 +84,17 @@ export const CountdownPlayer: Component = () => {
             }
           }
         });
-        internalPlayer.addListener("player_state_changed", debouncedHandlePlayerStateChange);
+        internalPlayer.addListener(
+          "player_state_changed",
+          debouncedHandlePlayerStateChange,
+        );
         internalPlayer.addListener("player_state_changed", handlePauseState);
       };
     })();
   });
   const [paused, setPaused] = createSignal(true);
-  const handlePauseState = (state: Spotify.PlaybackState) => setPaused(state?.paused ?? false);
+  const handlePauseState = (state: Spotify.PlaybackState) =>
+    setPaused(state?.paused ?? false);
   const handlePlayerStateChange = async (state: Spotify.PlaybackState) => {
     if (state?.track_window) {
       if (
@@ -104,7 +108,10 @@ export const CountdownPlayer: Component = () => {
     }
   };
 
-  const debouncedHandlePlayerStateChange = debounce(handlePlayerStateChange, 20);
+  const debouncedHandlePlayerStateChange = debounce(
+    handlePlayerStateChange,
+    20,
+  );
 
   const [tracks] = createResource(spotify, async () => {
     if (!playlistId) return [];
@@ -149,7 +156,10 @@ export const CountdownPlayer: Component = () => {
       }
     }
     // Spotify types are wrong. Make sure this lines up with teh fields array.
-    return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
+    return shuffle(allItems).slice(
+      undefined,
+      100,
+    ) as unknown as ActualPlaylistedTrack[];
   });
 
   const countdownHandler = async () => {
@@ -163,7 +173,9 @@ export const CountdownPlayer: Component = () => {
     if (store.iterator === undefined) {
       setStore("iterator", tracks()!.length);
     } else {
-      setStore("iterator", (prev) => (prev !== undefined ? prev - 1 : undefined));
+      setStore("iterator", (prev) =>
+        prev !== undefined ? prev - 1 : undefined,
+      );
     }
     // Play the hottest 100 counter.
     setDisabled(true);
@@ -195,14 +207,26 @@ export const CountdownPlayer: Component = () => {
         <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
           <div class="w-2/5 overflow-y-auto">
             <Show when={view() === "list"}>
-              <ListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+              <ListView
+                tracks={tracks}
+                spotify={spotify}
+                showSpoilers={showSpoilers}
+              />
             </Show>
             <Show when={view() === "compact-list"}>
-              <CompactListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+              <CompactListView
+                tracks={tracks}
+                spotify={spotify}
+                showSpoilers={showSpoilers}
+              />
             </Show>
           </div>
           <div class="flex-1 overflow-y-auto">
-            <StatsView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+            <StatsView
+              tracks={tracks}
+              spotify={spotify}
+              showSpoilers={showSpoilers}
+            />
           </div>
         </div>
       </Suspense>
@@ -261,14 +285,18 @@ const Toolbar: Component<{
             class={`px-4 py-2 first:rounded-l-md focus:outline-none ${props.view() === "list" ? "bg-slate-600" : "bg-white"}`}
             onClick={() => props.setView("list")}
           >
-            <List class={props.view() === "list" ? "text-white" : "text-gray-600"} />
+            <List
+              class={props.view() === "list" ? "text-white" : "text-gray-600"}
+            />
           </button>
           <button
             class={`px-4 py-2 focus:outline-none ${props.view() === "compact-list" ? "bg-slate-600" : "bg-white"}`}
             onClick={() => props.setView("compact-list")}
           >
             <GalleryVertical
-              class={props.view() === "compact-list" ? "text-white" : "text-gray-600"}
+              class={
+                props.view() === "compact-list" ? "text-white" : "text-gray-600"
+              }
             />
           </button>
         </div>

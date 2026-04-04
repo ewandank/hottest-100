@@ -12,7 +12,7 @@ export const OldestSong: Component<StatsComponentProps> = (props) => {
     if (!currentTracks || currentTracks.length === 0) return undefined;
 
     // Sort the tracks by release date in ascending order (oldest first)
-    return [...currentTracks].sort((a, b) => {
+    return currentTracks.toSorted((a, b) => {
       const dateA = a.track.album.release_date || "";
       const dateB = b.track.album.release_date || "";
       // Compare dates in string form since they're in YYYY-MM-DD format

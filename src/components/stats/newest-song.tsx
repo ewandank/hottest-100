@@ -26,7 +26,7 @@ export const NewestSong: Component<StatsComponentProps> = (props) => {
     if (!currentTracks || currentTracks.length === 0) return undefined;
 
     // Sort the tracks by release date in descending order (newest first)
-    return [...currentTracks].sort((a, b) => {
+    return currentTracks.toSorted((a, b) => {
       const dateA = a.track.album.release_date || "";
       const dateB = b.track.album.release_date || "";
       // Compare dates in string form since they're in YYYY-MM-DD format

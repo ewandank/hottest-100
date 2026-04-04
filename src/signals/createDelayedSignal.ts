@@ -8,7 +8,7 @@ export const createDelayedSignal = <T>(source: () => T, ms: number): Accessor<T>
 
   createEffect(() => {
     const value = source();
-    delay(ms).then(() => setDelayed(() => value));
+    void delay(ms).then(() => setDelayed(() => value));
   });
 
   return delayed;
