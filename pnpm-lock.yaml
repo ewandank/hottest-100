@@ -16,7 +16,7 @@ importers:
         version: 1.2.0
       '@tanstack/solid-query':
         specifier: ^5.96.1
-        version: 5.96.1(solid-js@1.9.12)
+        version: 5.96.2(solid-js@1.9.12)
       '@tanstack/solid-router':
         specifier: ^1.168.9
         version: 1.168.9(solid-js@1.9.12)
@@ -1199,8 +1199,8 @@ packages:
     resolution: {integrity: sha512-NaOGLRrddszbQj9upGat6HG/4TKvXLvu+osAIgfxPYA+eIvYKv8GKDJOrY2D3/U9MRnKfMWD7bU4jeD4xmqyIg==}
     engines: {node: '>=20.19'}
 
-  '@tanstack/query-core@5.96.1':
-    resolution: {integrity: sha512-u1yBgtavSy+N8wgtW3PiER6UpxcplMje65yXnnVgiHTqiMwLlxiw4WvQDrXyn+UD6lnn8kHaxmerJUzQcV/MMg==}
+  '@tanstack/query-core@5.96.2':
+    resolution: {integrity: sha512-hzI6cTVh4KNRk8UtoIBS7Lv9g6BnJPXvBKsvYH1aGWvv0347jT3BnSvztOE+kD76XGvZnRC/t6qdW1CaIfwCeA==}
 
   '@tanstack/router-core@1.168.9':
     resolution: {integrity: sha512-18oeEwEDyXOIuO1VBP9ACaK7tYHZUjynGDCoUh/5c/BNhia9vCJCp9O0LfhZXOorDc/PmLSgvmweFhVmIxF10g==}
@@ -1237,8 +1237,8 @@ packages:
     resolution: {integrity: sha512-nRcYw+w2OEgK6VfjirYvGyPLOK+tZQz1jkYcmH5AjMamQ9PycnlxZF2aEZtPpNoUsaceX2bHptn6Ub5hGXqNvw==}
     engines: {node: '>=20.19'}
 
-  '@tanstack/solid-query@5.96.1':
-    resolution: {integrity: sha512-cXGBd4LICE2fpnW6Tmk7dCqBcwJyBhWftIXa42ZZrjVMrr6OEl8/HLTif6G/IZ2DxCTk18pZUGRvV+i3mQa/Dg==}
+  '@tanstack/solid-query@5.96.2':
+    resolution: {integrity: sha512-gAJhm/aHtubM4gKrtBJy9lMIQggtG4pN3P47dIbYi7pESm8ud0EY/jWkj18TUIC65e1nbSOerKBtjRvzydz5+Q==}
     peerDependencies:
       solid-js: ^1.6.0
 
@@ -2671,7 +2671,7 @@ snapshots:
 
   '@tanstack/history@1.161.6': {}
 
-  '@tanstack/query-core@5.96.1': {}
+  '@tanstack/query-core@5.96.2': {}
 
   '@tanstack/router-core@1.168.9':
     dependencies:
@@ -2728,9 +2728,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/solid-query@5.96.1(solid-js@1.9.12)':
+  '@tanstack/solid-query@5.96.2(solid-js@1.9.12)':
     dependencies:
-      '@tanstack/query-core': 5.96.1
+      '@tanstack/query-core': 5.96.2
       solid-js: 1.9.12
 
   '@tanstack/solid-router@1.168.9(solid-js@1.9.12)':
