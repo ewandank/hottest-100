@@ -14,12 +14,8 @@ export const BackToBack: Component<StatsComponentProps> = (props) => {
     let activeRun: { artist: string; positions: number[] } | null = null;
 
     for (let i = 0; i < currentTracks.length - 1; i++) {
-      const currentArtistNames = currentTracks[i]?.track.artists.map(
-        (a) => a.name,
-      );
-      const nextArtistNames = currentTracks[i + 1]?.track.artists.map(
-        (a) => a.name,
-      );
+      const currentArtistNames = currentTracks[i]?.track.artists.map((a) => a.name);
+      const nextArtistNames = currentTracks[i + 1]?.track.artists.map((a) => a.name);
 
       // Find if the current artist in the active run continues to the next track
       // Or find a new shared artist to start a run
@@ -44,9 +40,7 @@ export const BackToBack: Component<StatsComponentProps> = (props) => {
       }
     }
 
-    return artistRuns.toSorted(
-      (a, b) => b.positions.length - a.positions.length,
-    );
+    return artistRuns.toSorted((a, b) => b.positions.length - a.positions.length);
   };
   return (
     <Card>
@@ -60,9 +54,7 @@ export const BackToBack: Component<StatsComponentProps> = (props) => {
               <p>
                 <span class="font-bold">{run.artist}</span>
                 {" - "}
-                <span>
-                  {run.positions.map((value) => `#${value}`).join(" & ")}
-                </span>
+                <span>{run.positions.map((value) => `#${value}`).join(" & ")}</span>
               </p>
             </div>
           )}

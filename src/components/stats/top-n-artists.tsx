@@ -27,9 +27,7 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
 
     const cutoffValue = cutoffEntry[1];
     // Find the last index that matches the cutoff value to include all ties
-    const lastIndexWithTies = sorted.findLastIndex(
-      ([, count]) => count === cutoffValue,
-    );
+    const lastIndexWithTies = sorted.findLastIndex(([, count]) => count === cutoffValue);
 
     return sorted.slice(0, Math.max(TOP_N, lastIndexWithTies + 1));
   });
@@ -59,8 +57,7 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
         <For each={displayData()}>
           {(artist) => (
             <p class="py-0.5">
-              <span class="font-bold">{artist.position}.</span> {artist.person}{" "}
-              - {artist.num} song
+              <span class="font-bold">{artist.position}.</span> {artist.person} - {artist.num} song
               {artist.num !== 1 ? "s" : ""}
             </p>
           )}
@@ -68,8 +65,7 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
       </CardContent>
       <CardFooter>
         <p class="text-xs opacity-80">
-          Note that if more than one artist is on a song, they are counted
-          separately.
+          Note that if more than one artist is on a song, they are counted separately.
         </p>
       </CardFooter>
     </Card>
