@@ -12,7 +12,7 @@ export const TrackView: Component<{
       <div class="flex w-full flex-row items-center py-4">
         <h2 class="w-16 shrink-0 text-3xl font-bold">{props.idx}</h2>
 
-        <img class="size-36 shrink-0" src={props.track.track.album.images[1].url} />
+        <img class="size-36 shrink-0" src={props.track.track.album.images[1]!.url} />
         <div class="flex min-w-0 flex-col pl-4">
           <p class="font-bold wrap-break-word whitespace-normal"> {props.track.track.name}</p>
           <p class="wrap-break-word whitespace-normal">

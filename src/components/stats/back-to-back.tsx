@@ -4,63 +4,44 @@ import type { StatsComponentProps } from "./types";
 
 export const BackToBack: Component<StatsComponentProps> = (props) => {
   const runs = () => {
-    const currentTracks = props.tracks()?.slice(props.currentIndex());
-    if (!currentTracks?.length) return [];
+    const allTracks = props.tracks() || [];
+    const startIndex = props.currentIndex() || 0;
+    const currentTracks = allTracks.slice(startIndex);
 
-    const artistRuns: Array<{
-      artist: string;
-      positions: number[];
-    }> = [];
+    if (currentTracks.length < 2) return [];
 
-    let currentRun: {
-      artist: string;
-      positions: number[];
-    } | null = null;
+    const artistRuns: Array<{ artist: string; positions: number[] }> = [];
+    let activeRun: { artist: string; positions: number[] } | null = null;
 
-    // Process tracks to find runs
     for (let i = 0; i < currentTracks.length - 1; i++) {
-      const currentTrack = currentTracks[i];
-      const nextTrack = currentTracks[i + 1];
+      const currentArtistNames = currentTracks[i]?.track.artists.map((a) => a.name);
+      const nextArtistNames = currentTracks[i + 1]?.track.artists.map((a) => a.name);
 
-      // Get original positions in the countdown (1-based)
-      const currentIndex = props.currentIndex() ?? 0;
-      const currentPosition = i + currentIndex + 1;
-      const nextPosition = i + currentIndex + 2;
+      // Find if the current artist in the active run continues to the next track
+      // Or find a new shared artist to start a run
+      const sharedArtist: string | undefined = activeRun
+        ? nextArtistNames?.find((name) => name === activeRun?.artist)
+        : currentArtistNames?.find((name) => nextArtistNames?.includes(name));
 
-      // Get artists from current and next tracks
-      const currentArtists = currentTrack.track.artists;
-      const nextArtists = nextTrack.track.artists;
+      if (sharedArtist) {
+        const nextPos = startIndex + i + 2;
 
-      // Find shared artists between current and next tracks
-      for (const currentArtist of currentArtists) {
-        const isInRun = nextArtists.some((nextArtist) => nextArtist.name === currentArtist.name);
-
-        if (isInRun) {
-          // If we have an active run with this artist
-          if (currentRun && currentRun.artist === currentArtist.name) {
-            // Add next position to the run
-            if (!currentRun.positions.includes(nextPosition)) {
-              currentRun.positions.push(nextPosition);
-            }
-          } else {
-            // Start a new run
-            currentRun = {
-              artist: currentArtist.name,
-              positions: [currentPosition, nextPosition],
-            };
-            artistRuns.push(currentRun);
-          }
-        } else if (currentRun && currentRun.artist === currentArtist.name) {
-          // End current run
-          currentRun = null;
+        if (activeRun && activeRun.artist === sharedArtist) {
+          activeRun.positions.push(nextPos);
+        } else {
+          activeRun = {
+            artist: sharedArtist,
+            positions: [startIndex + i + 1, nextPos],
+          };
+          artistRuns.push(activeRun);
         }
+      } else {
+        activeRun = null;
       }
     }
 
-    // Sort runs by length (longest runs first)
-    return artistRuns.sort((a, b) => b.positions.length - a.positions.length);
+    return artistRuns.toSorted((a, b) => b.positions.length - a.positions.length);
   };
-
   return (
     <Card>
       <CardHeader>

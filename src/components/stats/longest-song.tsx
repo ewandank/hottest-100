@@ -12,7 +12,7 @@ export const LongestSong: Component<StatsComponentProps> = (props) => {
     if (!currentTracks || currentTracks.length === 0) return undefined;
 
     // Sort the tracks by duration in descending order and take the first one
-    return [...currentTracks].sort((a, b) => {
+    return currentTracks.toSorted((a, b) => {
       // Safely handle potential undefined/null values
       const durationA = a?.track?.duration_ms || 0;
       const durationB = b?.track?.duration_ms || 0;

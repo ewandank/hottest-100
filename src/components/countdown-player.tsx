@@ -35,7 +35,7 @@ export const CountdownPlayer: Component = () => {
   createEffect(() => {
     // Wait for authorization before injecting the SDK script
     const sdk = spotify();
-    sdk?.getAccessToken().then((token) => {
+    void sdk?.getAccessToken().then((token) => {
       if (token && !document.getElementById("spotify-sdk")) {
         const script = document.createElement("script");
         script.id = "spotify-sdk";
@@ -55,7 +55,7 @@ export const CountdownPlayer: Component = () => {
   const spotify = createSpotify(`${window.location.origin}/player`);
 
   createEffect(() => {
-    (async () => {
+    void (async () => {
       if (spotify() === null) {
         return;
       }
@@ -64,7 +64,7 @@ export const CountdownPlayer: Component = () => {
         const internalPlayer = new window.Spotify.Player({
           name: "Hottest 100 Player",
           getOAuthToken: (cb) => {
-            spotify()
+            void spotify()
               ?.getAccessToken()
               // Cheeky non-null assert
               .then((token) => cb(token!.access_token));
@@ -72,7 +72,7 @@ export const CountdownPlayer: Component = () => {
           // just go full volume, use your systems volume if you want that.
           volume: 1,
         });
-        internalPlayer.connect();
+        void internalPlayer.connect();
         setPlayer(internalPlayer);
         internalPlayer.addListener("ready", async ({ device_id }) => {
           await spotify()?.player.transferPlayback([device_id]);
@@ -230,14 +230,14 @@ const Toolbar: Component<{
             if (store.iterator === undefined) {
               props.startCountdown();
             } else {
-              player()?.togglePlay();
+              void player()?.togglePlay();
             }
           }}
         >
-          <Show when={props.paused() === true}>
+          <Show when={props.paused()}>
             <Play class="text-gray-600" />
           </Show>
-          <Show when={props.paused() === false}>
+          <Show when={!props.paused()}>
             <Pause class="text-gray-600" />
           </Show>
         </button>

@@ -12,7 +12,7 @@ export const SongsByYear: Component<StatsComponentProps> = (props) => {
         const year = track.track.album.release_date.slice(0, 4) ?? undefined;
         internalCounts[year] = (internalCounts[year] || 0) + 1;
       });
-    const sortedCounts = Object.entries(internalCounts).sort((a, b) => {
+    const sortedCounts = Object.entries(internalCounts).toSorted((a, b) => {
       // First sort by count (descending)
       const countDiff = b[1] - a[1];
       if (countDiff !== 0) return countDiff;

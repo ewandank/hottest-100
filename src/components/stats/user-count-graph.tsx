@@ -40,16 +40,11 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
   // Compute counts for each person for the visible portion
   const getCounts = (): [string, number][] => {
     const tracks = props.tracks()?.slice(props.currentIndex()) ?? [];
-    const counts: Record<string, number> = {};
-    for (const track of tracks) {
-      const id = track.added_by?.id;
-      if (id) counts[id] = (counts[id] || 0) + 1;
-    }
-    // Ensure all people are present, even if zero
-    for (const id of allPeople()) {
-      if (!(id in counts)) counts[id] = 0;
-    }
-    return allPeople().map((id) => [id, counts[id]]);
+
+    return allPeople().map((id) => {
+      const count = tracks.filter((t) => t.added_by?.id === id).length;
+      return [id, count];
+    });
   };
 
   const chartData = (): ChartData => {
