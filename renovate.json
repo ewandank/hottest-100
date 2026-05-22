@@ -3,7 +3,8 @@
   "extends": [
     "config:recommended",
     "helpers:pinGitHubActionDigests",
+    "docker:pinDigests",
     "group:allNonMajor",
-    "schedule:weekly"
+    "schedule:monthly"
   ]
 }
