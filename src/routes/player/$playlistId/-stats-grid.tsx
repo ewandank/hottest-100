@@ -1,14 +1,14 @@
-import { type ViewProps } from "./countdown-player";
-import { useGlobalContext } from "../context/context";
-import { createDelayedSignal } from "../signals/createDelayedSignal";
-import { UserCountGraph } from "./stats/user-count-graph";
-import { TopNArtists } from "./stats/top-n-artists";
-import { LongestSong } from "./stats/longest-song";
-import { ShortestSong } from "./stats/shortest-song";
-import { BackToBack } from "./stats/back-to-back";
-import { SongsByYear } from "./stats/songs-by-year";
-import { NewestSong } from "./stats/newest-song";
-import { OldestSong } from "./stats/oldest-song";
+import { type ViewProps } from "./-countdown-player";
+import { useGlobalContext } from "../../../context/context";
+import { createDelayedSignal } from "../../../signals/createDelayedSignal";
+import { UserCountGraph } from "../../../components/stats/user-count-graph";
+import { TopNArtists } from "../../../components/stats/top-n-artists";
+import { LongestSong } from "../../../components/stats/longest-song";
+import { ShortestSong } from "../../../components/stats/shortest-song";
+import { BackToBack } from "../../../components/stats/back-to-back";
+import { SongsByYear } from "../../../components/stats/songs-by-year";
+import { NewestSong } from "../../../components/stats/newest-song";
+import { OldestSong } from "../../../components/stats/oldest-song";
 
 export const StatsView = (props: ViewProps) => {
   const [store] = useGlobalContext();

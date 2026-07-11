@@ -1,10 +1,18 @@
-import { createSignal, For, type Component } from "solid-js";
-import { Link, getRouteApi } from "@tanstack/solid-router";
+import { createFileRoute, Link } from "@tanstack/solid-router";
+import { getSpotifySdk } from "../../../spotify-sdk";
+import { createSignal, For } from "solid-js";
 
-const route = getRouteApi("/player/");
+export const Route = createFileRoute("/player/")({
+  loader: async () => {
+    const sdk = await getSpotifySdk(`${window.location.origin}/player`);
+    if (!sdk) return { items: [] };
+    return await sdk.currentUser.playlists.playlists();
+  },
+  component: PlaylistSelector,
+});
 
-export const PlaylistSelector: Component = () => {
-  const playlists = route.useLoaderData();
+function PlaylistSelector() {
+  const playlists = Route.useLoaderData();
   const [selectedId, setSelectedId] = createSignal("");
 
   return (
@@ -36,4 +44,4 @@ export const PlaylistSelector: Component = () => {
       </div>
     </div>
   );
-};
+}

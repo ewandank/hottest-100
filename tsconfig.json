@@ -38,6 +38,10 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "preserve",
-    "jsxImportSource": "solid-js"
+    "jsxImportSource": "solid-js",
+    // Import alias so i can move stuff around easier.
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   }
 }

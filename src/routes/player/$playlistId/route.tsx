@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/solid-router";
-import { CountdownPlayer } from "../components/countdown-player";
+import { CountdownPlayer } from "./-countdown-player";
 
 export const Route = createFileRoute("/player/$playlistId")({
   component: CountdownPlayer,

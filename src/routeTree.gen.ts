@@ -9,86 +9,86 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as PlayerIndexRouteImport } from './routes/player.index'
-import { Route as PlayerPlaylistIdRouteImport } from './routes/player.$playlistId'
+import { Route as IndexRouteRouteImport } from './routes/index/route'
+import { Route as PlayerPlaylistIdRouteRouteImport } from './routes/player/$playlistId/route'
+import { Route as PlayerIndexRouteRouteImport } from './routes/player/index/route'
 
-const IndexRoute = IndexRouteImport.update({
+const IndexRouteRoute = IndexRouteRouteImport.update({
   id: '/',
-  path: '/',
+  path: '',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlayerIndexRoute = PlayerIndexRouteImport.update({
-  id: '/player/',
-  path: '/player/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlayerPlaylistIdRoute = PlayerPlaylistIdRouteImport.update({
+const PlayerPlaylistIdRouteRoute = PlayerPlaylistIdRouteRouteImport.update({
   id: '/player/$playlistId',
   path: '/player/$playlistId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayerIndexRouteRoute = PlayerIndexRouteRouteImport.update({
+  id: '/player/',
+  path: '/player',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/player/$playlistId': typeof PlayerPlaylistIdRoute
-  '/player/': typeof PlayerIndexRoute
+  '/': typeof IndexRouteRoute
+  '/player/': typeof PlayerIndexRouteRoute
+  '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/player/$playlistId': typeof PlayerPlaylistIdRoute
-  '/player': typeof PlayerIndexRoute
+  '/': typeof IndexRouteRoute
+  '/player': typeof PlayerIndexRouteRoute
+  '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/player/$playlistId': typeof PlayerPlaylistIdRoute
-  '/player/': typeof PlayerIndexRoute
+  '/': typeof IndexRouteRoute
+  '/player/': typeof PlayerIndexRouteRoute
+  '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/player/$playlistId' | '/player/'
+  fullPaths: '/' | '/player/' | '/player/$playlistId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/player/$playlistId' | '/player'
-  id: '__root__' | '/' | '/player/$playlistId' | '/player/'
+  to: '/' | '/player' | '/player/$playlistId'
+  id: '__root__' | '/' | '/player/' | '/player/$playlistId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  PlayerPlaylistIdRoute: typeof PlayerPlaylistIdRoute
-  PlayerIndexRoute: typeof PlayerIndexRoute
+  IndexRouteRoute: typeof IndexRouteRoute
+  PlayerIndexRouteRoute: typeof PlayerIndexRouteRoute
+  PlayerPlaylistIdRouteRoute: typeof PlayerPlaylistIdRouteRoute
 }
 
 declare module '@tanstack/solid-router' {
   interface FileRoutesByPath {
     '/': {
       id: '/'
-      path: '/'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/player/': {
-      id: '/player/'
-      path: '/player'
-      fullPath: '/player/'
-      preLoaderRoute: typeof PlayerIndexRouteImport
+      preLoaderRoute: typeof IndexRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/player/$playlistId': {
       id: '/player/$playlistId'
       path: '/player/$playlistId'
       fullPath: '/player/$playlistId'
-      preLoaderRoute: typeof PlayerPlaylistIdRouteImport
+      preLoaderRoute: typeof PlayerPlaylistIdRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/player/': {
+      id: '/player/'
+      path: '/player'
+      fullPath: '/player/'
+      preLoaderRoute: typeof PlayerIndexRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  PlayerPlaylistIdRoute: PlayerPlaylistIdRoute,
-  PlayerIndexRoute: PlayerIndexRoute,
+  IndexRouteRoute: IndexRouteRoute,
+  PlayerIndexRouteRoute: PlayerIndexRouteRoute,
+  PlayerPlaylistIdRouteRoute: PlayerPlaylistIdRouteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

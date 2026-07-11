@@ -9,17 +9,17 @@ import {
   onCleanup,
   Suspense,
 } from "solid-js";
-import { createSpotify } from "../signals/createSpotify";
-import { debounce, shuffle, playNumber } from "../utils";
+import { createSpotify } from "~/signals/createSpotify";
+import { debounce, shuffle, playNumber } from "~/utils";
 import Pause from "lucide-solid/icons/pause";
 import Play from "lucide-solid/icons/play";
 import List from "lucide-solid/icons/list";
 import GalleryVertical from "lucide-solid/icons/gallery-vertical";
-import { ListView } from "./views/ListView";
-import { CompactListView } from "./views/CompactListView";
-import { StatsView } from "./stats-grid";
-import { useGlobalContext } from "../context/context";
-import type { ActualPlaylistedTrack } from "../SpotifyHelper";
+import { ListView } from "./-views/ListView";
+import { CompactListView } from "./-views/CompactListView";
+import { StatsView } from "./-stats-grid";
+import { useGlobalContext } from "~/context/context";
+import type { ActualPlaylistedTrack } from "~/SpotifyHelper";
 import { getRouteApi } from "@tanstack/solid-router";
 
 const route = getRouteApi("/player/$playlistId");
