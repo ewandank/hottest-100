@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/solid-router";
-import { getSpotifySdk } from "../../../spotify-sdk";
+import { getSpotifySdk } from "~/spotify-sdk";
 import { createSignal, For } from "solid-js";
 
 export const Route = createFileRoute("/player/")({
@@ -22,7 +22,7 @@ function PlaylistSelector() {
           id="playlist-select"
           value={selectedId()}
           onChange={(e) => setSelectedId(e.currentTarget.value)}
-          class="w-full rounded-md bg-gray-400 px-4 py-3 text-lg text-white"
+          class="h-12 w-full rounded-lg bg-gray-400 px-4 py-3 text-lg text-white"
         >
           <option value="" disabled>
             Please select a playlist to shuffle...
@@ -33,7 +33,7 @@ function PlaylistSelector() {
           to="/player/$playlistId"
           params={{ playlistId: selectedId() }}
           disabled={!selectedId()}
-          class="w-full rounded-md px-4 py-3 text-center text-lg"
+          class="flex h-12 w-full items-center justify-center rounded-lg bg-gray-400 px-4 py-3 text-center text-lg text-white"
           classList={{
             "bg-gray-400 text-white": selectedId() !== "",
             "bg-gray-300 text-gray-100 cursor-not-allowed opacity-60": selectedId() === "",

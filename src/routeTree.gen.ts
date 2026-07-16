@@ -9,13 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteRouteImport } from './routes/index/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlayerIndexRouteImport } from './routes/player/index'
 import { Route as PlayerPlaylistIdRouteRouteImport } from './routes/player/$playlistId/route'
-import { Route as PlayerIndexRouteRouteImport } from './routes/player/index/route'
 
-const IndexRouteRoute = IndexRouteRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
-  path: '',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayerIndexRoute = PlayerIndexRouteImport.update({
+  id: '/player/',
+  path: '/player/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlayerPlaylistIdRouteRoute = PlayerPlaylistIdRouteRouteImport.update({
@@ -23,49 +28,51 @@ const PlayerPlaylistIdRouteRoute = PlayerPlaylistIdRouteRouteImport.update({
   path: '/player/$playlistId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlayerIndexRouteRoute = PlayerIndexRouteRouteImport.update({
-  id: '/player/',
-  path: '/player',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRouteRoute
-  '/player/': typeof PlayerIndexRouteRoute
+  '/': typeof IndexRoute
   '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
+  '/player/': typeof PlayerIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRouteRoute
-  '/player': typeof PlayerIndexRouteRoute
+  '/': typeof IndexRoute
   '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
+  '/player': typeof PlayerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRouteRoute
-  '/player/': typeof PlayerIndexRouteRoute
+  '/': typeof IndexRoute
   '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
+  '/player/': typeof PlayerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/player/' | '/player/$playlistId'
+  fullPaths: '/' | '/player/$playlistId' | '/player/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/player' | '/player/$playlistId'
-  id: '__root__' | '/' | '/player/' | '/player/$playlistId'
+  to: '/' | '/player/$playlistId' | '/player'
+  id: '__root__' | '/' | '/player/$playlistId' | '/player/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRouteRoute: typeof IndexRouteRoute
-  PlayerIndexRouteRoute: typeof PlayerIndexRouteRoute
+  IndexRoute: typeof IndexRoute
   PlayerPlaylistIdRouteRoute: typeof PlayerPlaylistIdRouteRoute
+  PlayerIndexRoute: typeof PlayerIndexRoute
 }
 
 declare module '@tanstack/solid-router' {
   interface FileRoutesByPath {
     '/': {
       id: '/'
-      path: ''
+      path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteRouteImport
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/player/': {
+      id: '/player/'
+      path: '/player'
+      fullPath: '/player/'
+      preLoaderRoute: typeof PlayerIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/player/$playlistId': {
@@ -75,20 +82,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof PlayerPlaylistIdRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/player/': {
-      id: '/player/'
-      path: '/player'
-      fullPath: '/player/'
-      preLoaderRoute: typeof PlayerIndexRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRouteRoute: IndexRouteRoute,
-  PlayerIndexRouteRoute: PlayerIndexRouteRoute,
+  IndexRoute: IndexRoute,
   PlayerPlaylistIdRouteRoute: PlayerPlaylistIdRouteRoute,
+  PlayerIndexRoute: PlayerIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
