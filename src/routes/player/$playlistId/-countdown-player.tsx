@@ -19,14 +19,16 @@ import { ListView } from "./-views/ListView";
 import { CompactListView } from "./-views/CompactListView";
 import { StatsView } from "./-stats-grid";
 import { useGlobalContext } from "~/context/context";
-import type { ActualPlaylistedTrack } from "~/SpotifyHelper";
+import type { ActualPlaylistedTrack } from "~/types/spotify";
 import { getRouteApi } from "@tanstack/solid-router";
 import { queryClient } from "~/queryClient";
+import { hottestNumberQueryOptions } from "~/query/hottest-number";
 
 const route = getRouteApi("/player/$playlistId");
 
 const [view, setView] = createSignal<"list" | "compact-list">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
+
 export const CountdownPlayer: Component = () => {
   const params = route.useParams();
   // I'm losing reactivity here but its probably ok as it should be static.
@@ -161,18 +163,7 @@ export const CountdownPlayer: Component = () => {
     }
     const currentIterator = store.iterator === undefined ? tracks()!.length : store.iterator - 1;
 
-    const audioBlob = await queryClient.ensureQueryData({
-      queryKey: ["hottest_number", currentIterator],
-      queryFn: async () => {
-        const res = await fetch(`/numbers/${currentIterator}.mp3`);
-        if (!res.ok) {
-          throw new Error("Fetch for number mp3 died");
-        }
-        const blob = await res.blob();
-        return URL.createObjectURL(blob);
-      },
-      staleTime: Infinity,
-    });
+    const audioBlob = await queryClient.ensureQueryData(hottestNumberQueryOptions(currentIterator));
 
     // Play the hottest 100 counter.
     setDisabled(true);
@@ -195,18 +186,7 @@ export const CountdownPlayer: Component = () => {
     if (nextIterator < 0) {
       return;
     }
-    void queryClient.prefetchQuery({
-      queryKey: ["hottest_number", nextIterator],
-      queryFn: async () => {
-        const res = await fetch(`/numbers/${nextIterator}.mp3`);
-        if (!res.ok) {
-          throw new Error("Fetch for number mp3 died");
-        }
-        const blob = await res.blob();
-        return URL.createObjectURL(blob);
-      },
-      staleTime: Infinity,
-    });
+    void queryClient.prefetchQuery(hottestNumberQueryOptions(nextIterator));
   };
 
   const [showSpoilers, setShowSpoilers] = createSignal(false);

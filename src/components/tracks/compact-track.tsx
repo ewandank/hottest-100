@@ -1,7 +1,8 @@
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { Suspense, type Component } from "solid-js";
-import { userDisplayNameQueryOptions, type ActualPlaylistedTrack } from "../../SpotifyHelper";
+import { type ActualPlaylistedTrack } from "../../types/spotify";
 import { createQuery } from "@tanstack/solid-query";
+import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
 
 export const CompactTrackView: Component<{
   track: ActualPlaylistedTrack;

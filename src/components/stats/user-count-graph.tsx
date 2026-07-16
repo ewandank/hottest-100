@@ -3,9 +3,9 @@ import { type ChartData } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { BarChart } from "../charts";
 import { Card, CardContent, CardHeader, CardTitle } from "../Card";
-import { userDisplayNameQueryOptions } from "../../SpotifyHelper";
 import type { StatsComponentProps } from "./types";
 import { createQueries } from "@tanstack/solid-query";
+import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
 
 export const UserCountGraph: Component<StatsComponentProps> = (props) => {
   // Get all unique people in the playlist
