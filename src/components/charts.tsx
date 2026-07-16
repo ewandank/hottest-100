@@ -45,7 +45,7 @@ const BaseChart: Component<ChartProps> = (rawProps) => {
     {
       width: 512,
       height: 512,
-      options: { responsive: true } as ChartOptions,
+      options: { responsive: true },
       plugins: [] as ChartPlugin[],
     },
     rawProps,
