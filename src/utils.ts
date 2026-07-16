@@ -13,14 +13,8 @@ export function shuffle<T>(array: T[]): T[] {
 export function playNumber(src: string) {
   return new Promise<void>((resolve, reject) => {
     const audio = new Audio(src);
-    //oxlint-disable-next-line prefer-add-event-listener
-    audio.onended = () => {
-      resolve();
-    };
-    //oxlint-disable-next-line prefer-add-event-listener
-    audio.onerror = (error) => {
-      reject(error);
-    };
+    audio.addEventListener("ended", () => resolve(), { once: true });
+    audio.addEventListener("error", (err) => reject(err), { once: true });
     void audio.play();
   });
 }

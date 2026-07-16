@@ -1,4 +1,4 @@
-import { useQueries, useQuery } from "@tanstack/solid-query";
+import { queryOptions } from "@tanstack/solid-query";
 import type {
   Album,
   Artist,
@@ -7,35 +7,14 @@ import type {
   TrackItem,
 } from "@spotify/web-api-ts-sdk";
 
-/**
- * Hook to fetch and cache the display name for a Spotify user using TanStack Query.
- * @param sdk SpotifyApi instance
- * @param userId Spotify user ID
- * @returns display name or userId if not found
- */
-export function useUserDisplayName(sdk: SpotifyApi | null, userId: string) {
-  return useQuery(() => ({
+
+export function userDisplayNameQueryOptions(sdk: SpotifyApi | null, userId: string) {
+  return queryOptions({
     queryKey: ["spotify-user", userId],
     queryFn: fetchUserName(sdk, userId),
     enabled: !!sdk && !!userId,
     staleTime: Infinity,
-  }));
-}
-
-/**
- * Hook to fetch and cache the display name(s) for a Spotify user using TanStack Query.
- * @param sdk SpotifyApi instance
- * @param userId Spotify user ID
- * @returns display name or userId if not found
- */
-export function useUserDisplayNames(sdk: SpotifyApi | null, userIds: string[]) {
-  return useQueries(() => ({
-    queries: userIds.map((id) => ({
-      queryKey: ["spotify-user", id],
-      queryFn: fetchUserName(sdk, id),
-      staleTime: Infinity,
-    })),
-  }));
+  });
 }
 
 const fetchUserName = (sdk: SpotifyApi | null, userId: string) => {
