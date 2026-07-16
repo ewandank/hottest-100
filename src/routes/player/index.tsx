@@ -1,10 +1,18 @@
-import { createSignal, For, type Component } from "solid-js";
-import { Link, getRouteApi } from "@tanstack/solid-router";
+import { createFileRoute, Link } from "@tanstack/solid-router";
+import { getSpotifySdk } from "~/spotify-sdk";
+import { createSignal, For } from "solid-js";
 
-const route = getRouteApi("/player/");
+export const Route = createFileRoute("/player/")({
+  loader: async () => {
+    const sdk = await getSpotifySdk(`${window.location.origin}/player`);
+    if (!sdk) return { items: [] };
+    return await sdk.currentUser.playlists.playlists();
+  },
+  component: PlaylistSelector,
+});
 
-export const PlaylistSelector: Component = () => {
-  const playlists = route.useLoaderData();
+function PlaylistSelector() {
+  const playlists = Route.useLoaderData();
   const [selectedId, setSelectedId] = createSignal("");
 
   return (
@@ -14,7 +22,7 @@ export const PlaylistSelector: Component = () => {
           id="playlist-select"
           value={selectedId()}
           onChange={(e) => setSelectedId(e.currentTarget.value)}
-          class="w-full rounded-md bg-gray-400 px-4 py-3 text-lg text-white"
+          class="h-12 w-full rounded-lg bg-gray-400 px-4 py-3 text-lg text-white"
         >
           <option value="" disabled>
             Please select a playlist to shuffle...
@@ -25,7 +33,7 @@ export const PlaylistSelector: Component = () => {
           to="/player/$playlistId"
           params={{ playlistId: selectedId() }}
           disabled={!selectedId()}
-          class="w-full rounded-md px-4 py-3 text-center text-lg"
+          class="flex h-12 w-full items-center justify-center rounded-lg bg-gray-400 px-4 py-3 text-center text-lg text-white"
           classList={{
             "bg-gray-400 text-white": selectedId() !== "",
             "bg-gray-300 text-gray-100 cursor-not-allowed opacity-60": selectedId() === "",
@@ -36,4 +44,4 @@ export const PlaylistSelector: Component = () => {
       </div>
     </div>
   );
-};
+}
