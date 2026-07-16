@@ -1,13 +1,17 @@
 import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { Suspense, type Component } from "solid-js";
-import { useUserDisplayName, type ActualPlaylistedTrack } from "../../SpotifyHelper";
+import { type ActualPlaylistedTrack } from "../../types/spotify";
+import { createQuery } from "@tanstack/solid-query";
+import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
 
 export const CompactTrackView: Component<{
   track: ActualPlaylistedTrack;
   idx: number;
   spotify: () => SpotifyApi | null;
 }> = (props) => {
-  const userName = useUserDisplayName(props.spotify(), props.track.added_by.id);
+  const userName = createQuery(() =>
+    userDisplayNameQueryOptions(props.spotify(), props.track.added_by.id),
+  );
   return (
     <Suspense>
       <div class="flex w-full flex-row items-center py-4">

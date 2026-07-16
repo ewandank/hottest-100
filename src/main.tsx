@@ -1,12 +1,11 @@
 import { RouterProvider, createRouter } from "@tanstack/solid-router";
 import { render } from "solid-js/web";
 
-import { routeTree } from "./routeTree.gen";
-import "./styles.css";
-import { GlobalStateProvider } from "./context/context";
-import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
-
-const queryClient = new QueryClient();
+import { routeTree } from "~/routeTree.gen";
+import "~/styles.css";
+import { GlobalStateProvider } from "~/context/context";
+import { QueryClientProvider } from "@tanstack/solid-query";
+import { queryClient } from "~/queryClient";
 
 const router = createRouter({
   routeTree,
@@ -23,13 +22,11 @@ declare module "@tanstack/solid-router" {
 
 function App() {
   return (
-    <>
-      <GlobalStateProvider>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
-      </GlobalStateProvider>
-    </>
+    <GlobalStateProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </GlobalStateProvider>
   );
 }
 

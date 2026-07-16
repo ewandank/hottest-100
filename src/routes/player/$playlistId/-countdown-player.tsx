@@ -19,13 +19,16 @@ import { ListView } from "./-views/ListView";
 import { CompactListView } from "./-views/CompactListView";
 import { StatsView } from "./-stats-grid";
 import { useGlobalContext } from "~/context/context";
-import type { ActualPlaylistedTrack } from "~/SpotifyHelper";
+import type { ActualPlaylistedTrack } from "~/types/spotify";
 import { getRouteApi } from "@tanstack/solid-router";
+import { queryClient } from "~/queryClient";
+import { hottestNumberQueryOptions } from "~/query/hottest-number";
 
 const route = getRouteApi("/player/$playlistId");
 
 const [view, setView] = createSignal<"list" | "compact-list">("list");
 const [player, setPlayer] = createSignal<Spotify.Player | null>(null);
+
 export const CountdownPlayer: Component = () => {
   const params = route.useParams();
   // I'm losing reactivity here but its probably ok as it should be static.
@@ -80,8 +83,10 @@ export const CountdownPlayer: Component = () => {
             await spotify()?.player.setRepeatMode("off", device_id);
           } catch (e) {
             if (e instanceof SyntaxError) {
-              // Ignore it
+              // This throws a syntax error as the api incorrectly assumes it returns JSON, however it just returns a string.
+              return;
             }
+            throw e;
           }
         });
         internalPlayer.addListener("player_state_changed", debouncedHandlePlayerStateChange);
@@ -148,35 +153,40 @@ export const CountdownPlayer: Component = () => {
         allItems.push(...page.items);
       }
     }
-    // Spotify types are wrong. Make sure this lines up with teh fields array.
+    // Spotify types are wrong. Make sure this lines up with the fields array.
     return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
   });
 
   const countdownHandler = async () => {
-    if (tracks() === undefined) {
+    if (tracks() === undefined || (store.iterator !== undefined && store.iterator <= 0)) {
       return;
     }
-    if (store.iterator! <= 0) {
-      return;
-    }
+    const currentIterator = store.iterator === undefined ? tracks()!.length : store.iterator - 1;
+
+    const audioBlob = await queryClient.ensureQueryData(hottestNumberQueryOptions(currentIterator));
+
+    // Play the hottest 100 counter.
+    setDisabled(true);
+    await playNumber(audioBlob);
+    setDisabled(false);
+
     // set the starting number
     if (store.iterator === undefined) {
       setStore("iterator", tracks()!.length);
     } else {
       setStore("iterator", (prev) => (prev !== undefined ? prev - 1 : undefined));
     }
-    // Play the hottest 100 counter.
-    setDisabled(true);
-    if (store.iterator !== undefined) {
-      await playNumber(`/numbers/${store.iterator}.mp3`);
-    }
-    setDisabled(false);
 
     // play the actual track, the device id will default to the active device (the current device), and an empty string keeps the types happy
     // TODO: try with retries? this returned 502 once
     await spotify()?.player.startResumePlayback("", undefined, [
-      tracks()?.at(store.iterator! - 1)?.track.uri ?? "",
+      tracks()?.at(currentIterator - 1)?.track.uri ?? "",
     ]);
+    const nextIterator = currentIterator - 1;
+    if (nextIterator < 0) {
+      return;
+    }
+    void queryClient.prefetchQuery(hottestNumberQueryOptions(nextIterator));
   };
 
   const [showSpoilers, setShowSpoilers] = createSignal(false);
