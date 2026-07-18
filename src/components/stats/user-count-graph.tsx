@@ -1,11 +1,13 @@
-import { type Component } from "solid-js";
+import { createQueries } from "@tanstack/solid-query";
 import { type ChartData } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { BarChart } from "../charts";
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
-import type { StatsComponentProps } from "./types";
-import { createQueries } from "@tanstack/solid-query";
+import { type Component } from "solid-js";
+
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
+
+import { Card, CardContent, CardHeader, CardTitle } from "../Card";
+import { BarChart } from "../charts";
+import type { StatsComponentProps } from "./types";
 
 export const UserCountGraph: Component<StatsComponentProps> = (props) => {
   // Get all unique people in the playlist
@@ -71,7 +73,7 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card class="col-span-2">
+    <Card class="col-span-4">
       <CardHeader>
         <CardTitle>Who got the most songs in?</CardTitle>
       </CardHeader>

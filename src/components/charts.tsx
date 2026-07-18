@@ -1,7 +1,3 @@
-import type { Component } from "solid-js";
-import { createEffect, createSignal, mergeProps, on, onCleanup, onMount } from "solid-js";
-import { unwrap } from "solid-js/store";
-
 import type { Ref } from "@solid-primitives/refs";
 import { mergeRefs } from "@solid-primitives/refs";
 import type {
@@ -23,6 +19,9 @@ import {
   LinearScale,
   Tooltip,
 } from "chart.js";
+import type { Component } from "solid-js";
+import { createEffect, createSignal, mergeProps, on, onCleanup, onMount } from "solid-js";
+import { unwrap } from "solid-js/store";
 
 type TypedChartProps = {
   data: ChartData;

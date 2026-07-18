@@ -1,4 +1,5 @@
 import { For, type Component } from "solid-js";
+
 import { Card, CardContent, CardHeader, CardTitle } from "../Card";
 import type { StatsComponentProps } from "./types";
 
@@ -43,7 +44,7 @@ export const BackToBack: Component<StatsComponentProps> = (props) => {
     return artistRuns.toSorted((a, b) => b.positions.length - a.positions.length);
   };
   return (
-    <Card>
+    <Card class="col-span-2">
       <CardHeader>
         <CardTitle>b2b2b</CardTitle>
       </CardHeader>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/solid-router";
-import { getSpotifySdk } from "~/spotify-sdk";
 import { createSignal, For } from "solid-js";
+
+import { getSpotifySdk } from "~/spotify-sdk";
 
 export const Route = createFileRoute("/player/")({
   loader: async () => {

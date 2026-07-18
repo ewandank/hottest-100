@@ -1,4 +1,5 @@
 import { For, type Component, createMemo } from "solid-js";
+
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../Card";
 import type { StatsComponentProps } from "./types";
 
@@ -49,7 +50,7 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
   });
 
   return (
-    <Card>
+    <Card class="col-span-2">
       <CardHeader>
         <CardTitle>Top {displayData().length} Artists</CardTitle>
       </CardHeader>

@@ -1,4 +1,13 @@
 import type { PlaylistedTrack, SpotifyApi } from "@spotify/web-api-ts-sdk";
+import { getRouteApi } from "@tanstack/solid-router";
+import EyeIcon from "lucide-solid/icons/eye";
+import EyeOffIcon from "lucide-solid/icons/eye-off";
+import GalleryVertical from "lucide-solid/icons/gallery-vertical";
+import List from "lucide-solid/icons/list";
+import Pause from "lucide-solid/icons/pause";
+import Play from "lucide-solid/icons/play";
+import ShareIcon from "lucide-solid/icons/share";
+import Trash2Icon from "lucide-solid/icons/trash-2";
 import {
   createEffect,
   createResource,
@@ -9,20 +18,17 @@ import {
   onCleanup,
   Suspense,
 } from "solid-js";
-import { createSpotify } from "~/signals/createSpotify";
-import { debounce, shuffle, playNumber } from "~/utils";
-import Pause from "lucide-solid/icons/pause";
-import Play from "lucide-solid/icons/play";
-import List from "lucide-solid/icons/list";
-import GalleryVertical from "lucide-solid/icons/gallery-vertical";
-import { ListView } from "./-views/ListView";
-import { CompactListView } from "./-views/CompactListView";
-import { StatsView } from "./-stats-grid";
+
 import { useGlobalContext } from "~/context/context";
-import type { ActualPlaylistedTrack } from "~/types/spotify";
-import { getRouteApi } from "@tanstack/solid-router";
-import { queryClient } from "~/queryClient";
 import { hottestNumberQueryOptions } from "~/query/hottest-number";
+import { queryClient } from "~/queryClient";
+import { createSpotify } from "~/signals/createSpotify";
+import type { ActualPlaylistedTrack } from "~/types/spotify";
+import { debounce, shuffle, playNumber } from "~/utils";
+
+import { StatsView } from "./-stats-grid";
+import { CompactListView } from "./-views/CompactListView";
+import { ListView } from "./-views/ListView";
 
 const route = getRouteApi("/player/$playlistId");
 
@@ -115,7 +121,7 @@ export const CountdownPlayer: Component = () => {
     if (!playlistId) return [];
     if (!spotify()) return [];
     const fields =
-      "items(added_by(id),track(name,album(images,release_date),artists(name),uri,duration_ms)),total";
+      "items(added_by(id),track(name,album(images,release_date),artists(name),uri,duration_ms,explicit)),total";
     // First call just to discover total number of tracks
     const firstPage = await spotify()!.playlists.getPlaylistItems(
       playlistId,
@@ -154,6 +160,7 @@ export const CountdownPlayer: Component = () => {
       }
     }
     // Spotify types are wrong. Make sure this lines up with the fields array.
+    console.log(allItems[0]);
     return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
   });
 
@@ -231,7 +238,25 @@ const Toolbar: Component<{
 }> = (props) => {
   const [store] = useGlobalContext();
   return (
-    <div class="flex w-full flex-row items-center pt-8 pb-4">
+    <div class="flex w-full flex-row items-center px-4 py-4">
+      <div class="flex justify-start">
+        <div class="flex flex-row divide-gray-600 overflow-hidden rounded-md border border-gray-600 bg-white">
+          <button
+            class={`px-4 py-2 first:rounded-l-md focus:outline-none ${props.view() === "list" ? "bg-slate-600" : "bg-white"}`}
+            onClick={() => props.setView("list")}
+          >
+            <List class={props.view() === "list" ? "text-white" : "text-gray-600"} />
+          </button>
+          <button
+            class={`px-4 py-2 focus:outline-none ${props.view() === "compact-list" ? "bg-slate-600" : "bg-white"}`}
+            onClick={() => props.setView("compact-list")}
+          >
+            <GalleryVertical
+              class={props.view() === "compact-list" ? "text-white" : "text-gray-600"}
+            />
+          </button>
+        </div>
+      </div>
       <div class="flex flex-1 justify-center">
         {/* TODO: Disable this button when the coundown audio is playing*/}
         <button
@@ -252,36 +277,16 @@ const Toolbar: Component<{
           </Show>
         </button>
       </div>
-      {/* Only allow cheating in development
-      {import.meta.env.DEV && (
-        <div class="flex items-center gap-4">
-          <label class="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              checked={props.showSpoilers()}
-              onInput={(e) => props.setShowSpoilers(e.currentTarget.checked)}
-            />
-            Show spoilers
-          </label>
-        </div>
-      )} */}
-      <div class="flex justify-end pr-4">
-        <div class="flex flex-row divide-gray-600 overflow-hidden rounded-md border border-gray-600 bg-white">
-          <button
-            class={`px-4 py-2 first:rounded-l-md focus:outline-none ${props.view() === "list" ? "bg-slate-600" : "bg-white"}`}
-            onClick={() => props.setView("list")}
-          >
-            <List class={props.view() === "list" ? "text-white" : "text-gray-600"} />
-          </button>
-          <button
-            class={`px-4 py-2 focus:outline-none ${props.view() === "compact-list" ? "bg-slate-600" : "bg-white"}`}
-            onClick={() => props.setView("compact-list")}
-          >
-            <GalleryVertical
-              class={props.view() === "compact-list" ? "text-white" : "text-gray-600"}
-            />
-          </button>
-        </div>
+      <div class="flex justify-end gap-2">
+        <ShareIcon onClick={() => alert("Export coming soon!")} />
+        <Trash2Icon onClick={() => alert("Persisted storage coming soon!")} />
+        {import.meta.env.DEV &&
+          //  Only allow cheating in development
+          (props.showSpoilers() ? (
+            <EyeIcon onClick={() => props.setShowSpoilers(false)} />
+          ) : (
+            <EyeOffIcon onClick={() => props.setShowSpoilers(true)} />
+          ))}
       </div>
     </div>
   );

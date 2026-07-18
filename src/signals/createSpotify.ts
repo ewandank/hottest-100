@@ -1,9 +1,9 @@
-import { createSignal, onMount } from "solid-js";
 import {
   SpotifyApi,
   type SdkOptions,
   AuthorizationCodeWithPKCEStrategy,
 } from "@spotify/web-api-ts-sdk";
+import { createSignal, onMount } from "solid-js";
 
 export function createSpotify(redirectUrl: string) {
   const [spotify, setSpotify] = createSignal<SpotifyApi | null>(null);

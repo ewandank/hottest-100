@@ -1,6 +1,7 @@
 import { type Component } from "solid-js";
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
+
 import { millisToMinutesAndSeconds } from "../../utils";
+import { Card, CardContent, CardHeader, CardTitle } from "../Card";
 import type { StatsComponentProps } from "./types";
 
 export const ShortestSong: Component<StatsComponentProps> = (props) => {
@@ -20,7 +21,7 @@ export const ShortestSong: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card>
+    <Card class="col-span-3">
       <CardHeader>
         <CardTitle>Shortest Song</CardTitle>
       </CardHeader>

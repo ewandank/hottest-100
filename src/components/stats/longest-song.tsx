@@ -1,6 +1,7 @@
 import { type Component } from "solid-js";
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
+
 import { millisToMinutesAndSeconds } from "../../utils";
+import { Card, CardContent, CardHeader, CardTitle } from "../Card";
 import type { StatsComponentProps } from "./types";
 
 export const LongestSong: Component<StatsComponentProps> = (props) => {
@@ -21,7 +22,7 @@ export const LongestSong: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card>
+    <Card class="col-span-3">
       <CardHeader>
         <CardTitle>Longest Song</CardTitle>
       </CardHeader>

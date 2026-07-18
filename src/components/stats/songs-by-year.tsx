@@ -1,4 +1,5 @@
 import { For, type Component } from "solid-js";
+
 import { Card, CardContent, CardHeader, CardTitle } from "../Card";
 import type { StatsComponentProps } from "./types";
 
@@ -23,7 +24,7 @@ export const SongsByYear: Component<StatsComponentProps> = (props) => {
     return sortedCounts;
   };
   return (
-    <Card>
+    <Card class="col-span-2">
       <CardHeader>
         <CardTitle>Songs By Year</CardTitle>
       </CardHeader>

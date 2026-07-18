@@ -1,8 +1,9 @@
 import { For, Show } from "solid-js";
+
+import type { ViewProps } from "../-countdown-player";
+import { TrackView } from "../../../../components/tracks/track";
 import { useGlobalContext } from "../../../../context/context";
 import { createDelayedSignal } from "../../../../signals/createDelayedSignal";
-import { TrackView } from "../../../../components/tracks/track";
-import type { ViewProps } from "../-countdown-player";
 
 export const ListView = (props: ViewProps) => {
   const [store] = useGlobalContext();

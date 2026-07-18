@@ -7,7 +7,7 @@ export interface ActualPlaylistedTrack extends Pick<PlaylistedTrack, "added_by">
   track: ActualTrackItem;
 }
 
-interface ActualTrackItem extends Pick<TrackItem, "duration_ms" | "uri" | "name"> {
+interface ActualTrackItem extends Pick<TrackItem, "duration_ms" | "uri" | "name" | "explicit"> {
   album: Pick<Album, "images" | "release_date">;
   artists: Pick<Artist, "name">[];
 }

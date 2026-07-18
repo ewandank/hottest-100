@@ -1,11 +1,11 @@
+import { QueryClientProvider } from "@tanstack/solid-query";
 import { RouterProvider, createRouter } from "@tanstack/solid-router";
 import { render } from "solid-js/web";
 
-import { routeTree } from "~/routeTree.gen";
 import "~/styles.css";
 import { GlobalStateProvider } from "~/context/context";
-import { QueryClientProvider } from "@tanstack/solid-query";
 import { queryClient } from "~/queryClient";
+import { routeTree } from "~/routeTree.gen";
 
 const router = createRouter({
   routeTree,
