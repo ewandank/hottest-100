@@ -160,7 +160,6 @@ export const CountdownPlayer: Component = () => {
       }
     }
     // Spotify types are wrong. Make sure this lines up with the fields array.
-    console.log(allItems[0]);
     return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
   });
 
