@@ -24,7 +24,7 @@ export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
   return (
     <Card class="col-span-2">
       <CardHeader>
-        <CardTitle>% of F**ks/given</CardTitle>
+        <CardTitle>% of F**ks given</CardTitle>
       </CardHeader>
       <CardContent>
         <div class="flex h-20 flex-col items-center justify-center">
@@ -37,7 +37,7 @@ export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
       </CardContent>
       <CardFooter>
         <p class="mt-8 text-xs opacity-80">
-Percentage of songs flagged by Spotify as <i>Explicit</i>.
+          Percentage of songs flagged by Spotify as <i>Explicit</i>.
         </p>
       </CardFooter>
     </Card>
