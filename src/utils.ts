@@ -33,10 +33,19 @@ export function debounce<T extends (...args: never[]) => void>(
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+const pad = (num: number) => String(num).padStart(2, "0");
 
 export function millisToMinutesAndSeconds(millis: number) {
-  const minutes = Math.floor(millis / 60000);
-  const seconds = ((millis % 60000) / 1000).toFixed(0);
-  // @ts-expect-error i think this is abusing teh loosy goosy nature
-  return minutes + " Mins " + (seconds < 10 ? "" : "") + seconds + " Secs ";
+  const totalSeconds = Math.floor(millis / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${minutes} Mins ${pad(seconds)} Secs `;
+}
+
+export function getFormattedDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  return `${year}-${month}-${day}`;
 }

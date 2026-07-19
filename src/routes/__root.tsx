@@ -1,4 +1,5 @@
 import { Outlet, createRootRouteWithContext } from "@tanstack/solid-router";
+import { Toaster } from "solid-sonner";
 
 export const Route = createRootRouteWithContext()({
   component: RootComponent,
@@ -10,6 +11,7 @@ function RootComponent() {
       <div class="mx-auto flex min-h-0 w-4/5 flex-1 flex-col">
         <Outlet />
       </div>
+      <Toaster visibleToasts={1} />
     </div>
   );
 }
