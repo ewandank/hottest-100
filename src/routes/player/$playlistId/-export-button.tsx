@@ -14,29 +14,31 @@ export const ExportButton: Component<{
 }> = (props) => {
   const playlistTitle = `${getFormattedDate()} Hottest 100 Results`;
   const createPlaylistMutation = createMutation(() => ({
-    mutationFn: async () => {
-      const userId = (await props.spotify()?.currentUser.profile())?.id;
-      if (!userId) {
-        throw new Error("no user to make playlist?");
-      }
-      const createdPlaylist = await props
-        .spotify()
-        ?.playlists.createPlaylist(userId, { name: playlistTitle });
-      if (!createdPlaylist) {
-        throw new Error("Failed to make playlist");
-      }
-      return props.spotify()?.playlists.updatePlaylistItems(createdPlaylist.id, {
-        uris: props.tracks()!.map(({ track }) => track.uri),
-      });
-    },
+mutationFn: async () => {
+  const spotify = props.spotify();
+  const tracks = props.tracks();
+  if (!spotify) throw new Error("Spotify client is not available.");
+  if (!tracks || tracks.length === 0) throw new Error("No tracks available to export.");
+
+  const userId = (await spotify.currentUser.profile()).id;
+  if (!userId) throw new Error("Unable to determine current user ID.");
+
+  const createdPlaylist = await spotify.playlists.createPlaylist(userId, { name: playlistTitle });
+  await spotify.playlists.updatePlaylistItems(createdPlaylist.id, {
+    uris: tracks.map(({ track }) => track.uri),
+  });
+}
     onSuccess: () => toast.success(`Created Playlist: ${playlistTitle}`),
-    onError: (e) => toast.error("Failed to create playlist", { description: e.message }),
+onError: (e) =>
+  toast.error("Failed to create playlist", {
+    description: e instanceof Error ? e.message : String(e),
+  }),
   }));
   return (
     <button
       aria-label="Export as Playlist"
       onClick={() => createPlaylistMutation.mutate()}
-      disabled={createPlaylistMutation.isError || createPlaylistMutation.isPending}
+disabled={createPlaylistMutation.isPending}
     >
       <Show when={!createPlaylistMutation.isPending}>
         <ShareIcon />
