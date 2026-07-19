@@ -1,7 +1,7 @@
 import { createQueries, createQuery } from "@tanstack/solid-query";
 import { type ChartData } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { type Component } from "solid-js";
+import { createMemo, type Component } from "solid-js";
 
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
@@ -21,8 +21,7 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
     return Array.from(ids);
   };
 
-  // Calculate the maximum possible count for any user (based on full dataset)
-  const calculateMaxPossibleCount = () => {
+  const maxYCount = createMemo(() => {
     const tracks = props.tracks ?? [];
     const counts: Record<string, number> = {};
     for (const track of tracks) {
@@ -30,20 +29,16 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
       if (id) counts[id] = (counts[id] || 0) + 1;
     }
 
-    if (Object.values(counts).length === 0) return 25; // Default if no data
+    if (Object.values(counts).length === 0) return 25;
 
     const maxValue = Math.max(...Object.values(counts));
-    // Add 10% padding to the top for visual appeal, then round to nearest multiple of 5
     const withPadding = maxValue * 1.1;
     return Math.ceil(withPadding / 5) * 5;
-  };
+  });
 
-  // Store the max value once - this won't change as the currentIndex changes
-  const maxYValue = calculateMaxPossibleCount();
-
-  // Compute counts for each person for the visible portion
-  const getCounts = (): Record<string, number> => {
-    const tracks = props.tracks?.slice(props.currentIndex()) ?? [];
+  const entries = createMemo<Record<string, number>>(() => {
+    const currentIndex = props.currentIndex();
+    const tracks = props.tracks?.slice(currentIndex) ?? [];
 
     return Object.fromEntries(
       allPeople().map((id) => {
@@ -51,15 +46,16 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
         return [id, count];
       }),
     );
-  };
+  });
 
-  const entries = getCounts();
   const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
   const displayNames = createQueries(() => ({
-    queries: Object.keys(entries).map((id) => userDisplayNameQueryOptions(spotifyQuery.data, id)),
+    queries: spotifyQuery.data
+      ? Object.keys(entries()).map((id) => userDisplayNameQueryOptions(spotifyQuery.data, id))
+      : [],
   }));
-  const chartData = (): ChartData => {
-    const values = Object.values(entries);
+  const chartData = createMemo<ChartData>(() => {
+    const values = Object.values(entries());
     return {
       labels: displayNames.map((d) => d.data ?? "Unknown"),
       datasets: [
@@ -72,7 +68,7 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
         },
       ],
     };
-  };
+  });
 
   return (
     <Card class="col-span-4">
@@ -92,7 +88,7 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
               },
             },
             scales: {
-              y: { max: maxYValue },
+              y: { max: maxYCount() },
             },
           }}
           plugins={[ChartDataLabels]}
