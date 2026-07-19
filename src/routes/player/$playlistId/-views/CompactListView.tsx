@@ -12,10 +12,10 @@ export const CompactListView = (props: ViewProps) => {
 
   return (
     <div class="p-8">
-      <For each={props.tracks()}>
+      <For each={props.tracks}>
         {(track, index) => (
           <Show when={currentIndex() !== undefined && currentIndex()! <= index() + 1}>
-            <CompactTrackView track={track} idx={index() + 1} spotify={props.spotify} />
+            <CompactTrackView track={track} idx={index() + 1} />
           </Show>
         )}
       </For>

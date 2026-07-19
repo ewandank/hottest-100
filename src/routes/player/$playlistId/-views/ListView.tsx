@@ -11,10 +11,10 @@ export const ListView = (props: ViewProps) => {
   const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator());
   return (
     <div class="p-8">
-      <For each={props.tracks()}>
+      <For each={props.tracks}>
         {(track, index) => (
           <Show when={currentIndex !== undefined && currentIndex()! <= index() + 1}>
-            <TrackView track={track} idx={index() + 1} spotify={props.spotify} />
+            <TrackView track={track} idx={index() + 1} />
           </Show>
         )}
       </For>

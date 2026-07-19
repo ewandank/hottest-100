@@ -6,7 +6,7 @@ import type { StatsComponentProps } from "./types";
 
 export const LongestSong: Component<StatsComponentProps> = (props) => {
   const longestSong = () => {
-    const tracks = props.tracks();
+    const tracks = props.tracks;
     if (!tracks || tracks.length === 0) return undefined;
 
     const currentTracks = tracks.slice(props.currentIndex());

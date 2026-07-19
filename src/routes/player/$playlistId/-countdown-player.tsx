@@ -1,4 +1,5 @@
-import type { PlaylistedTrack, SpotifyApi } from "@spotify/web-api-ts-sdk";
+import type { PlaylistedTrack } from "@spotify/web-api-ts-sdk";
+import { createQuery, skipToken } from "@tanstack/solid-query";
 import { getRouteApi } from "@tanstack/solid-router";
 import EyeIcon from "lucide-solid/icons/eye";
 import EyeOffIcon from "lucide-solid/icons/eye-off";
@@ -9,7 +10,6 @@ import Play from "lucide-solid/icons/play";
 import Trash2Icon from "lucide-solid/icons/trash-2";
 import {
   createEffect,
-  createResource,
   createSignal,
   type Component,
   Show,
@@ -20,8 +20,8 @@ import {
 
 import { useGlobalContext } from "~/context/context";
 import { hottestNumberQueryOptions } from "~/query/hottest-number";
+import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { queryClient } from "~/queryClient";
-import { createSpotify } from "~/signals/createSpotify";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
 import { debounce, shuffle, playNumber } from "~/utils";
 
@@ -41,10 +41,10 @@ export const CountdownPlayer: Component = () => {
   const playlistId = params().playlistId;
   const [store, setStore] = useGlobalContext();
   const [disabled, setDisabled] = createSignal(false);
+  const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
   createEffect(() => {
     // Wait for authorization before injecting the SDK script
-    const sdk = spotify();
-    void sdk?.getAccessToken().then((token) => {
+    void spotifyQuery.data?.getAccessToken().then((token) => {
       if (token && !document.getElementById("spotify-sdk")) {
         const script = document.createElement("script");
         script.id = "spotify-sdk";
@@ -61,11 +61,9 @@ export const CountdownPlayer: Component = () => {
     const script = document.getElementById("spotify-sdk");
     script?.remove();
   });
-  const spotify = createSpotify(`${window.location.origin}/player`);
-
   createEffect(() => {
     void (async () => {
-      if (spotify() === null) {
+      if (spotifyQuery.data === null) {
         return;
       }
 
@@ -73,7 +71,7 @@ export const CountdownPlayer: Component = () => {
         const internalPlayer = new window.Spotify.Player({
           name: "Hottest 100 Player",
           getOAuthToken: (cb) => {
-            void spotify()
+            void spotifyQuery.data
               ?.getAccessToken()
               // Cheeky non-null assert
               .then((token) => cb(token!.access_token));
@@ -84,9 +82,9 @@ export const CountdownPlayer: Component = () => {
         void internalPlayer.connect();
         setPlayer(internalPlayer);
         internalPlayer.addListener("ready", async ({ device_id }) => {
-          await spotify()?.player.transferPlayback([device_id]);
+          await spotifyQuery.data?.player.transferPlayback([device_id]);
           try {
-            await spotify()?.player.setRepeatMode("off", device_id);
+            await spotifyQuery.data?.player.setRepeatMode("off", device_id);
           } catch (e) {
             if (e instanceof SyntaxError) {
               // This throws a syntax error as the api incorrectly assumes it returns JSON, however it just returns a string.
@@ -117,57 +115,61 @@ export const CountdownPlayer: Component = () => {
 
   const debouncedHandlePlayerStateChange = debounce(handlePlayerStateChange, 20);
 
-  const [tracks] = createResource(spotify, async () => {
-    if (!playlistId) return [];
-    if (!spotify()) return [];
-    const fields =
-      "items(added_by(id),track(name,album(images,release_date),artists(name),uri,duration_ms,explicit)),total";
-    // First call just to discover total number of tracks
-    const firstPage = await spotify()!.playlists.getPlaylistItems(
-      playlistId,
-      undefined,
-      fields,
-      undefined, // defaults to 100.
-      0,
-    );
-
-    const total = firstPage.total ?? firstPage.items.length;
-    const allItems: PlaylistedTrack[] = [...firstPage.items];
-
-    if (total > firstPage.items.length) {
-      // Calculate offsets for remaining pages
-      const offsets: number[] = [];
-      for (let offset = firstPage.items.length; offset < total; offset += 100) {
-        offsets.push(offset);
-      }
-
-      // Kick off all requests in parallel
-      const pages = await Promise.all(
-        offsets.map((offset) =>
-          spotify()!.playlists.getPlaylistItems(
+  const tracksQuery = createQuery(() => ({
+    queryKey: ["shuffledTracks", playlistId],
+    queryFn: spotifyQuery.data
+      ? async () => {
+          const fields =
+            "items(added_by(id),track(name,album(images,release_date),artists(name),uri,duration_ms,explicit)),total";
+          // First call just to discover total number of tracks
+          const firstPage = await spotifyQuery.data.playlists.getPlaylistItems(
             playlistId,
             undefined,
             fields,
-            undefined, //defaults to 100
-            offset,
-          ),
-        ),
-      );
+            undefined, // defaults to 100.
+            0,
+          );
 
-      // Collect results
-      for (const page of pages) {
-        allItems.push(...page.items);
-      }
-    }
-    // Spotify types are wrong. Make sure this lines up with the fields array.
-    return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
-  });
+          const total = firstPage.total ?? firstPage.items.length;
+          const allItems: PlaylistedTrack[] = [...firstPage.items];
+
+          if (total > firstPage.items.length) {
+            // Calculate offsets for remaining pages
+            const offsets: number[] = [];
+            for (let offset = firstPage.items.length; offset < total; offset += 100) {
+              offsets.push(offset);
+            }
+
+            // Kick off all requests in parallel
+            const pages = await Promise.all(
+              offsets.map((offset) =>
+                spotifyQuery.data.playlists.getPlaylistItems(
+                  playlistId,
+                  undefined,
+                  fields,
+                  undefined, //defaults to 100
+                  offset,
+                ),
+              ),
+            );
+
+            // Collect results
+            for (const page of pages) {
+              allItems.push(...page.items);
+            }
+          }
+          // Spotify types are wrong. Make sure this lines up with the fields array.
+          return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
+        }
+      : skipToken,
+  }));
 
   const countdownHandler = async () => {
-    if (tracks() === undefined || (store.iterator !== undefined && store.iterator <= 0)) {
+    if (tracksQuery.data === undefined || (store.iterator !== undefined && store.iterator <= 0)) {
       return;
     }
-    const currentIterator = store.iterator === undefined ? tracks()!.length : store.iterator - 1;
+    const currentIterator =
+      store.iterator === undefined ? tracksQuery.data.length : store.iterator - 1;
 
     const audioBlob = await queryClient.ensureQueryData(hottestNumberQueryOptions(currentIterator));
 
@@ -178,15 +180,15 @@ export const CountdownPlayer: Component = () => {
 
     // set the starting number
     if (store.iterator === undefined) {
-      setStore("iterator", tracks()!.length);
+      setStore("iterator", tracksQuery.data.length);
     } else {
       setStore("iterator", (prev) => (prev !== undefined ? prev - 1 : undefined));
     }
 
     // play the actual track, the device id will default to the active device (the current device), and an empty string keeps the types happy
     // TODO: try with retries? this returned 502 once
-    await spotify()?.player.startResumePlayback("", undefined, [
-      tracks()?.at(currentIterator - 1)?.track.uri ?? "",
+    await spotifyQuery.data?.player.startResumePlayback("", undefined, [
+      tracksQuery.data.at(currentIterator - 1)?.track.uri ?? "",
     ]);
     const nextIterator = currentIterator - 1;
     if (nextIterator < 0) {
@@ -206,21 +208,20 @@ export const CountdownPlayer: Component = () => {
         showSpoilers={showSpoilers}
         setShowSpoilers={setShowSpoilers}
         disabled={disabled}
-        spotify={spotify}
-        tracks={tracks}
+        tracks={tracksQuery.data}
       />
       <Suspense>
         <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
           <div class="w-2/5 overflow-y-auto">
             <Show when={view() === "list"}>
-              <ListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+              <ListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
             </Show>
             <Show when={view() === "compact-list"}>
-              <CompactListView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+              <CompactListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
             </Show>
           </div>
           <div class="flex-1 overflow-y-auto">
-            <StatsView tracks={tracks} spotify={spotify} showSpoilers={showSpoilers} />
+            <StatsView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
           </div>
         </div>
       </Suspense>
@@ -236,8 +237,7 @@ const Toolbar: Component<{
   showSpoilers: Accessor<boolean>;
   setShowSpoilers: (v: boolean) => void;
   disabled: Accessor<boolean>;
-  tracks: Accessor<ActualPlaylistedTrack[] | undefined>;
-  spotify: () => SpotifyApi | null;
+  tracks: ActualPlaylistedTrack[] | undefined;
 }> = (props) => {
   const [store] = useGlobalContext();
   return (
@@ -282,7 +282,7 @@ const Toolbar: Component<{
       </div>
       <div class="flex justify-end gap-2">
         <Trash2Icon onClick={() => alert("Persisted storage coming soon!")} />
-        <ExportButton spotify={props.spotify} tracks={props.tracks} />
+        <ExportButton tracks={props.tracks} />
         {import.meta.env.DEV &&
           //  Only allow cheating in development
           (props.showSpoilers() ? (
@@ -296,7 +296,6 @@ const Toolbar: Component<{
 };
 
 export type ViewProps = {
-  tracks: Accessor<ActualPlaylistedTrack[] | undefined>;
-  spotify: () => SpotifyApi | null;
+  tracks: ActualPlaylistedTrack[] | undefined;
   showSpoilers: Accessor<boolean>;
 };

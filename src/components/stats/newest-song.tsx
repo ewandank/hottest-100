@@ -20,7 +20,7 @@ export const formatDate = (dateStr: string): string => {
 
 export const NewestSong: Component<StatsComponentProps> = (props) => {
   const newestSong = () => {
-    const tracks = props.tracks();
+    const tracks = props.tracks;
     if (!tracks || tracks.length === 0) return undefined;
 
     const currentTracks = tracks.slice(props.currentIndex());

@@ -23,24 +23,20 @@ export const StatsView = (props: ViewProps) => {
     if (iterator !== undefined) {
       return iterator - 1;
     }
-    return props.tracks()?.length;
+    return props.tracks?.length;
   };
 
   return (
     <div class="grid h-fit grid-cols-6 gap-5 p-2">
-      <UserCountGraph spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <TopNArtists spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <LongestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <ShortestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <SongsByYear spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <BackToBack spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <PercentageExplicit
-        spotify={props.spotify}
-        tracks={props.tracks}
-        currentIndex={currentIndex}
-      />
-      <NewestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
-      <OldestSong spotify={props.spotify} tracks={props.tracks} currentIndex={currentIndex} />
+      {/* <UserCountGraph tracks={props.tracks} currentIndex={currentIndex} /> */}
+      <TopNArtists tracks={props.tracks} currentIndex={currentIndex} />
+      <LongestSong tracks={props.tracks} currentIndex={currentIndex} />
+      <ShortestSong tracks={props.tracks} currentIndex={currentIndex} />
+      <SongsByYear tracks={props.tracks} currentIndex={currentIndex} />
+      <BackToBack tracks={props.tracks} currentIndex={currentIndex} />
+      <PercentageExplicit tracks={props.tracks} currentIndex={currentIndex} />
+      <NewestSong tracks={props.tracks} currentIndex={currentIndex} />
+      <OldestSong tracks={props.tracks} currentIndex={currentIndex} />
     </div>
   );
 };

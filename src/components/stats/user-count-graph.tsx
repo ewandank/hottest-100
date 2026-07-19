@@ -1,8 +1,9 @@
-import { createQueries } from "@tanstack/solid-query";
+import { createQueries, createQuery } from "@tanstack/solid-query";
 import { type ChartData } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { type Component } from "solid-js";
 
+import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../Card";
@@ -12,7 +13,7 @@ import type { StatsComponentProps } from "./types";
 export const UserCountGraph: Component<StatsComponentProps> = (props) => {
   // Get all unique people in the playlist
   const allPeople = () => {
-    const tracks = props.tracks() ?? [];
+    const tracks = props.tracks ?? [];
     const ids = new Set<string>();
     for (const track of tracks) {
       if (track.added_by?.id) ids.add(track.added_by.id);
@@ -22,7 +23,7 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
 
   // Calculate the maximum possible count for any user (based on full dataset)
   const calculateMaxPossibleCount = () => {
-    const tracks = props.tracks() ?? [];
+    const tracks = props.tracks ?? [];
     const counts: Record<string, number> = {};
     for (const track of tracks) {
       const id = track.added_by?.id;
@@ -42,7 +43,7 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
 
   // Compute counts for each person for the visible portion
   const getCounts = (): Record<string, number> => {
-    const tracks = props.tracks()?.slice(props.currentIndex()) ?? [];
+    const tracks = props.tracks?.slice(props.currentIndex()) ?? [];
 
     return Object.fromEntries(
       allPeople().map((id) => {
@@ -52,12 +53,13 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
     );
   };
 
+  const entries = getCounts();
+  const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
+  const displayNames = createQueries(() => ({
+    queries: Object.keys(entries).map((id) => userDisplayNameQueryOptions(spotifyQuery.data, id)),
+  }));
   const chartData = (): ChartData => {
-    const entries = getCounts();
     const values = Object.values(entries);
-    const displayNames = createQueries(() => ({
-      queries: Object.keys(entries).map((id) => userDisplayNameQueryOptions(props.spotify(), id)),
-    }));
     return {
       labels: displayNames.map((d) => d.data ?? "Unknown"),
       datasets: [

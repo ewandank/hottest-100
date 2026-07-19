@@ -1,32 +1,31 @@
-import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
-import { createMutation } from "@tanstack/solid-query";
+import { createMutation, createQuery } from "@tanstack/solid-query";
 import LoaderCircleIcon from "lucide-solid/icons/loader-circle";
 import ShareIcon from "lucide-solid/icons/share";
-import { type Component, type Accessor, Show } from "solid-js";
+import { type Component, Show } from "solid-js";
 import { toast } from "solid-sonner";
 
+import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
 import { getFormattedDate } from "~/utils";
 
 export const ExportButton: Component<{
-  tracks: Accessor<ActualPlaylistedTrack[] | undefined>;
-  spotify: () => SpotifyApi | null;
+  tracks: ActualPlaylistedTrack[] | undefined;
 }> = (props) => {
   const playlistTitle = `${getFormattedDate()} Hottest 100 Results`;
+  const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
   const createPlaylistMutation = createMutation(() => ({
     mutationFn: async () => {
-      const spotify = props.spotify();
-      const tracks = props.tracks();
-      if (!spotify) throw new Error("Spotify client is not available.");
+      const tracks = props.tracks;
+      if (!spotifyQuery.data) throw new Error("Spotify client is not available.");
       if (!tracks || tracks.length === 0) throw new Error("No tracks available to export.");
 
-      const userId = (await spotify.currentUser.profile()).id;
+      const userId = (await spotifyQuery.data.currentUser.profile()).id;
       if (!userId) throw new Error("Unable to determine current user ID.");
 
-      const createdPlaylist = await spotify.playlists.createPlaylist(userId, {
+      const createdPlaylist = await spotifyQuery.data.playlists.createPlaylist(userId, {
         name: playlistTitle,
       });
-      await spotify.playlists.updatePlaylistItems(createdPlaylist.id, {
+      await spotifyQuery.data.playlists.updatePlaylistItems(createdPlaylist.id, {
         uris: tracks.map(({ track }) => track.uri),
       });
     },
