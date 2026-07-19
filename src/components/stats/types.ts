@@ -1,10 +1,8 @@
-import type { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { type Accessor } from "solid-js";
 
 import type { ActualPlaylistedTrack } from "../../types/spotify";
 
 export type StatsComponentProps = {
-  spotify: Accessor<SpotifyApi | null>;
-  tracks: Accessor<ActualPlaylistedTrack[] | undefined>;
+  tracks: ActualPlaylistedTrack[] | undefined;
   currentIndex: Accessor<number | undefined>;
 };

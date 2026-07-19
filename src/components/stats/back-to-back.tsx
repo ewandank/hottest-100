@@ -5,7 +5,7 @@ import type { StatsComponentProps } from "./types";
 
 export const BackToBack: Component<StatsComponentProps> = (props) => {
   const runs = () => {
-    const allTracks = props.tracks() || [];
+    const allTracks = props.tracks || [];
     const startIndex = props.currentIndex() || 0;
     const currentTracks = allTracks.slice(startIndex);
 

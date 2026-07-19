@@ -8,7 +8,7 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
 
   const sortedCounts = createMemo(() => {
     // TODO deslopify
-    const tracks = props.tracks()?.slice(props.currentIndex()) ?? [];
+    const tracks = props.tracks?.slice(props.currentIndex()) ?? [];
 
     const counts: Record<string, number> = {};
     tracks

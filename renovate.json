@@ -6,5 +6,6 @@
     "docker:pinDigests",
     "group:allNonMajor",
     "schedule:monthly"
-  ]
+  ],
+  "minimumReleaseAge": "1 day"
 }

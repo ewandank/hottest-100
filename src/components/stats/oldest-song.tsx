@@ -6,7 +6,7 @@ import type { StatsComponentProps } from "./types";
 
 export const OldestSong: Component<StatsComponentProps> = (props) => {
   const oldestSong = () => {
-    const tracks = props.tracks();
+    const tracks = props.tracks;
     if (!tracks || tracks.length === 0) return undefined;
 
     const currentTracks = tracks.slice(props.currentIndex());

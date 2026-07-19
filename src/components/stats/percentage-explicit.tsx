@@ -5,7 +5,7 @@ import type { StatsComponentProps } from "./types";
 
 export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
   const percentage = () => {
-    const tracks = props.tracks();
+    const tracks = props.tracks;
     if (!tracks || tracks.length === 0) {
       return undefined;
     }
@@ -22,21 +22,19 @@ export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card class="col-span-2">
+    <Card class="col-span-2 flex flex-col justify-between">
       <CardHeader>
         <CardTitle>% of F**ks given</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div class="flex h-20 flex-col items-center justify-center">
-          {percentage() !== undefined ? (
-            <p class="text-6xl font-extrabold">{percentage()?.toFixed(2)}%</p>
-          ) : (
-            <p class="text-base font-normal">No songs available</p>
-          )}
-        </div>
+      <CardContent class="flex h-20 flex-col items-center justify-center p-0">
+        {percentage() !== undefined ? (
+          <p class="text-6xl font-extrabold">{percentage()?.toFixed(2)}%</p>
+        ) : (
+          <p class="text-base font-normal">No songs available</p>
+        )}
       </CardContent>
       <CardFooter>
-        <p class="mt-8 text-xs opacity-80">
+        <p class="text-xs opacity-80">
           Percentage of songs flagged by Spotify as <i>Explicit</i>.
         </p>
       </CardFooter>

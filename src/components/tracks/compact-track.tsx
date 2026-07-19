@@ -1,7 +1,7 @@
-import { SpotifyApi } from "@spotify/web-api-ts-sdk";
 import { createQuery } from "@tanstack/solid-query";
 import { Suspense, type Component } from "solid-js";
 
+import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
 
 import { type ActualPlaylistedTrack } from "../../types/spotify";
@@ -9,10 +9,11 @@ import { type ActualPlaylistedTrack } from "../../types/spotify";
 export const CompactTrackView: Component<{
   track: ActualPlaylistedTrack;
   idx: number;
-  spotify: () => SpotifyApi | null;
 }> = (props) => {
+  const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
+
   const userName = createQuery(() =>
-    userDisplayNameQueryOptions(props.spotify(), props.track.added_by.id),
+    userDisplayNameQueryOptions(spotifyQuery.data, props.track.added_by.id),
   );
   return (
     <Suspense>
