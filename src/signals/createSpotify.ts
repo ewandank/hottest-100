@@ -10,6 +10,8 @@ export function createSpotify(redirectUrl: string) {
   const clientId = import.meta.env.VITE_CLIENT_ID;
   const scopes = [
     "playlist-read-private",
+    "playlist-modify-public",
+    "playlist-modify-private",
     "user-modify-playback-state",
     "streaming",
     "user-read-email",

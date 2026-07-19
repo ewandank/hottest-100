@@ -6,7 +6,6 @@ import GalleryVertical from "lucide-solid/icons/gallery-vertical";
 import List from "lucide-solid/icons/list";
 import Pause from "lucide-solid/icons/pause";
 import Play from "lucide-solid/icons/play";
-import ShareIcon from "lucide-solid/icons/share";
 import Trash2Icon from "lucide-solid/icons/trash-2";
 import {
   createEffect,
@@ -26,6 +25,7 @@ import { createSpotify } from "~/signals/createSpotify";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
 import { debounce, shuffle, playNumber } from "~/utils";
 
+import { ExportButton } from "./-export-button";
 import { StatsView } from "./-stats-grid";
 import { CompactListView } from "./-views/CompactListView";
 import { ListView } from "./-views/ListView";
@@ -206,6 +206,8 @@ export const CountdownPlayer: Component = () => {
         showSpoilers={showSpoilers}
         setShowSpoilers={setShowSpoilers}
         disabled={disabled}
+        spotify={spotify}
+        tracks={tracks}
       />
       <Suspense>
         <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
@@ -234,6 +236,8 @@ const Toolbar: Component<{
   showSpoilers: Accessor<boolean>;
   setShowSpoilers: (v: boolean) => void;
   disabled: Accessor<boolean>;
+  tracks: Accessor<ActualPlaylistedTrack[] | undefined>;
+  spotify: () => SpotifyApi | null;
 }> = (props) => {
   const [store] = useGlobalContext();
   return (
@@ -277,8 +281,8 @@ const Toolbar: Component<{
         </button>
       </div>
       <div class="flex justify-end gap-2">
-        <ShareIcon onClick={() => alert("Export coming soon!")} />
         <Trash2Icon onClick={() => alert("Persisted storage coming soon!")} />
+        <ExportButton spotify={props.spotify} tracks={props.tracks} />
         {import.meta.env.DEV &&
           //  Only allow cheating in development
           (props.showSpoilers() ? (

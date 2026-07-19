@@ -38,5 +38,13 @@ export function millisToMinutesAndSeconds(millis: number) {
   const minutes = Math.floor(millis / 60000);
   const seconds = ((millis % 60000) / 1000).toFixed(0);
   // @ts-expect-error i think this is abusing teh loosy goosy nature
-  return minutes + " Mins " + (seconds < 10 ? "" : "") + seconds + " Secs ";
+  return seconds === 60 ? minutes + 1 + ":00" : minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+}
+const pad = (num: number) => String(num).padStart(2, "0");
+
+export function getFormattedDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  return `${year}-${month}-${day}`;
 }
