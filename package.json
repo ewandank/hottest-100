@@ -11,7 +11,8 @@
     "fmt": "oxfmt",
     "fmt:ci": "oxfmt --check",
     "knip": "knip",
-    "knip:ci": "knip --reporter github-actions"
+    "knip:ci": "knip --reporter github-actions",
+    "test": "vitest"
   },
   "dependencies": {
     "@solid-primitives/refs": "^1.1.4",
@@ -39,7 +40,8 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.1.5",
-    "vite-plugin-solid": "^2.11.12"
+    "vite-plugin-solid": "^2.11.12",
+    "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@11.14.0"
 }
