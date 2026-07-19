@@ -40,7 +40,7 @@ export function millisToMinutesAndSeconds(millis: number) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
 
-  return `${minutes}:${pad(seconds)}`;
+  return `${minutes} Mins ${pad(seconds)} Secs `;
 }
 
 export function getFormattedDate(date = new Date()) {
