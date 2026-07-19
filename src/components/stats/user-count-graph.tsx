@@ -1,7 +1,7 @@
 import { createQueries, createQuery } from "@tanstack/solid-query";
 import { type ChartData } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { createMemo, type Component } from "solid-js";
+import { createMemo, Show, type Component } from "solid-js";
 
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
@@ -11,6 +11,19 @@ import { BarChart } from "../charts";
 import type { StatsComponentProps } from "./types";
 
 export const UserCountGraph: Component<StatsComponentProps> = (props) => {
+  return (
+    <Card class="col-span-4">
+      <CardHeader>
+        <CardTitle>Who got the most songs in?</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <CountBarChart tracks={props.tracks} currentIndex={props.currentIndex} />
+      </CardContent>
+    </Card>
+  );
+};
+
+const CountBarChart: Component<StatsComponentProps> = (props) => {
   // Get all unique people in the playlist
   const allPeople = () => {
     const tracks = props.tracks ?? [];
@@ -50,10 +63,9 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
 
   const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
   const displayNames = createQueries(() => ({
-    queries: spotifyQuery.data
-      ? Object.keys(entries()).map((id) => userDisplayNameQueryOptions(spotifyQuery.data, id))
-      : [],
+    queries: Object.keys(entries()).map((id) => userDisplayNameQueryOptions(spotifyQuery.data, id)),
   }));
+
   const chartData = createMemo<ChartData>(() => {
     const values = Object.values(entries());
     return {
@@ -61,41 +73,36 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
       datasets: [
         {
           data: values,
+
           //   bg-blue-500
           backgroundColor: ["oklch(62.3% 0.214 259.815)"],
-          borderRadius: 20,
+          borderRadius: 8,
           borderSkipped: false,
         },
       ],
     };
   });
-
   return (
-    <Card class="col-span-4">
-      <CardHeader>
-        <CardTitle>Who got the most songs in?</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <BarChart
-          data={chartData()}
-          options={{
-            plugins: {
-              legend: { display: false },
-              tooltip: { enabled: false },
-              datalabels: {
-                anchor: "end",
-                align: "top",
-              },
+    <Show when={displayNames.every((q) => q.isSuccess) && props.tracks !== undefined}>
+      <BarChart
+        data={chartData()}
+        options={{
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false },
+            datalabels: {
+              anchor: "end",
+              align: "top",
             },
-            scales: {
-              y: { max: maxYCount() },
-            },
-          }}
-          plugins={[ChartDataLabels]}
-          width={600}
-          height={200}
-        />
-      </CardContent>
-    </Card>
+          },
+          scales: {
+            y: { max: maxYCount() },
+          },
+        }}
+        plugins={[ChartDataLabels]}
+        width={600}
+        height={200}
+      />
+    </Show>
   );
 };
