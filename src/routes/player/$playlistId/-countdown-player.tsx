@@ -200,33 +200,31 @@ export const CountdownPlayer: Component = () => {
 
   const [showSpoilers, setShowSpoilers] = createSignal(false);
   return (
-    <>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Toolbar
-          startCountdown={countdownHandler}
-          paused={paused}
-          view={view}
-          setView={setView}
-          showSpoilers={showSpoilers}
-          setShowSpoilers={setShowSpoilers}
-          disabled={disabled}
-          tracks={tracksQuery.data}
-        />
-        <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
-          <div class="w-2/5 overflow-y-auto">
-            <Show when={view() === "list"}>
-              <ListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
-            </Show>
-            <Show when={view() === "compact-list"}>
-              <CompactListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
-            </Show>
-          </div>
-          <div class="flex-1 overflow-y-auto">
-            <StatsView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
-          </div>
+    <Suspense fallback={<LoadingSpinner />}>
+      <Toolbar
+        startCountdown={countdownHandler}
+        paused={paused}
+        view={view}
+        setView={setView}
+        showSpoilers={showSpoilers}
+        setShowSpoilers={setShowSpoilers}
+        disabled={disabled}
+        tracks={tracksQuery.data}
+      />
+      <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
+        <div class="w-2/5 overflow-y-auto">
+          <Show when={view() === "list"}>
+            <ListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
+          </Show>
+          <Show when={view() === "compact-list"}>
+            <CompactListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
+          </Show>
         </div>
-      </Suspense>
-    </>
+        <div class="flex-1 overflow-y-auto">
+          <StatsView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
+        </div>
+      </div>
+    </Suspense>
   );
 };
 
