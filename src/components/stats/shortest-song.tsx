@@ -21,7 +21,7 @@ export const ShortestSong: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card class="col-span-3 h-52">
+    <Card class="col-span-3 min-h-52">
       <CardHeader>
         <CardTitle>Shortest Song</CardTitle>
       </CardHeader>
@@ -34,7 +34,7 @@ export const ShortestSong: Component<StatsComponentProps> = (props) => {
                 .join(",")}
             </p>
             <p class="">"{shortestSong()!.track.name}"</p>
-            <p class="text-center font-extrabold text-blue-500">
+            <p class="text-center font-extrabold text-accent">
               {millisToMinutesAndSeconds(shortestSong()!.track.duration_ms)}
             </p>
           </>

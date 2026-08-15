@@ -102,6 +102,7 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
           y: "count",
           inset: 2,
           radius: 8,
+          fill: "var(--accent)",
         }),
         text(rows, {
           x: "person",
@@ -111,7 +112,7 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
           anchor: "middle",
           fontSize: 12,
           fontWeight: 600,
-          fill: "white",
+          fill: "var(--accent-foreground)",
         }),
       ],
       y: {

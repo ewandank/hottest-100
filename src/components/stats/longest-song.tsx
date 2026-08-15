@@ -22,7 +22,7 @@ export const LongestSong: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card class="col-span-3 h-52">
+    <Card class="col-span-3 min-h-52">
       <CardHeader>
         <CardTitle>Longest Song</CardTitle>
       </CardHeader>
@@ -35,7 +35,7 @@ export const LongestSong: Component<StatsComponentProps> = (props) => {
                 .join(",")}
             </p>
             <p class="">"{longestSong()!.track.name}"</p>
-            <p class="text-center font-extrabold text-blue-500">
+            <p class="text-center font-extrabold text-accent">
               {millisToMinutesAndSeconds(longestSong()!.track.duration_ms)}
             </p>
           </>

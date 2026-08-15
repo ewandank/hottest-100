@@ -43,7 +43,7 @@ export const NewestSong: Component<StatsComponentProps> = (props) => {
       <CardContent>
         {newestSong() !== undefined ? (
           <div class="flex h-full flex-col items-center justify-center">
-            <p class="text-2xl font-extrabold text-blue-500">
+            <p class="text-2xl font-extrabold text-accent">
               {formatDate(newestSong()!.track.album.release_date)}
             </p>
             <p class="font-bold">{newestSong()!.track.name}</p>
