@@ -1,8 +1,7 @@
 /**
- * Performs a weighted random shuffle returning `n` unique items.
- * Duplicates in the input array represent weights.
+ * Performs a weighted random shuffle returning `n` unique items. Duplicates in the input array
+ * represent weights.
  *
-s
  * @param arr - Input array where duplicate values represent weight
  * @param n - Number of unique items to return
  * @returns Array of `n` weighted randomly selected unique items
@@ -22,8 +21,9 @@ export function weightedShuffle<T>(arr: T[], n: number, randomAlg = Math.random)
 }
 /**
  * From a list of items with duplicates, generate their weights in a map.
- * @param items the items (with duplicates)
- * @returns the map of each unique item to its weight.
+ *
+ * @param items The items (with duplicates)
+ * @returns The map of each unique item to its weight.
  */
 const buildFrequencyMap = <T>(items: T[]): Map<T, number> => {
   const weights = new Map<T, number>();
