@@ -18,6 +18,7 @@ import {
   Suspense,
 } from "solid-js";
 
+import { LoadingSpinner } from "~/components/loading-spinner";
 import { useGlobalContext } from "~/context/context";
 import { hottestNumberQueryOptions } from "~/query/hottest-number";
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
@@ -200,17 +201,17 @@ export const CountdownPlayer: Component = () => {
   const [showSpoilers, setShowSpoilers] = createSignal(false);
   return (
     <>
-      <Toolbar
-        startCountdown={countdownHandler}
-        paused={paused}
-        view={view}
-        setView={setView}
-        showSpoilers={showSpoilers}
-        setShowSpoilers={setShowSpoilers}
-        disabled={disabled}
-        tracks={tracksQuery.data}
-      />
-      <Suspense>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Toolbar
+          startCountdown={countdownHandler}
+          paused={paused}
+          view={view}
+          setView={setView}
+          showSpoilers={showSpoilers}
+          setShowSpoilers={setShowSpoilers}
+          disabled={disabled}
+          tracks={tracksQuery.data}
+        />
         <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
           <div class="w-2/5 overflow-y-auto">
             <Show when={view() === "list"}>

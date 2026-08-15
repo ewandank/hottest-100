@@ -1,4 +1,4 @@
-import { barY, defineChart } from "@tanstack/charts";
+import { barY, defineChart, text } from "@tanstack/charts";
 import { scaleBand } from "@tanstack/charts/scales/band";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { Chart } from "@tanstack/charts/solid";
@@ -68,9 +68,7 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
     const maxValue = Math.max(...countByPerson.values(), 0);
 
     if (maxValue === 0) return 25;
-
-    const withPadding = maxValue * 1.1;
-    return Math.ceil(withPadding / 5) * 5;
+    return maxValue;
   });
 
   const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
@@ -97,40 +95,59 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
     const rows = chartRows();
 
     return defineChart({
+      svgAnimation: true,
       marks: [
         barY(rows, {
           x: "person",
           y: "count",
-          inset: 4,
+          inset: 2,
           radius: 8,
+        }),
+        text(rows, {
+          x: "person",
+          y: "count",
+          text: "count",
+          dy: 14,
+          anchor: "middle",
+          fontSize: 12,
+          fontWeight: 600,
+          fill: "white",
         }),
       ],
       y: {
         scale: scaleLinear().domain([0, maxYCount()]),
-        nice: true,
         grid: true,
-        axis: {
-          label: "Songs",
-        },
       },
       x: {
         scale: () =>
           scaleBand()
             .domain(rows.map((row) => row.person))
             .padding(0.2),
+
+        axis: {
+          tickLabels: {
+            rotate: -50,
+            thin: false,
+          },
+        },
       },
+      pointer: false,
+
+      keyboard: false,
     });
   });
 
   return (
-    <Show when={displayNames.every((q) => q.isSuccess) && props.tracks !== undefined}>
-      <Chart
-        definition={chartDefinition()}
-        ariaLabel="Who got the most songs in?"
-        ariaDescription="Horizontal bar chart showing how many tracks each contributor added."
-        height={480}
-        class="h-full"
-      />
-    </Show>
+    <div class="h-90">
+      <Show when={displayNames.every((q) => q.isSuccess) && props.tracks !== undefined}>
+        <Chart
+          definition={chartDefinition()}
+          ariaLabel="Who got the most songs in?"
+          ariaDescription="Vertical bar chart showing how many tracks each contributor added."
+          height={360}
+          class="animate-in transition duration-1000 fade-in"
+        />
+      </Show>
+    </div>
   );
 };

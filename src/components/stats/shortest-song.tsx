@@ -21,7 +21,7 @@ export const ShortestSong: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card class="col-span-3">
+    <Card class="col-span-3 h-52">
       <CardHeader>
         <CardTitle>Shortest Song</CardTitle>
       </CardHeader>

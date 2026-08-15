@@ -50,11 +50,11 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
   });
 
   return (
-    <Card class="col-span-2">
+    <Card class="col-span-2 flex h-full flex-col">
       <CardHeader>
         <CardTitle>Top {displayData().length} Artists</CardTitle>
       </CardHeader>
-      <CardContent class="h-56 overflow-y-auto">
+      <CardContent class="max-h-76 flex-1 overflow-y-auto">
         <For each={displayData()}>
           {(artist) => (
             <p class="py-0.5">
@@ -64,7 +64,7 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
           )}
         </For>
       </CardContent>
-      <CardFooter>
+      <CardFooter class="mt-auto">
         <p class="text-xs opacity-80">
           Note that if more than one artist is on a song, they are counted separately.
         </p>
