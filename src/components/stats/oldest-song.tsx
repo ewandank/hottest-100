@@ -22,14 +22,14 @@ export const OldestSong: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card class="col-span-3">
+    <Card class="col-span-3 h-44">
       <CardHeader>
         <CardTitle>Oldest Song</CardTitle>
       </CardHeader>
       <CardContent>
         {oldestSong() !== undefined ? (
           <div class="flex h-full flex-col items-center justify-center">
-            <p class="text-2xl font-extrabold">
+            <p class="text-2xl font-extrabold text-accent">
               {formatDate(oldestSong()!.track.album.release_date)}
             </p>
             <p class="font-bold">{oldestSong()!.track.name}</p>

@@ -1,13 +1,14 @@
+import { barY, defineChart, text } from "@tanstack/charts";
+import { scaleBand } from "@tanstack/charts/scales/band";
+import { scaleLinear } from "@tanstack/charts/scales/linear";
+import { Chart } from "@tanstack/charts/solid";
 import { createQueries, createQuery } from "@tanstack/solid-query";
-import { type ChartData } from "chart.js";
-import ChartDataLabels from "chartjs-plugin-datalabels";
 import { createMemo, Show, type Component } from "solid-js";
 
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../Card";
-import { BarChart } from "../charts";
 import type { StatsComponentProps } from "./types";
 
 export const UserCountGraph: Component<StatsComponentProps> = (props) => {
@@ -24,85 +25,130 @@ export const UserCountGraph: Component<StatsComponentProps> = (props) => {
 };
 
 const CountBarChart: Component<StatsComponentProps> = (props) => {
-  // Get all unique people in the playlist
-  const allPeople = () => {
+  const allPeople = createMemo(() => {
     const tracks = props.tracks ?? [];
     const ids = new Set<string>();
+
     for (const track of tracks) {
-      if (track.added_by?.id) ids.add(track.added_by.id);
+      const id = track.added_by?.id;
+      if (id) ids.add(id);
     }
+
     return Array.from(ids);
-  };
+  });
+
+  const counts = createMemo(() => {
+    const currentIndex = props.currentIndex() ?? 0;
+    const tracks = props.tracks?.slice(currentIndex) ?? [];
+    const countByPerson = new Map<string, number>();
+
+    for (const track of tracks) {
+      const id = track.added_by?.id;
+      if (!id) continue;
+
+      countByPerson.set(id, (countByPerson.get(id) ?? 0) + 1);
+    }
+
+    return allPeople()
+      .map((id) => ({ id, count: countByPerson.get(id) ?? 0 }))
+      .toSorted((a, b) => b.count - a.count);
+  });
 
   const maxYCount = createMemo(() => {
     const tracks = props.tracks ?? [];
-    const counts: Record<string, number> = {};
+    const countByPerson = new Map<string, number>();
+
     for (const track of tracks) {
       const id = track.added_by?.id;
-      if (id) counts[id] = (counts[id] || 0) + 1;
+      if (!id) continue;
+
+      countByPerson.set(id, (countByPerson.get(id) ?? 0) + 1);
     }
 
-    if (Object.values(counts).length === 0) return 25;
+    const maxValue = Math.max(...countByPerson.values(), 0);
 
-    const maxValue = Math.max(...Object.values(counts));
-    const withPadding = maxValue * 1.1;
-    return Math.ceil(withPadding / 5) * 5;
-  });
-
-  const entries = createMemo<Record<string, number>>(() => {
-    const currentIndex = props.currentIndex();
-    const tracks = props.tracks?.slice(currentIndex) ?? [];
-
-    return Object.fromEntries(
-      allPeople().map((id) => {
-        const count = tracks.filter((t) => t.added_by?.id === id).length;
-        return [id, count];
-      }),
-    );
+    if (maxValue === 0) return 25;
+    return maxValue;
   });
 
   const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
   const displayNames = createQueries(() => ({
-    queries: Object.keys(entries()).map((id) => userDisplayNameQueryOptions(spotifyQuery.data, id)),
+    queries: counts().map(({ id }) => userDisplayNameQueryOptions(spotifyQuery.data, id)),
   }));
 
-  const chartData = createMemo<ChartData>(() => {
-    const values = Object.values(entries());
-    return {
-      labels: displayNames.map((d) => d.data ?? "Unknown"),
-      datasets: [
-        {
-          data: values,
+  const chartRows = createMemo(() => {
+    if (
+      !props.tracks ||
+      allPeople().length === 0 ||
+      !displayNames.every((query) => query.isSuccess)
+    ) {
+      return [];
+    }
 
-          //   bg-blue-500
-          backgroundColor: ["oklch(62.3% 0.214 259.815)"],
-          borderRadius: 8,
-          borderSkipped: false,
-        },
-      ],
-    };
+    return counts().map(({ count }, index) => ({
+      person: displayNames[index]?.data ?? "Unknown",
+      count,
+    }));
   });
+
+  const chartDefinition = createMemo(() => {
+    const rows = chartRows();
+
+    return defineChart({
+      svgAnimation: true,
+      marks: [
+        barY(rows, {
+          x: "person",
+          y: "count",
+          inset: 2,
+          radius: 8,
+          fill: "var(--accent)",
+        }),
+        text(rows, {
+          x: "person",
+          y: "count",
+          text: "count",
+          dy: 14,
+          anchor: "middle",
+          fontSize: 12,
+          fontWeight: 600,
+          fill: "var(--accent-foreground)",
+        }),
+      ],
+      y: {
+        scale: scaleLinear().domain([0, maxYCount()]),
+        grid: true,
+      },
+      x: {
+        scale: () =>
+          scaleBand()
+            .domain(rows.map((row) => row.person))
+            .padding(0.2),
+
+        axis: {
+          tickLabels: {
+            rotate: -50,
+            thin: false,
+          },
+        },
+      },
+      pointer: false,
+
+      keyboard: false,
+    });
+  });
+
   return (
-    <Show when={displayNames.every((q) => q.isSuccess) && props.tracks !== undefined}>
-      <BarChart
-        data={chartData()}
-        options={{
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false },
-            datalabels: {
-              anchor: "end",
-              align: "top",
-            },
-          },
-          scales: {
-            y: { max: maxYCount() },
-          },
-        }}
-        plugins={[ChartDataLabels]}
-        width={600}
-        height={200}
-      />
-    </Show>
+    <div class="h-90">
+      <Show when={displayNames.every((q) => q.isSuccess) && props.tracks !== undefined}>
+        <Chart
+          definition={chartDefinition()}
+          ariaLabel="Who got the most songs in?"
+          ariaDescription="Vertical bar chart showing how many tracks each contributor added."
+          height={360}
+          class="animate-in transition duration-1000 fade-in"
+        />
+      </Show>
+    </div>
   );
 };

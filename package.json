@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "hottest-100",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,12 +15,10 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@solid-primitives/refs": "^1.1.4",
     "@spotify/web-api-ts-sdk": "^1.2.0",
+    "@tanstack/charts": "0.12.0",
     "@tanstack/solid-query": "^5.101.2",
     "@tanstack/solid-router": "^1.170.18",
-    "chart.js": "^4.5.1",
-    "chartjs-plugin-datalabels": "^2.2.0",
     "clsx": "^2.1.1",
     "lucide-solid": "^1.25.0",
     "solid-js": "^1.9.14",
@@ -31,7 +29,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/router-plugin": "^1.168.22",
-    "@types/node": "^26.1.1",
+    "@types/node": "24.1.0",
     "@types/spotify-web-playback-sdk": "^0.1.19",
     "knip": "^6.27.0",
     "oxfmt": "^0.61.0",
@@ -42,6 +40,13 @@
     "vite": "^8.1.5",
     "vite-plugin-solid": "^2.11.12",
     "vitest": "^4.1.10"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.19.0",
+      "onFail": "download"
+    }
   },
   "packageManager": "pnpm@11.18.0"
 }
