@@ -1,4 +1,3 @@
-import type { PlaylistedTrack } from "@spotify/web-api-ts-sdk";
 import { createQuery, skipToken } from "@tanstack/solid-query";
 import { getRouteApi } from "@tanstack/solid-router";
 import EyeIcon from "lucide-solid/icons/eye";
@@ -23,7 +22,8 @@ import { hottestNumberQueryOptions } from "~/query/hottest-number";
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { queryClient } from "~/queryClient";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
-import { debounce, shuffle, playNumber } from "~/utils";
+import { debounce, playNumber } from "~/utils";
+import { weightedShuffle } from "~/weighted-shuffle";
 
 import { ExportButton } from "./-export-button";
 import { StatsView } from "./-stats-grid";
@@ -52,6 +52,7 @@ export const CountdownPlayer: Component = () => {
         script.async = true;
         document.body.appendChild(script);
       }
+      return;
     });
   });
 
@@ -70,11 +71,12 @@ export const CountdownPlayer: Component = () => {
       window.onSpotifyWebPlaybackSDKReady = () => {
         const internalPlayer = new window.Spotify.Player({
           name: "Hottest 100 Player",
-          getOAuthToken: (cb) => {
-            void spotifyQuery.data
-              ?.getAccessToken()
-              // Cheeky non-null assert
-              .then((token) => cb(token!.access_token));
+          getOAuthToken: async (cb) => {
+            const token = await spotifyQuery.data?.getAccessToken();
+            if (!token) {
+              return;
+            }
+            cb(token.access_token);
           },
           // just go full volume, use your systems volume if you want that.
           volume: 1,
@@ -131,7 +133,7 @@ export const CountdownPlayer: Component = () => {
           );
 
           const total = firstPage.total ?? firstPage.items.length;
-          const allItems: PlaylistedTrack[] = [...firstPage.items];
+          const allItems: ActualPlaylistedTrack[] = [...firstPage.items];
 
           if (total > firstPage.items.length) {
             // Calculate offsets for remaining pages
@@ -159,7 +161,7 @@ export const CountdownPlayer: Component = () => {
             }
           }
           // Spotify types are wrong. Make sure this lines up with the fields array.
-          return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
+          return weightedShuffle(allItems, 100);
         }
       : skipToken,
   }));
