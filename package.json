@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "hottest-100",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,12 +17,12 @@
   "dependencies": {
     "@solid-primitives/refs": "^1.1.4",
     "@spotify/web-api-ts-sdk": "^1.2.0",
-    "@tanstack/solid-query": "^5.101.2",
-    "@tanstack/solid-router": "^1.170.18",
+    "@tanstack/solid-query": "^5.101.4",
+    "@tanstack/solid-router": "^1.170.25",
     "chart.js": "^4.5.1",
     "chartjs-plugin-datalabels": "^2.2.0",
     "clsx": "^2.1.1",
-    "lucide-solid": "^1.25.0",
+    "lucide-solid": "^1.31.0",
     "solid-js": "^1.9.14",
     "solid-sonner": "^0.3.1",
     "tailwind-merge": "^3.6.0",
@@ -30,17 +30,17 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
-    "@tanstack/router-plugin": "^1.168.22",
-    "@types/node": "^26.1.1",
+    "@tanstack/router-plugin": "^1.168.30",
+    "@types/node": "^26.2.0",
     "@types/spotify-web-playback-sdk": "^0.1.19",
-    "knip": "^6.27.0",
-    "oxfmt": "^0.61.0",
-    "oxlint": "^1.74.0",
-    "oxlint-tsgolint": "^7.0.0",
+    "knip": "^6.32.2",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vite": "^8.1.5",
-    "vite-plugin-solid": "^2.11.12",
+    "vite": "^8.2.1",
+    "vite-plugin-solid": "^2.11.14",
     "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@11.18.0"
