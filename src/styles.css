@@ -54,12 +54,14 @@
 
   body {
     @apply text-foreground;
-    background-image: linear-gradient(180deg,
-        #dae7e8,
-        rgba(254, 210, 210, 0.3) 19.71%,
-        #fff 42.79%,
-        #fff 63.5%,
-        rgba(254, 210, 210, 0.3) 80.5%,
-        #dae7e8);
+    background-image: linear-gradient(
+      180deg,
+      #dae7e8,
+      rgba(254, 210, 210, 0.3) 19.71%,
+      #fff 42.79%,
+      #fff 63.5%,
+      rgba(254, 210, 210, 0.3) 80.5%,
+      #dae7e8
+    );
   }
 }

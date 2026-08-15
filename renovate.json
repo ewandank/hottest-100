@@ -9,7 +9,5 @@
     "workarounds:typesNodeVersioning"
   ],
   "minimumReleaseAge": "1 day",
-  "postUpdateOptions": [
-    "pnpmDedupe"
-  ]
+  "postUpdateOptions": ["pnpmDedupe"]
 }
