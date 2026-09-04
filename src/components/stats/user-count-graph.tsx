@@ -115,20 +115,22 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
           fill: "var(--accent-foreground)",
         }),
       ],
-      y: {
-        scale: scaleLinear().domain([0, maxYCount()]),
-        grid: true,
-      },
-      x: {
-        scale: () =>
-          scaleBand()
-            .domain(rows.map((row) => row.person))
-            .padding(0.2),
+      scales: {
+        y: {
+          scale: scaleLinear().domain([0, maxYCount()]),
+          grid: true,
+        },
+        x: {
+          scale: () =>
+            scaleBand()
+              .domain(rows.map((row) => row.person))
+              .padding(0.2),
 
-        axis: {
-          tickLabels: {
-            rotate: -50,
-            thin: false,
+          axis: {
+            tickLabels: {
+              rotate: -50,
+              thin: false,
+            },
           },
         },
       },
