@@ -1,6 +1,3 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
 export function shuffle<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
@@ -30,9 +27,6 @@ export function debounce<T extends (...args: never[]) => void>(
   };
 }
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 const pad = (num: number) => String(num).padStart(2, "0");
 
 export function millisToMinutesAndSeconds(millis: number) {
