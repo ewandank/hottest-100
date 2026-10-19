@@ -7,7 +7,7 @@ import GalleryVertical from "lucide-solid/icons/gallery-vertical";
 import List from "lucide-solid/icons/list";
 import Pause from "lucide-solid/icons/pause";
 import Play from "lucide-solid/icons/play";
-import Trash2Icon from "lucide-solid/icons/trash-2";
+import TrashIcon from "lucide-solid/icons/trash";
 import {
   createEffect,
   createSignal,
@@ -280,7 +280,7 @@ const Toolbar: Component<{
         </button>
       </div>
       <div class="flex justify-end gap-2">
-        <Trash2Icon onClick={() => alert("Persisted storage coming soon!")} />
+        <TrashIcon onClick={() => alert("Persisted storage coming soon!")} />
         <ExportButton tracks={props.tracks} />
         {import.meta.env.DEV &&
           //  Only allow cheating in development
