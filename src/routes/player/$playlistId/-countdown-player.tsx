@@ -174,7 +174,7 @@ export const CountdownPlayer: Component = () => {
     const currentIterator =
       store.iterator === undefined ? tracksQuery.data.length : store.iterator - 1;
 
-    const audioBlob = await queryClient.ensureQueryData(hottestNumberQueryOptions(currentIterator));
+    const audioBlob = await queryClient.query(hottestNumberQueryOptions(currentIterator));
 
     // Play the hottest 100 counter.
     setDisabled(true);
@@ -197,7 +197,7 @@ export const CountdownPlayer: Component = () => {
     if (nextIterator < 0) {
       return;
     }
-    void queryClient.prefetchQuery(hottestNumberQueryOptions(nextIterator));
+    void queryClient.query(hottestNumberQueryOptions(nextIterator));
   };
 
   const [showSpoilers, setShowSpoilers] = createSignal(false);
