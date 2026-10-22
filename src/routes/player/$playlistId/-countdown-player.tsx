@@ -23,7 +23,7 @@ import { hottestNumberQueryOptions } from "~/query/hottest-number";
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { queryClient } from "~/queryClient";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
-import { debounce, playNumber } from "~/utils";
+import { playNumber } from "~/utils";
 import { weightedShuffle } from "~/weighted-shuffle";
 
 import { ExportButton } from "./-export-button";
@@ -103,20 +103,28 @@ export const CountdownPlayer: Component = () => {
   });
   const [paused, setPaused] = createSignal(true);
   const handlePauseState = (state: Spotify.PlaybackState) => setPaused(state?.paused ?? false);
+  let countdownLock = false;
+
   const handlePlayerStateChange = async (state: Spotify.PlaybackState) => {
-    if (state?.track_window) {
-      if (
-        state.track_window.previous_tracks.find(
-          (x) => x.uid === state.track_window.current_track.uid,
-        ) &&
-        state.paused
-      ) {
-        await countdownHandler();
-      }
+    const ended =
+      state.paused &&
+      state.track_window.previous_tracks.some(
+        (track) => track.uid === state.track_window.current_track.uid,
+      );
+
+    if (!ended || countdownLock) {
+      return;
+    }
+
+    countdownLock = true;
+    try {
+      await countdownHandler();
+    } finally {
+      countdownLock = false;
     }
   };
 
-  const debouncedHandlePlayerStateChange = debounce(handlePlayerStateChange, 20);
+  const debouncedHandlePlayerStateChange = handlePlayerStateChange;
 
   const tracksQuery = createQuery(() => ({
     queryKey: ["shuffledTracks", playlistId],
