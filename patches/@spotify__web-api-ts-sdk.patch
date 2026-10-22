@@ -1,0 +1,27 @@
+diff --git a/dist/mjs/auth/Crypto.js b/dist/mjs/auth/Crypto.js
+index d2c7c8c8d87c1eb646e6135ba8664b307ece6ad0..8b9a182cebf6abcb641d031937e8b81664f54dda 100644
+--- a/dist/mjs/auth/Crypto.js
++++ b/dist/mjs/auth/Crypto.js
+@@ -1,20 +1,7 @@
+ export class Crypto {
+     static get current() {
+-        return this.hasSubtleCrypto ? window.crypto : this.tryLoadNodeWebCrypto();
+-    }
+-    static get hasSubtleCrypto() {
+-        return typeof window !== 'undefined' && typeof window.crypto !== 'undefined' && typeof window.crypto.subtle !== 'undefined';
+-    }
+-    static tryLoadNodeWebCrypto() {
+-        try {
+-            // Deliberately avoid bundling for browsers depending
+-            // on node by doing this require during execution.
+-            const { webcrypto } = require('crypto');
+-            return webcrypto;
+-        }
+-        catch (e) {
+-            throw e;
+-        }
++        // we are a browser so don't even try to load node crypto.
++        return window.crypto;
+     }
+ }
+ //# sourceMappingURL=Crypto.js.map
