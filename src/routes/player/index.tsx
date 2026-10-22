@@ -1,12 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/solid-router";
 import { createSignal, For } from "solid-js";
 
-import { getSpotifySdk } from "~/spotify-sdk";
-
 export const Route = createFileRoute("/player/")({
-  loader: async () => {
-    const sdk = await getSpotifySdk(`${window.location.origin}/player`);
-    if (!sdk) return { items: [] };
+  loader: async ({ context }) => {
+    const sdk = context.sdk;
     return await sdk.currentUser.playlists.playlists();
   },
   component: PlaylistSelector,

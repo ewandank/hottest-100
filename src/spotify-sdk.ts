@@ -4,7 +4,20 @@ import {
   AuthorizationCodeWithPKCEStrategy,
 } from "@spotify/web-api-ts-sdk";
 
+let sdkPromise: Promise<SpotifyApi | null> | undefined;
+
 export async function getSpotifySdk(redirectUrl: string): Promise<SpotifyApi | null> {
+  if (sdkPromise) return sdkPromise;
+
+  sdkPromise = authenticate(redirectUrl);
+  const sdk = await sdkPromise;
+
+  if (!sdk) sdkPromise = undefined;
+
+  return sdk;
+}
+
+async function authenticate(redirectUrl: string): Promise<SpotifyApi | null> {
   const clientId = import.meta.env.VITE_CLIENT_ID;
   const scopes = [
     "playlist-read-private",
