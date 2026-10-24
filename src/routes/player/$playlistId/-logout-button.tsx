@@ -10,6 +10,10 @@ export const LogoutButton = () => {
   return (
     <button
       onClick={async () => {
+        if (!window.confirm("Are you sure you want to log out?")) {
+          return;
+        }
+
         spotifyQuery.data?.logOut();
         await navigate({ to: "/" });
       }}
