@@ -74,11 +74,11 @@ export const CountdownPlayer: Component = () => {
         const internalPlayer = new window.Spotify.Player({
           name: "Hottest 100 Player",
           getOAuthToken: async (cb) => {
-            const token = await spotifyQuery.data?.getAccessToken();
+            const token = await spotifyQuery.data?.authenticate();
             if (!token) {
               return;
             }
-            cb(token.access_token);
+            cb(token.accessToken.access_token);
           },
           // just go full volume, use your systems volume if you want that.
           volume: 1,

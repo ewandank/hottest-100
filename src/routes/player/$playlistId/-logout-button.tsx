@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/solid-router";
 import LogOut from "lucide-solid/icons/log-out";
 
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
+import { queryClient } from "~/queryClient";
 
 export const LogoutButton = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export const LogoutButton = () => {
         }
 
         spotifyQuery.data?.logOut();
+        queryClient.clear();
         await navigate({ to: "/" });
       }}
     >
