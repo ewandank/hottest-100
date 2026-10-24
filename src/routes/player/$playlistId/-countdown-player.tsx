@@ -96,7 +96,7 @@ export const CountdownPlayer: Component = () => {
             throw e;
           }
         });
-        internalPlayer.addListener("player_state_changed", debouncedHandlePlayerStateChange);
+        internalPlayer.addListener("player_state_changed", handlePlayerStateChange);
         internalPlayer.addListener("player_state_changed", handlePauseState);
       };
     })();
@@ -123,8 +123,6 @@ export const CountdownPlayer: Component = () => {
       countdownLock = false;
     }
   };
-
-  const debouncedHandlePlayerStateChange = handlePlayerStateChange;
 
   const tracksQuery = createQuery(() => ({
     queryKey: ["shuffledTracks", playlistId],
