@@ -169,7 +169,6 @@ export const CountdownPlayer: Component = () => {
               allItems.push(...page.items);
             }
           }
-          // Spotify types are wrong. Make sure this lines up with the fields array.
           return weightedShuffle(allItems, 100);
         }
       : skipToken,
@@ -202,7 +201,7 @@ export const CountdownPlayer: Component = () => {
       tracksQuery.data.at(currentIterator - 1)?.track.uri ?? "",
     ]);
     const nextIterator = currentIterator - 1;
-    if (nextIterator < 0) {
+    if (nextIterator <= 0) {
       return;
     }
     void queryClient.query(hottestNumberQueryOptions(nextIterator));
