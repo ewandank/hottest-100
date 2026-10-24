@@ -1,4 +1,3 @@
-import type { PlaylistedTrack } from "@spotify/web-api-ts-sdk";
 import { createQuery, skipToken } from "@tanstack/solid-query";
 import { getRouteApi } from "@tanstack/solid-router";
 import EyeIcon from "lucide-solid/icons/eye";
@@ -24,7 +23,8 @@ import { hottestNumberQueryOptions } from "~/query/hottest-number";
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { queryClient } from "~/queryClient";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
-import { debounce, shuffle, playNumber } from "~/utils";
+import { playNumber } from "~/utils";
+import { weightedShuffle } from "~/weighted-shuffle";
 
 import { ExportButton } from "./-export-button";
 import { StatsView } from "./-stats-grid";
@@ -53,6 +53,7 @@ export const CountdownPlayer: Component = () => {
         script.async = true;
         document.body.appendChild(script);
       }
+      return;
     });
   });
 
@@ -71,11 +72,12 @@ export const CountdownPlayer: Component = () => {
       window.onSpotifyWebPlaybackSDKReady = () => {
         const internalPlayer = new window.Spotify.Player({
           name: "Hottest 100 Player",
-          getOAuthToken: (cb) => {
-            void spotifyQuery.data
-              ?.getAccessToken()
-              // Cheeky non-null assert
-              .then((token) => cb(token!.access_token));
+          getOAuthToken: async (cb) => {
+            const token = await spotifyQuery.data?.getAccessToken();
+            if (!token) {
+              return;
+            }
+            cb(token.access_token);
           },
           // just go full volume, use your systems volume if you want that.
           volume: 1,
@@ -94,27 +96,33 @@ export const CountdownPlayer: Component = () => {
             throw e;
           }
         });
-        internalPlayer.addListener("player_state_changed", debouncedHandlePlayerStateChange);
+        internalPlayer.addListener("player_state_changed", handlePlayerStateChange);
         internalPlayer.addListener("player_state_changed", handlePauseState);
       };
     })();
   });
   const [paused, setPaused] = createSignal(true);
   const handlePauseState = (state: Spotify.PlaybackState) => setPaused(state?.paused ?? false);
+  let countdownLock = false;
+
   const handlePlayerStateChange = async (state: Spotify.PlaybackState) => {
-    if (state?.track_window) {
-      if (
-        state.track_window.previous_tracks.find(
-          (x) => x.uid === state.track_window.current_track.uid,
-        ) &&
-        state.paused
-      ) {
-        await countdownHandler();
-      }
+    const ended =
+      state.paused &&
+      state.track_window.previous_tracks.some(
+        (track) => track.uid === state.track_window.current_track.uid,
+      );
+
+    if (!ended || countdownLock) {
+      return;
+    }
+
+    countdownLock = true;
+    try {
+      await countdownHandler();
+    } finally {
+      countdownLock = false;
     }
   };
-
-  const debouncedHandlePlayerStateChange = debounce(handlePlayerStateChange, 20);
 
   const tracksQuery = createQuery(() => ({
     queryKey: ["shuffledTracks", playlistId],
@@ -132,7 +140,7 @@ export const CountdownPlayer: Component = () => {
           );
 
           const total = firstPage.total ?? firstPage.items.length;
-          const allItems: PlaylistedTrack[] = [...firstPage.items];
+          const allItems: ActualPlaylistedTrack[] = [...firstPage.items];
 
           if (total > firstPage.items.length) {
             // Calculate offsets for remaining pages
@@ -159,8 +167,7 @@ export const CountdownPlayer: Component = () => {
               allItems.push(...page.items);
             }
           }
-          // Spotify types are wrong. Make sure this lines up with the fields array.
-          return shuffle(allItems).slice(undefined, 100) as unknown as ActualPlaylistedTrack[];
+          return weightedShuffle(allItems, 100);
         }
       : skipToken,
   }));
@@ -172,7 +179,7 @@ export const CountdownPlayer: Component = () => {
     const currentIterator =
       store.iterator === undefined ? tracksQuery.data.length : store.iterator - 1;
 
-    const audioBlob = await queryClient.ensureQueryData(hottestNumberQueryOptions(currentIterator));
+    const audioBlob = await queryClient.query(hottestNumberQueryOptions(currentIterator));
 
     // Play the hottest 100 counter.
     setDisabled(true);
@@ -192,10 +199,10 @@ export const CountdownPlayer: Component = () => {
       tracksQuery.data.at(currentIterator - 1)?.track.uri ?? "",
     ]);
     const nextIterator = currentIterator - 1;
-    if (nextIterator < 0) {
+    if (nextIterator <= 0) {
       return;
     }
-    void queryClient.prefetchQuery(hottestNumberQueryOptions(nextIterator));
+    void queryClient.query(hottestNumberQueryOptions(nextIterator));
   };
 
   const [showSpoilers, setShowSpoilers] = createSignal(false);

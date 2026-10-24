@@ -4,13 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@spotify/web-api-ts-sdk': c97442e855e5306d7958c3cd09d3b790a72ad3cb1ab665dfd39bdb55b9548f79
+
 importers:
 
   .:
     dependencies:
       '@spotify/web-api-ts-sdk':
         specifier: ^1.2.0
-        version: 1.2.0
+        version: 1.2.0(patch_hash=c97442e855e5306d7958c3cd09d3b790a72ad3cb1ab665dfd39bdb55b9548f79)
       '@tanstack/charts':
         specifier: 1.1.0
         version: 1.1.0(solid-js@1.9.17)
@@ -2585,7 +2588,7 @@ snapshots:
     dependencies:
       solid-js: 1.9.17
 
-  '@spotify/web-api-ts-sdk@1.2.0': {}
+  '@spotify/web-api-ts-sdk@1.2.0(patch_hash=c97442e855e5306d7958c3cd09d3b790a72ad3cb1ab665dfd39bdb55b9548f79)': {}
 
   '@tailwindcss/node@4.3.3':
     dependencies:

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlayerRouteRouteImport } from './routes/player/route'
 import { Route as PlayerIndexRouteImport } from './routes/player/index'
 import { Route as PlayerPlaylistIdRouteRouteImport } from './routes/player/$playlistId/route'
 
@@ -18,19 +19,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlayerIndexRoute = PlayerIndexRouteImport.update({
-  id: '/player/',
-  path: '/player/',
+const PlayerRouteRoute = PlayerRouteRouteImport.update({
+  id: '/player',
+  path: '/player',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayerIndexRoute = PlayerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PlayerRouteRoute,
+} as any)
 const PlayerPlaylistIdRouteRoute = PlayerPlaylistIdRouteRouteImport.update({
-  id: '/player/$playlistId',
-  path: '/player/$playlistId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$playlistId',
+  path: '/$playlistId',
+  getParentRoute: () => PlayerRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/player': typeof PlayerRouteRouteWithChildren
   '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
   '/player/': typeof PlayerIndexRoute
 }
@@ -42,21 +49,21 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/player': typeof PlayerRouteRouteWithChildren
   '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
   '/player/': typeof PlayerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/player/$playlistId' | '/player/'
+  fullPaths: '/' | '/player' | '/player/$playlistId' | '/player/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/player/$playlistId' | '/player'
-  id: '__root__' | '/' | '/player/$playlistId' | '/player/'
+  id: '__root__' | '/' | '/player' | '/player/$playlistId' | '/player/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PlayerPlaylistIdRouteRoute: typeof PlayerPlaylistIdRouteRoute
-  PlayerIndexRoute: typeof PlayerIndexRoute
+  PlayerRouteRoute: typeof PlayerRouteRouteWithChildren
 }
 
 declare module '@tanstack/solid-router' {
@@ -68,27 +75,47 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/player': {
+      id: '/player'
+      path: '/player'
+      fullPath: '/player'
+      preLoaderRoute: typeof PlayerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/player/': {
       id: '/player/'
-      path: '/player'
+      path: '/'
       fullPath: '/player/'
       preLoaderRoute: typeof PlayerIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PlayerRouteRoute
     }
     '/player/$playlistId': {
       id: '/player/$playlistId'
-      path: '/player/$playlistId'
+      path: '/$playlistId'
       fullPath: '/player/$playlistId'
       preLoaderRoute: typeof PlayerPlaylistIdRouteRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PlayerRouteRoute
     }
   }
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+interface PlayerRouteRouteChildren {
+  PlayerPlaylistIdRouteRoute: typeof PlayerPlaylistIdRouteRoute
+  PlayerIndexRoute: typeof PlayerIndexRoute
+}
+
+const PlayerRouteRouteChildren: PlayerRouteRouteChildren = {
   PlayerPlaylistIdRouteRoute: PlayerPlaylistIdRouteRoute,
   PlayerIndexRoute: PlayerIndexRoute,
+}
+
+const PlayerRouteRouteWithChildren = PlayerRouteRoute._addFileChildren(
+  PlayerRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  PlayerRouteRoute: PlayerRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

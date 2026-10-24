@@ -148,7 +148,6 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
           ariaLabel="Who got the most songs in?"
           ariaDescription="Vertical bar chart showing how many tracks each contributor added."
           height={360}
-          class="animate-in transition duration-1000 fade-in"
         />
       </Show>
     </div>
