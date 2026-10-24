@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/solid-router";
 
-import { getSpotifySdk } from "~/spotify-sdk";
+import { spotifyAPIQueryOptions } from "~/query/spotify-api";
+import { queryClient } from "~/queryClient";
 
 export const Route = createFileRoute("/player")({
   beforeLoad: async () => {
@@ -8,12 +9,11 @@ export const Route = createFileRoute("/player")({
       throw redirect({ to: "/" });
     }
 
-    const sdk = await getSpotifySdk(`${window.location.origin}/player`);
-
-    if (!sdk) {
+    try {
+      const sdk = await queryClient.query(spotifyAPIQueryOptions);
+      return { sdk };
+    } catch {
       throw redirect({ to: "/" });
     }
-
-    return { sdk };
   },
 });
