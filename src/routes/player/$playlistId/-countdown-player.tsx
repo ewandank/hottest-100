@@ -27,6 +27,7 @@ import { playNumber } from "~/utils";
 import { weightedShuffle } from "~/weighted-shuffle";
 
 import { ExportButton } from "./-export-button";
+import { LogoutButton } from "./-logout-button";
 import { StatsView } from "./-stats-grid";
 import { CompactListView } from "./-views/CompactListView";
 import { ListView } from "./-views/ListView";
@@ -289,6 +290,7 @@ const Toolbar: Component<{
       <div class="flex justify-end gap-2">
         <TrashIcon onClick={() => alert("Persisted storage coming soon!")} />
         <ExportButton tracks={props.tracks} />
+        <LogoutButton />
         {import.meta.env.DEV &&
           //  Only allow cheating in development
           (props.showSpoilers() ? (
