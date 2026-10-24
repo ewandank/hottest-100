@@ -6,10 +6,10 @@ import {
 
 let sdkPromise: Promise<SpotifyApi | null> | undefined;
 
-export async function getSpotifySdk(redirectUrl: string): Promise<SpotifyApi | null> {
+export async function getSpotifySdk(): Promise<SpotifyApi | null> {
   if (sdkPromise) return sdkPromise;
 
-  sdkPromise = authenticate(redirectUrl);
+  sdkPromise = authenticate();
   const sdk = await sdkPromise;
 
   if (!sdk) sdkPromise = undefined;
@@ -17,10 +17,13 @@ export async function getSpotifySdk(redirectUrl: string): Promise<SpotifyApi | n
   return sdk;
 }
 
-async function authenticate(redirectUrl: string): Promise<SpotifyApi | null> {
+async function authenticate(): Promise<SpotifyApi | null> {
+  const redirectUrl = `${window.location.origin}/player`;
   const clientId = import.meta.env.VITE_CLIENT_ID;
   const scopes = [
     "playlist-read-private",
+    "playlist-modify-public",
+    "playlist-modify-private",
     "user-modify-playback-state",
     "streaming",
     "user-read-email",
