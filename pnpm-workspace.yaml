@@ -1,4 +1,4 @@
 # This is the default but i want renovate to pick it up.
 minimumReleaseAge: 1440
 patchedDependencies:
-  '@spotify/web-api-ts-sdk': patches/@spotify__web-api-ts-sdk.patch
+  "@spotify/web-api-ts-sdk": patches/@spotify__web-api-ts-sdk.patch
