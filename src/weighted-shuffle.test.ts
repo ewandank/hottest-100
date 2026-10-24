@@ -1,55 +1,84 @@
 import { describe, it, expect } from "vitest";
 
+import type { ActualPlaylistedTrack } from "./types/spotify";
 import { weightedShuffle } from "./weighted-shuffle";
+
+const track = (uri: string): ActualPlaylistedTrack => ({
+  added_by: {
+    external_urls: { spotify: "" },
+    href: "",
+    id: "test-user",
+    type: "user",
+    uri: "spotify:user:test-user",
+  },
+  track: {
+    uri,
+    duration_ms: 180_000,
+    name: uri,
+    explicit: false,
+    album: { images: [], release_date: "2020" },
+    artists: [{ name: "Artist" }],
+  },
+});
 
 describe("weightedShuffle", () => {
   // --- Edge Cases & Basic Functionality ---
 
   it("returns an empty array on empty input or invalid n", () => {
-    expect(weightedShuffle<string>([], 3)).toEqual([]);
-    expect(weightedShuffle<string>(["A", "B"], 0)).toEqual([]);
-    expect(weightedShuffle<string>(["A", "B"], -1)).toEqual([]);
+    expect(weightedShuffle([], 3)).toEqual([]);
+    expect(weightedShuffle([track("A"), track("B")], 0)).toEqual([]);
+    expect(weightedShuffle([track("A"), track("B")], -1)).toEqual([]);
   });
 
   it("returns at most the number of unique items available", () => {
-    const input = ["A", "A", "A", "B"]; // 2 unique items
+    const input = [track("A"), track("A"), track("A"), track("B")];
     const result = weightedShuffle(input, 5);
 
     expect(result).toHaveLength(2);
-    expect(result).toContain("A");
-    expect(result).toContain("B");
+    expect(result.map((item) => item.track.uri)).toEqual(expect.arrayContaining(["A", "B"]));
   });
 
   it("returns unique items without duplicate elements in output", () => {
-    const input = ["A", "A", "A", "B", "B", "C"];
+    const input = [track("A"), track("A"), track("A"), track("B"), track("B"), track("C")];
     const result = weightedShuffle(input, 3);
-    const uniqueSet = new Set(result);
+    const uniqueSet = new Set(result.map((item) => item.track.uri));
 
     expect(result.length).toBe(uniqueSet.size);
   });
 
-  it("works seamlessly with custom objects using reference equality", () => {
-    const itemA = { id: 1, name: "Alpha" };
-    const itemB = { id: 2, name: "Beta" };
-    const input = [itemA, itemA, itemA, itemB];
+  it("groups distinct objects with the same URI", () => {
+    const input = [track("A"), track("A"), track("B")];
 
     const result = weightedShuffle(input, 2);
     expect(result).toHaveLength(2);
-    expect(result).toContain(itemA);
-    expect(result).toContain(itemB);
+    expect(result.map((item) => item.track.uri)).toEqual(expect.arrayContaining(["A", "B"]));
+  });
+
+  it("returns the highest weighted keys first", () => {
+    const randomValues = [0.1, 0.9, 0.5];
+    const result = weightedShuffle(
+      [track("A"), track("B"), track("C")],
+      3,
+      () => randomValues.shift() ?? 0,
+    );
+
+    expect(result.map((item) => item.track.uri)).toEqual(["B", "C", "A"]);
   });
 
   // --- Statistical Probability Test ---
 
   it("biases index 0 towards heavily weighted items", () => {
-    // 'A' has weight 8 (80%), 'B' has weight 2 (20%)
-    const pool = ["A", "A", "A", "A", "A", "A", "A", "A", "B", "B"];
+    // 'A' has weight 8 (80%), 'B' has weight 2 (20%).
+    const pool = [
+      ...Array.from({ length: 8 }, () => track("A")),
+      ...Array.from({ length: 2 }, () => track("B")),
+    ];
     const iterations = 10_000;
     let aAtIndexZeroCount = 0;
 
     for (let i = 0; i < iterations; i++) {
-      const res = weightedShuffle(pool, 2);
-      if (res[0] === "A") {
+      const res = weightedShuffle(pool, 1);
+      if (res[0]?.track.uri === "A") {
         aAtIndexZeroCount++;
       }
     }

@@ -1,43 +1,51 @@
+import type { ActualPlaylistedTrack } from "./types/spotify";
+
+type WeightedTrack = {
+  item: ActualPlaylistedTrack;
+  weight: number;
+};
+
 /**
- * Performs a weighted random shuffle returning `n` unique items. Duplicates in the input array
+ * Performs a weighted random shuffle returning up to `n` unique tracks. Tracks with the same URI
  * represent weights.
  *
- * @template T - Type of elements in the input array
  * @param arr - Input array where duplicate values represent weight
  * @param n - Number of unique items to return
  * @returns Array of `n` weighted randomly selected unique items
+ * @see https://maxhalford.github.io/blog/weighted-sampling-without-replacement/
+ * @see https://arxiv.org/pdf/1012.0256
  */
-export function weightedShuffle<T>(arr: T[], n: number, randomAlg = Math.random): T[] {
-  const result: T[] = [];
-  const weights = buildFrequencyMap(arr);
-  const count = Math.min(n, weights.size);
-
-  // 2. Sample without replacement
-  for (let i = 0; i < count; i++) {
-    let totalWeight = 0;
-    for (const weight of weights.values()) {
-      totalWeight += weight;
-    }
-
-    let random = randomAlg() * totalWeight;
-
-    for (const [item, weight] of weights.entries()) {
-      random -= weight;
-      if (random < 0) {
-        result.push(item);
-        weights.delete(item); // Remove picked item to ensure uniqueness
-        break;
-      }
-    }
+export function weightedShuffle(
+  arr: ActualPlaylistedTrack[],
+  n: number,
+  randomAlg = Math.random,
+): ActualPlaylistedTrack[] {
+  const weightedTracks = [...buildFrequencyMap(arr).values()];
+  const sampleSize = Math.min(Math.max(n, 0), weightedTracks.length);
+  if (sampleSize === 0) {
+    return [];
   }
 
-  return result;
+  const keyedTracks = weightedTracks.map((entry) => ({
+    entry,
+    key: randomAlg() ** (1 / entry.weight),
+  }));
+
+  keyedTracks.sort((a, b) => b.key - a.key);
+
+  return keyedTracks.slice(0, sampleSize).map(({ entry }) => entry.item);
 }
 
-const buildFrequencyMap = <T>(items: T[]): Map<T, number> => {
-  const weights = new Map<T, number>();
+const buildFrequencyMap = (items: ActualPlaylistedTrack[]): Map<string, WeightedTrack> => {
+  const weights = new Map<string, WeightedTrack>();
   for (const item of items) {
-    weights.set(item, (weights.get(item) ?? 0) + 1);
+    const uri = item.track.uri;
+    const entry = weights.get(uri);
+    if (entry) {
+      entry.weight += 1;
+    } else {
+      weights.set(uri, { item, weight: 1 });
+    }
   }
   return weights;
 };
