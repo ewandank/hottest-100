@@ -20,7 +20,9 @@
     "no-unsafe-type-assertion": "off",
     // this seems bad for css imports.
     "no-unassigned-import": "off",
-    "typescript/no-deprecated": "error"
+    "typescript/no-deprecated": "error",
+    "unicorn/no-array-reduce": "error",
+    "unicorn/no-array-for-each": "error"
   },
   "env": {
     "builtin": true

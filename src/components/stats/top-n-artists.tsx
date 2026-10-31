@@ -11,11 +11,9 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
     const tracks = props.tracks?.slice(props.currentIndex()) ?? [];
 
     const counts: Record<string, number> = {};
-    tracks
-      .flatMap((t) => t.track.artists)
-      .forEach(({ name }) => {
-        if (name) counts[name] = (counts[name] ?? 0) + 1;
-      });
+    for (const { name } of tracks.flatMap((track) => track.track.artists)) {
+      if (name) counts[name] = (counts[name] ?? 0) + 1;
+    }
 
     // 2. Convert to entries and sort descending
     const sorted = Object.entries(counts).toSorted(([, a], [, b]) => b - a);

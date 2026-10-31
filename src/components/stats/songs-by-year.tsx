@@ -6,10 +6,10 @@ import type { StatsComponentProps } from "./types";
 export const SongsByYear: Component<StatsComponentProps> = (props) => {
   const years = () => {
     const internalCounts: Record<string, number> = {};
-    props.tracks?.slice(props.currentIndex())?.forEach((track) => {
+    for (const track of props.tracks?.slice(props.currentIndex()) ?? []) {
       const year = track.track.album.release_date.slice(0, 4) ?? undefined;
       internalCounts[year] = (internalCounts[year] || 0) + 1;
-    });
+    }
     const sortedCounts = Object.entries(internalCounts).toSorted((a, b) => {
       // First sort by count (descending)
       const countDiff = b[1] - a[1];
