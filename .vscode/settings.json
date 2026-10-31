@@ -8,7 +8,7 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "cSpell.words": ["Playlisted"],
+  "cSpell.words": ["isrc", "Playlisted"],
   "[typescript]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },

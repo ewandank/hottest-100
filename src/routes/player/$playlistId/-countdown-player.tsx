@@ -130,7 +130,7 @@ export const CountdownPlayer: Component = () => {
     queryFn: spotifyQuery.data
       ? async () => {
           const fields =
-            "items(added_by(id),track(name,album(images,release_date),artists(name),uri,duration_ms,explicit)),total";
+            "items(added_by(id),track(name,album(images,release_date),artists(name),uri,duration_ms,explicit,external_ids(isrc))),total";
           // First call just to discover total number of tracks
           const firstPage = await spotifyQuery.data.playlists.getPlaylistItems(
             playlistId,

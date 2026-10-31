@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import type { ActualPlaylistedTrack } from "./types/spotify";
 import { weightedShuffle } from "./weighted-shuffle";
 
-const track = (uri: string): ActualPlaylistedTrack => ({
+const track = (uri: string, isrc: string): ActualPlaylistedTrack => ({
   added_by: {
     external_urls: { spotify: "" },
     href: "",
@@ -18,6 +18,7 @@ const track = (uri: string): ActualPlaylistedTrack => ({
     explicit: false,
     album: { images: [], release_date: "2020" },
     artists: [{ name: "Artist" }],
+    external_ids: { isrc },
   },
 });
 
@@ -26,12 +27,17 @@ describe("weightedShuffle", () => {
 
   it("returns an empty array on empty input or invalid n", () => {
     expect(weightedShuffle([], 3)).toEqual([]);
-    expect(weightedShuffle([track("A"), track("B")], 0)).toEqual([]);
-    expect(weightedShuffle([track("A"), track("B")], -1)).toEqual([]);
+    expect(weightedShuffle([track("A", "isrc-a"), track("B", "isrc-b")], 0)).toEqual([]);
+    expect(weightedShuffle([track("A", "isrc-a"), track("B", "isrc-b")], -1)).toEqual([]);
   });
 
   it("returns at most the number of unique items available", () => {
-    const input = [track("A"), track("A"), track("A"), track("B")];
+    const input = [
+      track("A", "isrc-a"),
+      track("A", "isrc-a"),
+      track("A", "isrc-a"),
+      track("B", "isrc-b"),
+    ];
     const result = weightedShuffle(input, 5);
 
     expect(result).toHaveLength(2);
@@ -39,7 +45,14 @@ describe("weightedShuffle", () => {
   });
 
   it("returns unique items without duplicate elements in output", () => {
-    const input = [track("A"), track("A"), track("A"), track("B"), track("B"), track("C")];
+    const input = [
+      track("A", "isrc-a"),
+      track("A", "isrc-a"),
+      track("A", "isrc-a"),
+      track("B", "isrc-b"),
+      track("B", "isrc-b"),
+      track("C", "isrc-c"),
+    ];
     const result = weightedShuffle(input, 3);
     const uniqueSet = new Set(result.map((item) => item.track.uri));
 
@@ -47,17 +60,27 @@ describe("weightedShuffle", () => {
   });
 
   it("groups distinct objects with the same URI", () => {
-    const input = [track("A"), track("A"), track("B")];
+    const input = [track("A", "isrc-a"), track("A", "isrc-a"), track("B", "isrc-b")];
 
     const result = weightedShuffle(input, 2);
     expect(result).toHaveLength(2);
     expect(result.map((item) => item.track.uri)).toEqual(expect.arrayContaining(["A", "B"]));
   });
 
+  it("does not duplicate tracks with different URIs but the same ISRC", () => {
+    const result = weightedShuffle(
+      [track("first-uri", "shared-isrc"), track("second-uri", "shared-isrc")],
+      2,
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.track.external_ids.isrc).toBe("shared-isrc");
+  });
+
   it("returns the highest weighted keys first", () => {
     const randomValues = [0.1, 0.9, 0.5];
     const result = weightedShuffle(
-      [track("A"), track("B"), track("C")],
+      [track("A", "isrc-a"), track("B", "isrc-b"), track("C", "isrc-c")],
       3,
       () => randomValues.shift() ?? 0,
     );
@@ -70,8 +93,8 @@ describe("weightedShuffle", () => {
   it("biases index 0 towards heavily weighted items", () => {
     // 'A' has weight 8 (80%), 'B' has weight 2 (20%).
     const pool = [
-      ...Array.from({ length: 8 }, () => track("A")),
-      ...Array.from({ length: 2 }, () => track("B")),
+      ...Array.from({ length: 8 }, () => track("A", "isrc-a")),
+      ...Array.from({ length: 2 }, () => track("B", "isrc-b")),
     ];
     const iterations = 10_000;
     let aAtIndexZeroCount = 0;

@@ -6,8 +6,8 @@ type WeightedTrack = {
 };
 
 /**
- * Performs a weighted random shuffle returning up to `n` unique tracks. Tracks with the same URI
- * represent weights.
+ * Performs a weighted random shuffle returning up to `n` unique tracks. Tracks with the same ISRC
+ * represent weights. The ISRC is the same across multiple recordings.
  *
  * @param arr - Input array where duplicate values represent weight
  * @param n - Number of unique items to return
@@ -39,12 +39,12 @@ export function weightedShuffle(
 const buildFrequencyMap = (items: ActualPlaylistedTrack[]): Map<string, WeightedTrack> => {
   const weights = new Map<string, WeightedTrack>();
   for (const item of items) {
-    const uri = item.track.uri;
-    const entry = weights.get(uri);
+    const isrc = item.track.external_ids.isrc;
+    const entry = weights.get(isrc);
     if (entry) {
       entry.weight += 1;
     } else {
-      weights.set(uri, { item, weight: 1 });
+      weights.set(isrc, { item, weight: 1 });
     }
   }
   return weights;
