@@ -268,7 +268,7 @@ const Toolbar: Component<{
         </div>
       </div>
       <div class="flex flex-1 justify-center">
-        {/* TODO: Disable this button when the coundown audio is playing*/}
+        {/* TODO: Disable this button when the countdown audio is playing*/}
         <button
           disabled={props.disabled()}
           onClick={() => {
