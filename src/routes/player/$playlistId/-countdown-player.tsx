@@ -209,27 +209,29 @@ export const CountdownPlayer: Component = () => {
   const [showSpoilers, setShowSpoilers] = createSignal(false);
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <Toolbar
-        startCountdown={countdownHandler}
-        paused={paused}
-        view={view}
-        setView={setView}
-        showSpoilers={showSpoilers}
-        setShowSpoilers={setShowSpoilers}
-        disabled={disabled}
-        tracks={tracksQuery.data}
-      />
-      <div class="mt-8 flex min-h-0 flex-1 gap-2 overflow-hidden">
-        <div class="w-2/5 overflow-y-auto">
-          <Show when={view() === "list"}>
-            <ListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
-          </Show>
-          <Show when={view() === "compact-list"}>
-            <CompactListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
-          </Show>
-        </div>
-        <div class="flex-1 overflow-y-auto">
-          <StatsView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
+      <div class="flex min-h-0 flex-1 flex-col gap-4 p-4">
+        <Toolbar
+          startCountdown={countdownHandler}
+          paused={paused}
+          view={view}
+          setView={setView}
+          showSpoilers={showSpoilers}
+          setShowSpoilers={setShowSpoilers}
+          disabled={disabled}
+          tracks={tracksQuery.data}
+        />
+        <div class="flex min-h-0 flex-1 gap-2 overflow-hidden">
+          <div class="w-2/5 overflow-y-auto">
+            <Show when={view() === "list"}>
+              <ListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
+            </Show>
+            <Show when={view() === "compact-list"}>
+              <CompactListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
+            </Show>
+          </div>
+          <div class="flex-1 overflow-y-auto">
+            <StatsView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
+          </div>
         </div>
       </div>
     </Suspense>
@@ -239,8 +241,8 @@ export const CountdownPlayer: Component = () => {
 const Toolbar: Component<{
   startCountdown: () => void;
   paused: Accessor<boolean>;
-  view: Accessor<"list" | "compact-list" | "stats">;
-  setView: (v: "list" | "compact-list" | "stats") => void;
+  view: Accessor<"list" | "compact-list">;
+  setView: (v: "list" | "compact-list") => void;
   showSpoilers: Accessor<boolean>;
   setShowSpoilers: (v: boolean) => void;
   disabled: Accessor<boolean>;
@@ -248,7 +250,7 @@ const Toolbar: Component<{
 }> = (props) => {
   const [store] = useGlobalContext();
   return (
-    <div class="flex w-full flex-row items-center px-4 py-4">
+    <div class="flex w-full flex-row items-center">
       <div class="flex justify-start">
         <div class="flex flex-row divide-gray-600 overflow-hidden rounded-md border border-gray-600 bg-white">
           <button

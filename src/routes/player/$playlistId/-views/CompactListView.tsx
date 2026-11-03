@@ -11,7 +11,7 @@ export const CompactListView = (props: ViewProps) => {
   const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator());
 
   return (
-    <div class="p-8">
+    <div class="flex flex-col gap-4 px-8">
       <For each={props.tracks}>
         {(track, index) => (
           <Show when={currentIndex() !== undefined && currentIndex()! <= index() + 1}>

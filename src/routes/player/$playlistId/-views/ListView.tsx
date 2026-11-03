@@ -10,7 +10,7 @@ export const ListView = (props: ViewProps) => {
   const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
   const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator());
   return (
-    <div class="p-8">
+    <div class="flex flex-col gap-8">
       <For each={props.tracks}>
         {(track, index) => (
           <Show when={currentIndex !== undefined && currentIndex()! <= index() + 1}>
