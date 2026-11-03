@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayerRouteRouteImport } from './routes/player/route'
+import { Route as UnsupportedRouteImport } from './routes/unsupported'
 import { Route as PlayerIndexRouteImport } from './routes/player/index'
 import { Route as PlayerPlaylistIdRouteRouteImport } from './routes/player/$playlistId/route'
 
@@ -22,6 +23,11 @@ const IndexRoute = IndexRouteImport.update({
 const PlayerRouteRoute = PlayerRouteRouteImport.update({
   id: '/player',
   path: '/player',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsupportedRoute = UnsupportedRouteImport.update({
+  id: '/unsupported',
+  path: '/unsupported',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlayerIndexRoute = PlayerIndexRouteImport.update({
@@ -38,11 +44,13 @@ const PlayerPlaylistIdRouteRoute = PlayerPlaylistIdRouteRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/player': typeof PlayerRouteRouteWithChildren
+  '/unsupported': typeof UnsupportedRoute
   '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
   '/player/': typeof PlayerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/unsupported': typeof UnsupportedRoute
   '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
   '/player': typeof PlayerIndexRoute
 }
@@ -50,20 +58,29 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/player': typeof PlayerRouteRouteWithChildren
+  '/unsupported': typeof UnsupportedRoute
   '/player/$playlistId': typeof PlayerPlaylistIdRouteRoute
   '/player/': typeof PlayerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/player' | '/player/$playlistId' | '/player/'
+  fullPaths:
+    '/' | '/player' | '/unsupported' | '/player/$playlistId' | '/player/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/player/$playlistId' | '/player'
-  id: '__root__' | '/' | '/player' | '/player/$playlistId' | '/player/'
+  to: '/' | '/unsupported' | '/player/$playlistId' | '/player'
+  id:
+    | '__root__'
+    | '/'
+    | '/player'
+    | '/unsupported'
+    | '/player/$playlistId'
+    | '/player/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PlayerRouteRoute: typeof PlayerRouteRouteWithChildren
+  UnsupportedRoute: typeof UnsupportedRoute
 }
 
 declare module '@tanstack/solid-router' {
@@ -80,6 +97,13 @@ declare module '@tanstack/solid-router' {
       path: '/player'
       fullPath: '/player'
       preLoaderRoute: typeof PlayerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsupported': {
+      id: '/unsupported'
+      path: '/unsupported'
+      fullPath: '/unsupported'
+      preLoaderRoute: typeof UnsupportedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/player/': {
@@ -116,6 +140,7 @@ const PlayerRouteRouteWithChildren = PlayerRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PlayerRouteRoute: PlayerRouteRouteWithChildren,
+  UnsupportedRoute: UnsupportedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
