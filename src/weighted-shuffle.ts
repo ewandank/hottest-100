@@ -43,8 +43,12 @@ const buildFrequencyMap = (items: ActualPlaylistedTrack[]): Map<string, Weighted
     const entry = weights.get(isrc);
     if (entry) {
       entry.weight += 1;
+      entry.item.added_by.push(...item.added_by);
     } else {
-      weights.set(isrc, { item, weight: 1 });
+      weights.set(isrc, {
+        item: { ...item, added_by: [...item.added_by] },
+        weight: 1,
+      });
     }
   }
   return weights;

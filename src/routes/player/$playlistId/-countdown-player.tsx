@@ -141,7 +141,13 @@ export const CountdownPlayer: Component = () => {
           );
 
           const total = firstPage.total ?? firstPage.items.length;
-          const allItems: ActualPlaylistedTrack[] = [...firstPage.items];
+          const toActualTrack = (
+            item: (typeof firstPage.items)[number],
+          ): ActualPlaylistedTrack => ({
+            ...item,
+            added_by: item.added_by ? [item.added_by] : [],
+          });
+          const allItems: ActualPlaylistedTrack[] = firstPage.items.map(toActualTrack);
 
           if (total > firstPage.items.length) {
             // Calculate offsets for remaining pages
@@ -165,7 +171,7 @@ export const CountdownPlayer: Component = () => {
 
             // Collect results
             for (const page of pages) {
-              allItems.push(...page.items);
+              allItems.push(...page.items.map(toActualTrack));
             }
           }
           return weightedShuffle(allItems, 100);
