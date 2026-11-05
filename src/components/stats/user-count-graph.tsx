@@ -88,11 +88,13 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
     return counts().map(({ count }, index) => ({
       person: displayNames[index]?.data ?? "Unknown",
       count,
+      labelPosition: count / 2,
     }));
   });
 
   const chartDefinition = createMemo(() => {
     const rows = chartRows();
+    const labelRows = rows.filter(({ count }) => count > 0);
 
     return defineChart({
       svgAnimation: true,
@@ -104,15 +106,15 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
           radius: 8,
           fill: "var(--accent)",
         }),
-        text(rows, {
+        text(labelRows, {
           x: "person",
-          y: "count",
+          y: "labelPosition",
           text: "count",
-          dy: 14,
+          dy: 0,
           anchor: "middle",
           fontSize: 12,
           fontWeight: 600,
-          fill: "var(--accent-foreground)",
+          fill: "white",
         }),
       ],
       scales: {

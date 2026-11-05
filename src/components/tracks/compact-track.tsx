@@ -17,7 +17,7 @@ export const CompactTrackView: Component<{
   );
   return (
     <Suspense>
-      <div class="flex w-full flex-row items-center py-4">
+      <div class="flex w-full flex-row items-center">
         <h2 class="w-16 shrink-0 text-3xl font-bold">{props.idx}</h2>
 
         <div class="flex min-w-0 flex-col pl-4">

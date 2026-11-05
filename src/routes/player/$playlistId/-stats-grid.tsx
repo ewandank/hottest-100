@@ -27,7 +27,7 @@ export const StatsView = (props: ViewProps) => {
   };
 
   return (
-    <div class="grid h-fit grid-cols-6 gap-5 p-2">
+    <div class="grid h-fit grid-cols-6 gap-5">
       <UserCountGraph tracks={props.tracks} currentIndex={currentIndex} />
       <TopNArtists tracks={props.tracks} currentIndex={currentIndex} />
       <LongestSong tracks={props.tracks} currentIndex={currentIndex} />
