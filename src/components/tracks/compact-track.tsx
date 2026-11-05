@@ -1,4 +1,4 @@
-import { createQuery } from "@tanstack/solid-query";
+import { createQueries, createQuery } from "@tanstack/solid-query";
 import { Suspense, type Component } from "solid-js";
 
 import { spotifyAPIQueryOptions } from "~/query/spotify-api";
@@ -12,9 +12,11 @@ export const CompactTrackView: Component<{
 }> = (props) => {
   const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
 
-  const userName = createQuery(() =>
-    userDisplayNameQueryOptions(spotifyQuery.data, props.track.added_by.id),
-  );
+  const userNames = createQueries(() => ({
+    queries: props.track.added_by.map(({ id }) =>
+      userDisplayNameQueryOptions(spotifyQuery.data, id),
+    ),
+  }));
   return (
     <Suspense>
       <div class="flex w-full flex-row items-center">
@@ -25,7 +27,9 @@ export const CompactTrackView: Component<{
           <p class="wrap-break-word whitespace-normal">
             {props.track.track.artists.map((artist) => artist.name).join(",")}
           </p>
-          <p class="wrap-break-word whitespace-normal text-gray-500">{userName.data}</p>
+          <p class="wrap-break-word whitespace-normal text-gray-500">
+            {userNames.map((userName) => userName.data).join(", ")}
+          </p>
         </div>
       </div>
     </Suspense>

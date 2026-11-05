@@ -9,7 +9,8 @@ import type {
 /**
  * A type that actually lines up with the fields I am requesting, no more no less.
  */
-export interface ActualPlaylistedTrack extends Pick<PlaylistedTrack, "added_by"> {
+export interface ActualPlaylistedTrack {
+  added_by: NonNullable<PlaylistedTrack["added_by"]>[];
   track: ActualTrackItem;
 }
 

@@ -3,14 +3,16 @@ import { describe, it, expect } from "vitest";
 import type { ActualPlaylistedTrack } from "./types/spotify";
 import { weightedShuffle } from "./weighted-shuffle";
 
-const track = (uri: string, isrc: string): ActualPlaylistedTrack => ({
-  added_by: {
-    external_urls: { spotify: "" },
-    href: "",
-    id: "test-user",
-    type: "user",
-    uri: "spotify:user:test-user",
-  },
+const track = (uri: string, isrc: string, userId = "test-user"): ActualPlaylistedTrack => ({
+  added_by: [
+    {
+      external_urls: { spotify: "" },
+      href: "",
+      id: userId,
+      type: "user",
+      uri: `spotify:user:${userId}`,
+    },
+  ],
   track: {
     uri,
     duration_ms: 180_000,
@@ -65,6 +67,15 @@ describe("weightedShuffle", () => {
     const result = weightedShuffle(input, 2);
     expect(result).toHaveLength(2);
     expect(result.map((item) => item.track.uri)).toEqual(expect.arrayContaining(["A", "B"]));
+  });
+
+  it("preserves every contributor when grouping duplicate tracks", () => {
+    const result = weightedShuffle(
+      [track("A", "isrc-a", "user-a"), track("A", "isrc-a", "user-b")],
+      1,
+    );
+
+    expect(result[0]?.added_by.map(({ id }) => id)).toEqual(["user-a", "user-b"]);
   });
 
   it("does not duplicate tracks with different URIs but the same ISRC", () => {
