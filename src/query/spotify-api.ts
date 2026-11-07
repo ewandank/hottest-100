@@ -32,6 +32,7 @@ async function authenticate(): Promise<SpotifyApi | null> {
 
 export const spotifyAPIQueryOptions = queryOptions({
   queryKey: ["spotify-api"],
+  gcTime: Infinity,
   queryFn: async () => {
     const sdk = await authenticate();
     if (!sdk) {
