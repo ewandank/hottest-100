@@ -17,9 +17,19 @@ export function millisToMinutesAndSeconds(millis: number) {
   return `${minutes} Mins ${pad(seconds)} Secs `;
 }
 
-export function getFormattedDate(date = new Date()) {
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-  return `${year}-${month}-${day}`;
-}
+// Helper function to convert YYYY-MM-DD date to DD/MM/YYYY format
+export const formatDateForDisplay = (dateStr: string): string => {
+  if (!dateStr) {
+    return "";
+  }
+
+  // Check if the date is in the YYYY-MM-DD format
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    const [, year, month, day] = match;
+    return `${day}/${month}/${year}`;
+  }
+
+  // If it's only YYYY format or any other format, return as is
+  return dateStr;
+};

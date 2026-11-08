@@ -5,14 +5,13 @@ import { type Component, Show } from "solid-js";
 import { toast } from "solid-sonner";
 
 import type { ActualPlaylistedTrack } from "~/types/spotify";
-import { getFormattedDate } from "~/utils";
 
 import { createSpotifyApi } from "../-create-spotify";
 
 export const ExportButton: Component<{
   tracks: ActualPlaylistedTrack[] | undefined;
 }> = (props) => {
-  const playlistTitle = `${getFormattedDate()} Hottest 100 Results`;
+  const playlistTitle = `${formatFileSafeDate()} Hottest 100 Results`;
   const spotify = createSpotifyApi();
   const createPlaylistMutation = createMutation(() => ({
     mutationFn: async () => {
@@ -54,3 +53,11 @@ export const ExportButton: Component<{
     </button>
   );
 };
+
+// Format date in YYYY-MM-DD so that exports can be sorted by name.
+function formatFileSafeDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  return `${year}-${month}-${day}`;
+}
