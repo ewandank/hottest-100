@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/solid-router";
-import CircleAlertIcon from "lucide-solid/icons/circle-alert";
+import CircleExclamationPointAlertIcon from "lucide-solid/icons/circle-exclamation-point";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../components/Card";
 
@@ -12,7 +12,7 @@ function RouteComponent() {
     <div class="flex h-full w-full items-center justify-center">
       <Card class="items-center text-center">
         <CardHeader class="flex flex-row items-center justify-center">
-          <CircleAlertIcon class="size-10 pr-2" />
+          <CircleExclamationPointAlertIcon class="size-10 pr-2" />
           <CardTitle class="">Unsupported Browser</CardTitle>
         </CardHeader>
         <CardContent>
