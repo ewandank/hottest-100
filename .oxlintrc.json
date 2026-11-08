@@ -22,7 +22,8 @@
     "no-unassigned-import": "off",
     "typescript/no-deprecated": "error",
     "unicorn/no-array-reduce": "error",
-    "unicorn/no-array-for-each": "error"
+    "unicorn/no-array-for-each": "error",
+    "curly": "error"
   },
   "env": {
     "builtin": true

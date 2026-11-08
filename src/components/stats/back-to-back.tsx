@@ -9,7 +9,9 @@ export const BackToBack: Component<StatsComponentProps> = (props) => {
     const startIndex = props.currentIndex() || 0;
     const currentTracks = allTracks.slice(startIndex);
 
-    if (currentTracks.length < 2) return [];
+    if (currentTracks.length < 2) {
+      return [];
+    }
 
     const artistRuns: Array<{ artist: string; positions: number[] }> = [];
     let activeRun: { artist: string; positions: number[] } | null = null;

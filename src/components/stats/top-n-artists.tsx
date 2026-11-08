@@ -12,17 +12,23 @@ export const TopNArtists: Component<StatsComponentProps> = (props) => {
 
     const counts: Record<string, number> = {};
     for (const { name } of tracks.flatMap((track) => track.track.artists)) {
-      if (name) counts[name] = (counts[name] ?? 0) + 1;
+      if (name) {
+        counts[name] = (counts[name] ?? 0) + 1;
+      }
     }
 
     // 2. Convert to entries and sort descending
     const sorted = Object.entries(counts).toSorted(([, a], [, b]) => b - a);
 
     // 3. Handle TOP_N cutoff with ties
-    if (sorted.length <= TOP_N) return sorted;
+    if (sorted.length <= TOP_N) {
+      return sorted;
+    }
 
     const cutoffEntry = sorted[TOP_N - 1];
-    if (!cutoffEntry) return sorted;
+    if (!cutoffEntry) {
+      return sorted;
+    }
 
     const cutoffValue = cutoffEntry[1];
     // Find the last index that matches the cutoff value to include all ties

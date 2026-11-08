@@ -5,7 +5,9 @@ import type { StatsComponentProps } from "./types";
 
 // Helper function to convert YYYY-MM-DD date to DD/MM/YYYY format
 export const formatDate = (dateStr: string): string => {
-  if (!dateStr) return "";
+  if (!dateStr) {
+    return "";
+  }
 
   // Check if the date is in the YYYY-MM-DD format
   const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -21,10 +23,14 @@ export const formatDate = (dateStr: string): string => {
 export const NewestSong: Component<StatsComponentProps> = (props) => {
   const newestSong = () => {
     const tracks = props.tracks;
-    if (!tracks || tracks.length === 0) return undefined;
+    if (!tracks || tracks.length === 0) {
+      return undefined;
+    }
 
     const currentTracks = tracks.slice(props.currentIndex());
-    if (!currentTracks || currentTracks.length === 0) return undefined;
+    if (!currentTracks || currentTracks.length === 0) {
+      return undefined;
+    }
 
     // Sort the tracks by release date in descending order (newest first)
     return currentTracks.toSorted((a, b) => {

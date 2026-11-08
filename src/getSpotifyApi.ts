@@ -3,9 +3,18 @@ import {
   type SdkOptions,
   AuthorizationCodeWithPKCEStrategy,
 } from "@spotify/web-api-ts-sdk";
-import { queryOptions } from "@tanstack/solid-query";
 
-async function authenticate(): Promise<SpotifyApi | null> {
+let spotifyPromise: Promise<SpotifyApi | null> | undefined;
+
+export function getSpotifyApi() {
+  if (!spotifyPromise) {
+    spotifyPromise = createSpotifyApi();
+  }
+
+  return spotifyPromise;
+}
+
+async function createSpotifyApi(): Promise<SpotifyApi | null> {
   const redirectUrl = `${window.location.origin}/player`;
   const clientId = import.meta.env.VITE_CLIENT_ID;
   const scopes = [
@@ -24,20 +33,8 @@ async function authenticate(): Promise<SpotifyApi | null> {
     const sdk = new SpotifyApi(auth, config);
     const { authenticated } = await sdk.authenticate();
     return authenticated ? sdk : null;
-  } catch (e) {
-    console.error(e);
+  } catch (error) {
+    console.error(error);
     return null;
   }
 }
-
-export const spotifyAPIQueryOptions = queryOptions({
-  queryKey: ["spotify-api"],
-  queryFn: async () => {
-    const sdk = await authenticate();
-    if (!sdk) {
-      throw new Error("Failed to authenticate with Spotify.");
-    }
-
-    return sdk;
-  },
-});

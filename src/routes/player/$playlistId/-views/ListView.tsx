@@ -14,7 +14,7 @@ export const ListView = (props: ViewProps) => {
       <For each={props.tracks}>
         {(track, index) => (
           <Show when={currentIndex !== undefined && currentIndex()! <= index() + 1}>
-            <TrackView track={track} idx={index() + 1} />
+            <TrackView track={track} idx={index() + 1} showAlbumArt />
           </Show>
         )}
       </For>
