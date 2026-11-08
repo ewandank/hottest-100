@@ -31,7 +31,9 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
 
     for (const track of tracks) {
       for (const contributor of track.added_by) {
-        if (contributor.id) ids.add(contributor.id);
+        if (contributor.id) {
+          ids.add(contributor.id);
+        }
       }
     }
 
@@ -46,7 +48,9 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
     for (const track of tracks) {
       for (const contributor of track.added_by) {
         const id = contributor.id;
-        if (!id) continue;
+        if (!id) {
+          continue;
+        }
         countByPerson.set(id, (countByPerson.get(id) ?? 0) + 1);
       }
     }
@@ -63,14 +67,18 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
     for (const track of tracks) {
       for (const contributor of track.added_by) {
         const id = contributor.id;
-        if (!id) continue;
+        if (!id) {
+          continue;
+        }
         countByPerson.set(id, (countByPerson.get(id) ?? 0) + 1);
       }
     }
 
     const maxValue = Math.max(...countByPerson.values(), 0);
 
-    if (maxValue === 0) return 25;
+    if (maxValue === 0) {
+      return 25;
+    }
     return maxValue;
   });
 

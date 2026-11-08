@@ -7,10 +7,14 @@ import type { StatsComponentProps } from "./types";
 export const OldestSong: Component<StatsComponentProps> = (props) => {
   const oldestSong = () => {
     const tracks = props.tracks;
-    if (!tracks || tracks.length === 0) return undefined;
+    if (!tracks || tracks.length === 0) {
+      return undefined;
+    }
 
     const currentTracks = tracks.slice(props.currentIndex());
-    if (!currentTracks || currentTracks.length === 0) return undefined;
+    if (!currentTracks || currentTracks.length === 0) {
+      return undefined;
+    }
 
     // Sort the tracks by release date in ascending order (oldest first)
     return currentTracks.toSorted((a, b) => {

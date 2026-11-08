@@ -5,7 +5,9 @@ export function userDisplayNameQueryOptions(sdk: SpotifyApi | undefined, userId:
   return queryOptions({
     queryKey: ["spotify-user", userId],
     queryFn: async () => {
-      if (!sdk) return userId;
+      if (!sdk) {
+        return userId;
+      }
       const user = await sdk.users.profile(userId);
       return user?.display_name ?? userId;
     },

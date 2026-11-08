@@ -17,10 +17,14 @@ export const ExportButton: Component<{
   const createPlaylistMutation = createMutation(() => ({
     mutationFn: async () => {
       const tracks = props.tracks;
-      if (!tracks || tracks.length === 0) throw new Error("No tracks available to export.");
+      if (!tracks || tracks.length === 0) {
+        throw new Error("No tracks available to export.");
+      }
 
       const userId = (await spotify.currentUser.profile()).id;
-      if (!userId) throw new Error("Unable to determine current user ID.");
+      if (!userId) {
+        throw new Error("Unable to determine current user ID.");
+      }
 
       const createdPlaylist = await spotify.playlists.createPlaylist(userId, {
         name: playlistTitle,

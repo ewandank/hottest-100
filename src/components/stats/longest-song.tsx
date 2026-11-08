@@ -7,10 +7,14 @@ import type { StatsComponentProps } from "./types";
 export const LongestSong: Component<StatsComponentProps> = (props) => {
   const longestSong = () => {
     const tracks = props.tracks;
-    if (!tracks || tracks.length === 0) return undefined;
+    if (!tracks || tracks.length === 0) {
+      return undefined;
+    }
 
     const currentTracks = tracks.slice(props.currentIndex());
-    if (!currentTracks || currentTracks.length === 0) return undefined;
+    if (!currentTracks || currentTracks.length === 0) {
+      return undefined;
+    }
 
     // Sort the tracks by duration in descending order and take the first one
     return currentTracks.toSorted((a, b) => {
