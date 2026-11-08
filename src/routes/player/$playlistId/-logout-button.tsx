@@ -1,13 +1,13 @@
-import { createQuery } from "@tanstack/solid-query";
 import { useNavigate } from "@tanstack/solid-router";
 import LogOut from "lucide-solid/icons/log-out";
 
-import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { queryClient } from "~/queryClient";
+
+import { createSpotifyApi } from "../-create-spotify";
 
 export const LogoutButton = () => {
   const navigate = useNavigate();
-  const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
+  const spotify = createSpotifyApi();
   return (
     <button
       onClick={async () => {
@@ -15,7 +15,7 @@ export const LogoutButton = () => {
           return;
         }
 
-        spotifyQuery.data?.logOut();
+        spotify.logOut();
         queryClient.clear();
         await navigate({ to: "/" });
       }}

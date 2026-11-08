@@ -2,11 +2,11 @@ import { barY, defineChart, text } from "@tanstack/charts";
 import { scaleBand } from "@tanstack/charts/scales/band";
 import { scaleLinear } from "@tanstack/charts/scales/linear";
 import { Chart } from "@tanstack/charts/solid";
-import { createQueries, createQuery } from "@tanstack/solid-query";
+import { createQueries } from "@tanstack/solid-query";
 import { createMemo, Show, type Component } from "solid-js";
 
-import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
+import { createSpotifyApi } from "~/routes/player/-create-spotify";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../Card";
 import type { StatsComponentProps } from "./types";
@@ -74,9 +74,9 @@ const CountBarChart: Component<StatsComponentProps> = (props) => {
     return maxValue;
   });
 
-  const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
+  const spotify = createSpotifyApi();
   const displayNames = createQueries(() => ({
-    queries: counts().map(({ id }) => userDisplayNameQueryOptions(spotifyQuery.data, id)),
+    queries: counts().map(({ id }) => userDisplayNameQueryOptions(spotify, id)),
   }));
 
   const chartRows = createMemo(() => {

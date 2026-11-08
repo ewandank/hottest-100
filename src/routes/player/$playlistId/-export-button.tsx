@@ -1,31 +1,31 @@
-import { createMutation, createQuery } from "@tanstack/solid-query";
+import { createMutation } from "@tanstack/solid-query";
 import LoaderCircleIcon from "lucide-solid/icons/loader-circle";
 import ShareIcon from "lucide-solid/icons/share";
 import { type Component, Show } from "solid-js";
 import { toast } from "solid-sonner";
 
-import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
 import { getFormattedDate } from "~/utils";
+
+import { createSpotifyApi } from "../-create-spotify";
 
 export const ExportButton: Component<{
   tracks: ActualPlaylistedTrack[] | undefined;
 }> = (props) => {
   const playlistTitle = `${getFormattedDate()} Hottest 100 Results`;
-  const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
+  const spotify = createSpotifyApi();
   const createPlaylistMutation = createMutation(() => ({
     mutationFn: async () => {
       const tracks = props.tracks;
-      if (!spotifyQuery.data) throw new Error("Spotify client is not available.");
       if (!tracks || tracks.length === 0) throw new Error("No tracks available to export.");
 
-      const userId = (await spotifyQuery.data.currentUser.profile()).id;
+      const userId = (await spotify.currentUser.profile()).id;
       if (!userId) throw new Error("Unable to determine current user ID.");
 
-      const createdPlaylist = await spotifyQuery.data.playlists.createPlaylist(userId, {
+      const createdPlaylist = await spotify.playlists.createPlaylist(userId, {
         name: playlistTitle,
       });
-      await spotifyQuery.data.playlists.updatePlaylistItems(createdPlaylist.id, {
+      await spotify.playlists.updatePlaylistItems(createdPlaylist.id, {
         uris: tracks.map(({ track }) => track.uri),
       });
     },

@@ -20,12 +20,12 @@ import {
 import { LoadingSpinner } from "~/components/loading-spinner";
 import { useGlobalContext } from "~/context/context";
 import { hottestNumberQueryOptions } from "~/query/hottest-number";
-import { spotifyAPIQueryOptions } from "~/query/spotify-api";
 import { queryClient } from "~/queryClient";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
 import { playNumber } from "~/utils";
 import { weightedShuffle } from "~/weighted-shuffle";
 
+import { createSpotifyApi } from "../-create-spotify";
 import { ExportButton } from "./-export-button";
 import { LogoutButton } from "./-logout-button";
 import { StatsView } from "./-stats-grid";
@@ -43,10 +43,10 @@ export const CountdownPlayer: Component = () => {
   const playlistId = params().playlistId;
   const [store, setStore] = useGlobalContext();
   const [disabled, setDisabled] = createSignal(false);
-  const spotifyQuery = createQuery(() => spotifyAPIQueryOptions);
+  const sdk = createSpotifyApi();
   createEffect(() => {
     // Wait for authorization before injecting the SDK script
-    void spotifyQuery.data?.getAccessToken().then((token) => {
+    void sdk.getAccessToken().then((token) => {
       if (token && !document.getElementById("spotify-sdk")) {
         const script = document.createElement("script");
         script.id = "spotify-sdk";
@@ -66,15 +66,11 @@ export const CountdownPlayer: Component = () => {
   });
   createEffect(() => {
     void (async () => {
-      if (spotifyQuery.data === null) {
-        return;
-      }
-
       window.onSpotifyWebPlaybackSDKReady = () => {
         const internalPlayer = new window.Spotify.Player({
           name: "Hottest 100 Player",
           getOAuthToken: async (cb) => {
-            const token = await spotifyQuery.data?.getAccessToken();
+            const token = await sdk.getAccessToken();
             if (!token) {
               return;
             }
@@ -86,9 +82,9 @@ export const CountdownPlayer: Component = () => {
         void internalPlayer.connect();
         setPlayer(internalPlayer);
         internalPlayer.addListener("ready", async ({ device_id }) => {
-          await spotifyQuery.data?.player.transferPlayback([device_id]);
+          await sdk.player.transferPlayback([device_id]);
           try {
-            await spotifyQuery.data?.player.setRepeatMode("off", device_id);
+            await sdk.player.setRepeatMode("off", device_id);
           } catch (e) {
             if (e instanceof SyntaxError) {
               // This throws a syntax error as the api incorrectly assumes it returns JSON, however it just returns a string.
@@ -127,12 +123,12 @@ export const CountdownPlayer: Component = () => {
 
   const tracksQuery = createQuery(() => ({
     queryKey: ["shuffledTracks", playlistId],
-    queryFn: spotifyQuery.data
+    queryFn: sdk
       ? async () => {
           const fields =
             "items(added_by(id),track(name,album(images,release_date),artists(name),uri,duration_ms,explicit,external_ids(isrc))),total";
           // First call just to discover total number of tracks
-          const firstPage = await spotifyQuery.data.playlists.getPlaylistItems(
+          const firstPage = await sdk.playlists.getPlaylistItems(
             playlistId,
             undefined,
             fields,
@@ -159,7 +155,7 @@ export const CountdownPlayer: Component = () => {
             // Kick off all requests in parallel
             const pages = await Promise.all(
               offsets.map((offset) =>
-                spotifyQuery.data.playlists.getPlaylistItems(
+                sdk.playlists.getPlaylistItems(
                   playlistId,
                   undefined,
                   fields,
@@ -202,7 +198,7 @@ export const CountdownPlayer: Component = () => {
 
     // play the actual track, the device id will default to the active device (the current device), and an empty string keeps the types happy
     // TODO: try with retries? this returned 502 once
-    await spotifyQuery.data?.player.startResumePlayback("", undefined, [
+    await sdk.player.startResumePlayback("", undefined, [
       tracksQuery.data.at(currentIterator - 1)?.track.uri ?? "",
     ]);
     const nextIterator = currentIterator - 1;
