@@ -1,13 +1,14 @@
-import { For, type Component } from "solid-js";
+import { createMemo, For, type Component } from "solid-js";
 
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/Card";
+
 import type { StatsComponentProps } from "./types";
 
 export const SongsByYear: Component<StatsComponentProps> = (props) => {
-  const years = () => {
+  const years = createMemo(() => {
     const internalCounts: Record<string, number> = {};
     for (const track of props.tracks?.slice(props.currentIndex()) ?? []) {
-      const year = track.track.album.release_date.slice(0, 4) ?? undefined;
+      const year = track.track.album.release_date.slice(0, 4);
       internalCounts[year] = (internalCounts[year] || 0) + 1;
     }
     const sortedCounts = Object.entries(internalCounts).toSorted((a, b) => {
@@ -21,7 +22,7 @@ export const SongsByYear: Component<StatsComponentProps> = (props) => {
       return parseInt(b[0]) - parseInt(a[0]);
     });
     return sortedCounts;
-  };
+  });
   return (
     <Card class="col-span-2">
       <CardHeader>

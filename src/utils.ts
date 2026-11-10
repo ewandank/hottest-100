@@ -23,3 +23,16 @@ export function getFormattedDate(date = new Date()) {
   const day = pad(date.getDate());
   return `${year}-${month}-${day}`;
 }
+
+export const formatDateForDisplay = (date: string) => {
+  const [year, month, day] = date.split("-").map(Number);
+
+  if (!year) {
+    return "";
+  }
+  return new Intl.DateTimeFormat("en-GB", {
+    ...(month && { month: "2-digit" }),
+    ...(day && { day: "2-digit" }),
+    year: "numeric",
+  }).format(new Date(year, (month || 1) - 1, day || 1));
+};

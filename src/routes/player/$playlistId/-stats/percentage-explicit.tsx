@@ -1,16 +1,17 @@
-import type { Component } from "solid-js";
+import { createMemo, type Component } from "solid-js";
 
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../Card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "~/components/Card";
+
 import type { StatsComponentProps } from "./types";
 
 export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
-  const percentage = () => {
+  const percentage = createMemo(() => {
     const tracks = props.tracks;
     if (!tracks || tracks.length === 0) {
       return undefined;
     }
     const currentTracks = tracks.slice(props.currentIndex());
-    if (!currentTracks || currentTracks.length === 0) {
+    if (currentTracks.length === 0) {
       return undefined;
     }
 
@@ -19,24 +20,24 @@ export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
       numExplicit += +track.track.explicit;
     }
     return (numExplicit / currentTracks.length) * 100;
-  };
+  });
 
   return (
-    <Card class="col-span-2 flex flex-col justify-between">
+    <Card class="col-span-2 flex flex-col">
       <CardHeader>
         <CardTitle>% of F**ks given</CardTitle>
       </CardHeader>
-      <CardContent class="flex h-20 flex-col items-center justify-center p-0">
+      <CardContent class="flex flex-1">
         {percentage() !== undefined ? (
-          <p class="text-6xl font-extrabold">{percentage()?.toFixed(2)}%</p>
+          <div class="flex size-full items-center justify-center text-7xl font-extrabold">
+            {percentage()?.toFixed(2)}%
+          </div>
         ) : (
-          <p class="text-base font-normal">No songs available</p>
+          "No songs available"
         )}
       </CardContent>
-      <CardFooter>
-        <p class="text-xs opacity-80">
-          Percentage of songs flagged by Spotify as <i>Explicit</i>.
-        </p>
+      <CardFooter class="text-xs opacity-80">
+        Percentage of songs flagged by Spotify as <i>Explicit</i>.
       </CardFooter>
     </Card>
   );

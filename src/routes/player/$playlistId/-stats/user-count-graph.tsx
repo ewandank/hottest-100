@@ -5,10 +5,10 @@ import { Chart } from "@tanstack/charts/solid";
 import { createQueries } from "@tanstack/solid-query";
 import { createMemo, Show, type Component } from "solid-js";
 
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/Card";
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
 import { createSpotifyApi } from "~/routes/player/-create-spotify";
 
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
 import type { StatsComponentProps } from "./types";
 
 export const UserCountGraph: Component<StatsComponentProps> = (props) => {

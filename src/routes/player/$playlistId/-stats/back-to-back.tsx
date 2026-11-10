@@ -1,10 +1,11 @@
-import { For, type Component } from "solid-js";
+import { createMemo, For, type Component } from "solid-js";
 
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/Card";
+
 import type { StatsComponentProps } from "./types";
 
 export const BackToBack: Component<StatsComponentProps> = (props) => {
-  const runs = () => {
+  const runs = createMemo(() => {
     const allTracks = props.tracks || [];
     const startIndex = props.currentIndex() || 0;
     const currentTracks = allTracks.slice(startIndex);
@@ -44,7 +45,7 @@ export const BackToBack: Component<StatsComponentProps> = (props) => {
     }
 
     return artistRuns.toSorted((a, b) => b.positions.length - a.positions.length);
-  };
+  });
   return (
     <Card class="col-span-2">
       <CardHeader>
