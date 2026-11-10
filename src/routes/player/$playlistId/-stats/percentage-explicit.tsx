@@ -1,17 +1,17 @@
-import type { Component } from "solid-js";
+import { createMemo, type Component } from "solid-js";
 
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "~/components/Card";
 
 import type { StatsComponentProps } from "./types";
 
 export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
-  const percentage = () => {
+  const percentage = createMemo(() => {
     const tracks = props.tracks;
     if (!tracks || tracks.length === 0) {
       return undefined;
     }
     const currentTracks = tracks.slice(props.currentIndex());
-    if (!currentTracks || currentTracks.length === 0) {
+    if (currentTracks.length === 0) {
       return undefined;
     }
 
@@ -20,7 +20,7 @@ export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
       numExplicit += +track.track.explicit;
     }
     return (numExplicit / currentTracks.length) * 100;
-  };
+  });
 
   return (
     <Card class="col-span-2 flex flex-col">

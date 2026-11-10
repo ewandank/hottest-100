@@ -11,7 +11,10 @@ export const ListView = (props: ListProps) => {
   const delayedIterator = createDelayedSignal(() => store.iterator, 30_000);
   const currentIndex = () => (props.showSpoilers() ? 0 : delayedIterator());
   return (
-    <div class="flex flex-col gap-4">
+    <div
+      class="flex flex-col"
+      classList={{ "gap-8": props.showAlbumArt, "gap-4": !props.showAlbumArt }}
+    >
       <For each={props.tracks}>
         {(track, index) => (
           <Show when={currentIndex !== undefined && currentIndex()! <= index() + 1}>

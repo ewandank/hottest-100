@@ -1,4 +1,4 @@
-import type { Component } from "solid-js";
+import { createMemo, type Component } from "solid-js";
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/Card";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
@@ -13,13 +13,13 @@ type ExtremeSongProps = StatsComponentProps & {
 };
 
 export const ExtremeSong: Component<ExtremeSongProps> = (props) => {
-  const song = () => {
+  const song = createMemo(() => {
     const tracks = props.tracks?.slice(props.currentIndex()) ?? [];
 
     return tracks.toSorted((a, b) =>
       props.order === "asc" ? props.sortFn(a, b) : props.sortFn(b, a),
     )[0];
-  };
+  });
 
   return (
     <Card class="col-span-3 h-44">
