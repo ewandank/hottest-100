@@ -7,15 +7,7 @@ import List from "lucide-solid/icons/list";
 import Pause from "lucide-solid/icons/pause";
 import Play from "lucide-solid/icons/play";
 import TrashIcon from "lucide-solid/icons/trash";
-import {
-  createSignal,
-  type Component,
-  Show,
-  type Accessor,
-  onCleanup,
-  onMount,
-  Suspense,
-} from "solid-js";
+import { createSignal, type Component, Show, type Accessor, onMount, Suspense } from "solid-js";
 
 import { LoadingSpinner } from "~/components/loading-spinner";
 import { useGlobalContext } from "~/context/context";
