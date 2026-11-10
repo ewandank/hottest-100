@@ -29,17 +29,15 @@ export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
       </CardHeader>
       <CardContent class="flex flex-1">
         {percentage() !== undefined ? (
-          <div class="flex size-full items-center justify-center">
-            <p class="text-7xl font-extrabold">{percentage()?.toFixed(2)}%</p>
+          <div class="flex size-full items-center justify-center text-7xl font-extrabold">
+            {percentage()?.toFixed(2)}%
           </div>
         ) : (
-          <p>No songs available</p>
+          "No songs available"
         )}
       </CardContent>
-      <CardFooter class="">
-        <p class="text-xs opacity-80">
-          Percentage of songs flagged by Spotify as <i>Explicit</i>.
-        </p>
+      <CardFooter class="text-xs opacity-80">
+        Percentage of songs flagged by Spotify as <i>Explicit</i>.
       </CardFooter>
     </Card>
   );
