@@ -8,12 +8,12 @@ import Pause from "lucide-solid/icons/pause";
 import Play from "lucide-solid/icons/play";
 import TrashIcon from "lucide-solid/icons/trash";
 import {
-  createEffect,
   createSignal,
   type Component,
   Show,
   type Accessor,
   onCleanup,
+  onMount,
   Suspense,
 } from "solid-js";
 
@@ -43,60 +43,36 @@ export const CountdownPlayer: Component = () => {
   const [store, setStore] = useGlobalContext();
   const [disabled, setDisabled] = createSignal(false);
   const sdk = createSpotifyApi();
-  createEffect(() => {
-    // Wait for authorization before injecting the SDK script
-    void sdk.getAccessToken().then((token) => {
-      if (token && !document.getElementById("spotify-sdk")) {
-        const script = document.createElement("script");
-        script.id = "spotify-sdk";
-        script.src = "https://sdk.scdn.co/spotify-player.js";
-        script.async = true;
-        document.body.appendChild(script);
-      }
-      return;
+  const initializePlayer = () => {
+    const internalPlayer = new window.Spotify.Player({
+      name: "Hottest 100 Player",
+      getOAuthToken: async (cb) => {
+        const token = await sdk.getAccessToken();
+        if (!token) {
+          return;
+        }
+        cb(token.access_token);
+      },
+      // just go full volume, use your systems volume if you want that.
+      volume: 1,
     });
-  });
-
-  onCleanup(() => {
-    player()?.disconnect();
-    // This helps when this component gets hmr-ed.
-    const script = document.getElementById("spotify-sdk");
-    script?.remove();
-  });
-  createEffect(() => {
-    void (async () => {
-      window.onSpotifyWebPlaybackSDKReady = () => {
-        const internalPlayer = new window.Spotify.Player({
-          name: "Hottest 100 Player",
-          getOAuthToken: async (cb) => {
-            const token = await sdk.getAccessToken();
-            if (!token) {
-              return;
-            }
-            cb(token.access_token);
-          },
-          // just go full volume, use your systems volume if you want that.
-          volume: 1,
-        });
-        void internalPlayer.connect();
-        setPlayer(internalPlayer);
-        internalPlayer.addListener("ready", async ({ device_id }) => {
-          await sdk.player.transferPlayback([device_id]);
-          try {
-            await sdk.player.setRepeatMode("off", device_id);
-          } catch (e) {
-            if (e instanceof SyntaxError) {
-              // This throws a syntax error as the api incorrectly assumes it returns JSON, however it just returns a string.
-              return;
-            }
-            throw e;
-          }
-        });
-        internalPlayer.addListener("player_state_changed", handlePlayerStateChange);
-        internalPlayer.addListener("player_state_changed", handlePauseState);
-      };
-    })();
-  });
+    void internalPlayer.connect();
+    setPlayer(internalPlayer);
+    internalPlayer.addListener("ready", async ({ device_id }) => {
+      await sdk.player.transferPlayback([device_id]);
+      try {
+        await sdk.player.setRepeatMode("off", device_id);
+      } catch (e) {
+        if (e instanceof SyntaxError) {
+          // This throws a syntax error as the api incorrectly assumes it returns JSON, however it just returns a string.
+          return;
+        }
+        throw e;
+      }
+    });
+    internalPlayer.addListener("player_state_changed", handlePlayerStateChange);
+    internalPlayer.addListener("player_state_changed", handlePauseState);
+  };
   const [paused, setPaused] = createSignal(true);
   const handlePauseState = (state: Spotify.PlaybackState) => setPaused(state?.paused ?? false);
   let countdownLock = false;
@@ -206,6 +182,14 @@ export const CountdownPlayer: Component = () => {
     }
     void queryClient.query(hottestNumberQueryOptions(nextIterator));
   };
+
+  onMount(() => {
+    if (window.Spotify) {
+      initializePlayer();
+    } else {
+      window.onSpotifyWebPlaybackSDKReady = initializePlayer;
+    }
+  });
 
   const [showSpoilers, setShowSpoilers] = createSignal(false);
   return (
