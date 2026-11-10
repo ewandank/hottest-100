@@ -1,6 +1,6 @@
 import { type Accessor } from "solid-js";
 
-import type { ActualPlaylistedTrack } from "../../types/spotify";
+import type { ActualPlaylistedTrack } from "~/types/spotify";
 
 export type StatsComponentProps = {
   tracks: ActualPlaylistedTrack[] | undefined;

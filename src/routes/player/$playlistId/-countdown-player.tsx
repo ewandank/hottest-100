@@ -26,11 +26,10 @@ import { playNumber } from "~/utils";
 import { weightedShuffle } from "~/weighted-shuffle";
 
 import { createSpotifyApi } from "../-create-spotify";
-import { ExportButton } from "./-export-button";
-import { LogoutButton } from "./-logout-button";
+import { ListView } from "./-list-view";
 import { StatsView } from "./-stats-grid";
-import { CompactListView } from "./-views/CompactListView";
-import { ListView } from "./-views/ListView";
+import { ExportButton } from "./-toolbar/-export-button";
+import { LogoutButton } from "./-toolbar/-logout-button";
 
 const route = getRouteApi("/player/$playlistId");
 
@@ -224,12 +223,11 @@ export const CountdownPlayer: Component = () => {
         />
         <div class="flex min-h-0 flex-1 gap-2 overflow-hidden">
           <div class="w-2/5 overflow-y-auto">
-            <Show when={view() === "list"}>
-              <ListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
-            </Show>
-            <Show when={view() === "compact-list"}>
-              <CompactListView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
-            </Show>
+            <ListView
+              tracks={tracksQuery.data}
+              showSpoilers={showSpoilers}
+              showAlbumArt={view() === "list"}
+            />
           </div>
           <div class="flex-1 overflow-y-auto">
             <StatsView tracks={tracksQuery.data} showSpoilers={showSpoilers} />
