@@ -1,6 +1,7 @@
 import { For, type Component } from "solid-js";
 
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/Card";
+
 import type { StatsComponentProps } from "./types";
 
 export const BackToBack: Component<StatsComponentProps> = (props) => {

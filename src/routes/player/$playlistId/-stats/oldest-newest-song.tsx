@@ -1,6 +1,7 @@
 import { type Component } from "solid-js";
 
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/Card";
+
 import type { StatsComponentProps } from "./types";
 
 // Helper function to convert YYYY-MM-DD date to DD/MM/YYYY format
@@ -20,7 +21,9 @@ export const formatDate = (dateStr: string): string => {
   return dateStr;
 };
 
-export const NewestSong: Component<StatsComponentProps> = (props) => {
+type OldestNewestProps = { order: "ascending" | "descending" } & StatsComponentProps;
+
+export const OldestNewestSong: Component<OldestNewestProps> = (props) => {
   const newestSong = () => {
     const tracks = props.tracks;
     if (!tracks || tracks.length === 0) {
@@ -37,14 +40,14 @@ export const NewestSong: Component<StatsComponentProps> = (props) => {
       const dateA = a.track.album.release_date || "";
       const dateB = b.track.album.release_date || "";
       // Compare dates in string form since they're in YYYY-MM-DD format
-      return dateB.localeCompare(dateA);
+      return props.order === "ascending" ? dateB.localeCompare(dateA) : dateA.localeCompare(dateB);
     })[0];
   };
 
   return (
     <Card class="col-span-3 h-44">
       <CardHeader>
-        <CardTitle>Newest Song</CardTitle>
+        <CardTitle>{props.order === "ascending" ? "Newest" : "Oldest"} Song</CardTitle>
       </CardHeader>
       <CardContent>
         {newestSong() !== undefined ? (

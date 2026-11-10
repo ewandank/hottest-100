@@ -1,7 +1,8 @@
 import { type Component } from "solid-js";
 
-import { millisToMinutesAndSeconds } from "../../utils";
-import { Card, CardContent, CardHeader, CardTitle } from "../Card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/Card";
+import { millisToMinutesAndSeconds } from "~/utils";
+
 import type { StatsComponentProps } from "./types";
 
 export const LongestSong: Component<StatsComponentProps> = (props) => {

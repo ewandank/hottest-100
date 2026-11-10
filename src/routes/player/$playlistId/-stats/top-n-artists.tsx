@@ -1,6 +1,7 @@
 import { For, type Component, createMemo } from "solid-js";
 
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../Card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "~/components/Card";
+
 import type { StatsComponentProps } from "./types";
 
 export const TopNArtists: Component<StatsComponentProps> = (props) => {

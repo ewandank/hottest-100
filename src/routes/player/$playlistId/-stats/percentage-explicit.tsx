@@ -1,6 +1,7 @@
 import type { Component } from "solid-js";
 
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../Card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "~/components/Card";
+
 import type { StatsComponentProps } from "./types";
 
 export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
@@ -22,18 +23,20 @@ export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
   };
 
   return (
-    <Card class="col-span-2 flex flex-col justify-between">
+    <Card class="col-span-2 flex flex-col">
       <CardHeader>
         <CardTitle>% of F**ks given</CardTitle>
       </CardHeader>
-      <CardContent class="flex h-20 flex-col items-center justify-center p-0">
+      <CardContent class="flex flex-1">
         {percentage() !== undefined ? (
-          <p class="text-6xl font-extrabold">{percentage()?.toFixed(2)}%</p>
+          <div class="flex size-full items-center justify-center">
+            <p class="text-7xl font-extrabold">{percentage()?.toFixed(2)}%</p>
+          </div>
         ) : (
-          <p class="text-base font-normal">No songs available</p>
+          <p>No songs available</p>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter class="">
         <p class="text-xs opacity-80">
           Percentage of songs flagged by Spotify as <i>Explicit</i>.
         </p>

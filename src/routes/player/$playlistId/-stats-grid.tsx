@@ -1,16 +1,15 @@
-import { PercentageExplicit } from "~/components/stats/percentage-explicit";
+import { useGlobalContext } from "~/context/context";
 
-import { BackToBack } from "../../../components/stats/back-to-back";
-import { LongestSong } from "../../../components/stats/longest-song";
-import { NewestSong } from "../../../components/stats/newest-song";
-import { OldestSong } from "../../../components/stats/oldest-song";
-import { ShortestSong } from "../../../components/stats/shortest-song";
-import { SongsByYear } from "../../../components/stats/songs-by-year";
-import { TopNArtists } from "../../../components/stats/top-n-artists";
-import { UserCountGraph } from "../../../components/stats/user-count-graph";
-import { useGlobalContext } from "../../../context/context";
 import { createDelayedSignal } from "../../../signals/createDelayedSignal";
 import { type ViewProps } from "./-countdown-player";
+import { BackToBack } from "./-stats/back-to-back";
+import { LongestSong } from "./-stats/longest-song";
+import { OldestNewestSong } from "./-stats/oldest-newest-song";
+import { PercentageExplicit } from "./-stats/percentage-explicit";
+import { ShortestSong } from "./-stats/shortest-song";
+import { SongsByYear } from "./-stats/songs-by-year";
+import { TopNArtists } from "./-stats/top-n-artists";
+import { UserCountGraph } from "./-stats/user-count-graph";
 
 export const StatsView = (props: ViewProps) => {
   const [store] = useGlobalContext();
@@ -35,8 +34,8 @@ export const StatsView = (props: ViewProps) => {
       <SongsByYear tracks={props.tracks} currentIndex={currentIndex} />
       <BackToBack tracks={props.tracks} currentIndex={currentIndex} />
       <PercentageExplicit tracks={props.tracks} currentIndex={currentIndex} />
-      <NewestSong tracks={props.tracks} currentIndex={currentIndex} />
-      <OldestSong tracks={props.tracks} currentIndex={currentIndex} />
+      <OldestNewestSong tracks={props.tracks} currentIndex={currentIndex} order="descending" />
+      <OldestNewestSong tracks={props.tracks} currentIndex={currentIndex} order="ascending" />
     </div>
   );
 };

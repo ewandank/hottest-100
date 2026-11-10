@@ -14,6 +14,9 @@ export const LogoutButton = () => {
         if (!window.confirm("Are you sure you want to log out?")) {
           return;
         }
+        if (!window.confirm("Are you really sure? This will destroy your current countdown!")) {
+          return;
+        }
 
         spotify.logOut();
         queryClient.clear();
