@@ -37,7 +37,9 @@ export const PercentageExplicit: Component<StatsComponentProps> = (props) => {
         )}
       </CardContent>
       <CardFooter class="text-xs opacity-80">
-        Percentage of songs flagged by Spotify as <i>Explicit</i>.
+        <p>
+          Percentage of songs flagged by Spotify as <i>Explicit</i>.
+        </p>
       </CardFooter>
     </Card>
   );
