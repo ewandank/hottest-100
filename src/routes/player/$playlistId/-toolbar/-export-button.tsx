@@ -4,10 +4,9 @@ import ShareIcon from "lucide-solid/icons/share";
 import { type Component, Show } from "solid-js";
 import { toast } from "solid-sonner";
 
+import { createSpotifyApi } from "~/routes/player/-create-spotify";
 import type { ActualPlaylistedTrack } from "~/types/spotify";
 import { getFormattedDate } from "~/utils";
-
-import { createSpotifyApi } from "../-create-spotify";
 
 export const ExportButton: Component<{
   tracks: ActualPlaylistedTrack[] | undefined;

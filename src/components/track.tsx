@@ -1,5 +1,5 @@
 import { createQueries } from "@tanstack/solid-query";
-import { Suspense, type Component, Show } from "solid-js";
+import { Suspense, type Component } from "solid-js";
 
 import { userDisplayNameQueryOptions } from "~/query/spotify-display-name";
 import { createSpotifyApi } from "~/routes/player/-create-spotify";
