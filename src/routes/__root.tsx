@@ -1,4 +1,4 @@
-import { Outlet, createRootRouteWithContext } from "@tanstack/solid-router";
+import { HeadContent, Outlet, createRootRouteWithContext } from "@tanstack/solid-router";
 import { Toaster } from "solid-sonner";
 
 export const Route = createRootRouteWithContext()({
@@ -7,11 +7,14 @@ export const Route = createRootRouteWithContext()({
 
 function RootComponent() {
   return (
-    <div class="bg-jjj-gradient flex h-screen flex-col overflow-hidden">
-      <div class="mx-auto flex min-h-0 w-4/5 flex-1 flex-col">
-        <Outlet />
+    <>
+      <HeadContent />
+      <div class="bg-jjj-gradient flex h-screen flex-col overflow-hidden">
+        <div class="mx-auto flex min-h-0 w-4/5 flex-1 flex-col">
+          <Outlet />
+        </div>
+        <Toaster visibleToasts={1} />
       </div>
-      <Toaster visibleToasts={1} />
-    </div>
+    </>
   );
 }

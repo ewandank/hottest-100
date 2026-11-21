@@ -17,6 +17,13 @@ export default defineConfig({
   server: {
     // Spotify api no longer allows localhost for some reason.
     host: "127.0.0.1",
+    port: 5173,
+    strictPort: true,
+  },
+  preview: {
+    host: "127.0.0.1",
+    port: 5173,
+    strictPort: true,
   },
   test: {
     environment: "node",
